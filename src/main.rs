@@ -50,7 +50,7 @@ async fn main() -> anyhow::Result<()> {
     };
     
     // Create router
-    let docs_path = args.docs_dir.display().to_string();
+    let docs_path = args.docs_dir.display().to_string().replace('\\', "/");
     let app = server::create_router(doc_tree, docs_path);
     
     // Start server
