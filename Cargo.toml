@@ -1,6 +1,6 @@
 [package]
 name = "litho-book"
-version = "0.2.3"
+version = "0.1.5"
 edition = "2024"
 
 [dependencies]
