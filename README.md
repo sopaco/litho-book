@@ -140,28 +140,28 @@ flowchart TB
         B[Config Validation]
         C[Service Startup]
     end
-    
+
     subgraph "Web Server Layer"
         D[Axum Routing]
         E[Static File Service]
         F[API Endpoints]
         G[Middleware]
     end
-    
+
     subgraph "Frontend Layer"
         H[Directory Tree Component]
         I[Markdown Rendering]
         J[Mermaid Charts]
         K[Search Functionality]
     end
-    
+
     subgraph "Data Layer"
         L[File System]
         M[Directory Scanning]
         N[File Reading]
         O[Tree Structure Building]
     end
-    
+
     A --> D
     B --> D
     C --> D
@@ -193,7 +193,7 @@ litho-book/
 │   ├── server.rs            # Web server and routing configuration
 │   └── error.rs             # Error handling and type definitions
 ├── templates/
-│   └── index.html           # Main page template (Askama)
+│   └── index.html.tpl           # Main page template (Askama)
 ├── static/                  # Static resource files
 │   ├── css/                 # Style files
 │   ├── js/                  # JavaScript files
@@ -356,6 +356,6 @@ We welcome all forms of contributions! Report bugs or submit feature requests th
 
 <p align="center">
   <strong>🚀 Explore More Excellent Open Source Projects</strong><br>
-  <a href="https://github.com/sopaco/deepwiki-rs">Litho (deepwiki-rs)</a> • 
+  <a href="https://github.com/sopaco/deepwiki-rs">Litho (deepwiki-rs)</a> •
   <a href="https://github.com/sopaco/saga-reader">Saga Reader</a>
 </p>

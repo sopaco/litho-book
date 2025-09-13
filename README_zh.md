@@ -140,28 +140,28 @@ flowchart TB
         B[配置验证]
         C[服务启动]
     end
-    
+
     subgraph "Web Server Layer"
         D[Axum路由]
         E[静态文件服务]
         F[API接口]
         G[中间件]
     end
-    
+
     subgraph "Frontend Layer"
         H[目录树组件]
         I[Markdown渲染]
         J[Mermaid图表]
         K[搜索功能]
     end
-    
+
     subgraph "Data Layer"
         L[文件系统]
         M[目录扫描]
         N[文件读取]
         O[树结构构建]
     end
-    
+
     A --> D
     B --> D
     C --> D
@@ -193,7 +193,7 @@ litho-book/
 │   ├── server.rs            # Web服务器和路由配置
 │   └── error.rs             # 错误处理和类型定义
 ├── templates/
-│   └── index.html           # 主页面模板 (Askama)
+│   └── index.html.tpl           # 主页面模板 (Askama)
 ├── static/                  # 静态资源文件
 │   ├── css/                 # 样式文件
 │   ├── js/                  # JavaScript文件
@@ -356,6 +356,6 @@ cargo run -- -d ./docs --verbose
 
 <p align="center">
   <strong>🚀 探索更多优秀的开源项目</strong><br>
-  <a href="https://github.com/sopaco/deepwiki-rs">Litho (deepwiki-rs)</a> • 
+  <a href="https://github.com/sopaco/deepwiki-rs">Litho (deepwiki-rs)</a> •
   <a href="https://github.com/sopaco/saga-reader">Saga Reader</a>
 </p>
