@@ -1,0 +1,1878 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Litho Book</title>
+        <!-- 引入字体 -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Source+Han+Sans+SC:wght@300;400;500;600;700&family=PingFang+SC:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <style>
+            :root {
+                /* 白月光主题 */
+                --bg-primary: #ffffff;
+                --bg-secondary: #f8f9fa;
+                --bg-tertiary: #e9ecef;
+                --text-primary: #333333;
+                --text-secondary: #6c757d;
+                --text-tertiary: #495057;
+                --border-color: #e9ecef;
+                --accent-color: #007bff;
+                --accent-hover: #0056b3;
+                --header-bg: #2c3e50;
+                --header-text: #ffffff;
+                --sidebar-bg: #f8f9fa;
+                --code-bg: #f1f3f4;
+                --code-text: #e83e8c;
+                --pre-bg: #f8f9fa;
+                --table-stripe: #f8f9fa;
+                --blockquote-bg: #f8f9fa;
+                --shadow: rgba(0, 0, 0, 0.1);
+
+                /* 字体设置 */
+                --font-family:
+                    "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                    Roboto, "Helvetica Neue", Arial, sans-serif;
+                --font-size-base: 16px;
+                --font-size-scale: 1;
+            }
+
+            /* 暮光黑主题 */
+            [data-theme="dark"] {
+                --bg-primary: #1a1a1a;
+                --bg-secondary: #2d2d2d;
+                --bg-tertiary: #404040;
+                --text-primary: #e0e0e0;
+                --text-secondary: #b0b0b0;
+                --text-tertiary: #d0d0d0;
+                --border-color: #404040;
+                --accent-color: #4a9eff;
+                --accent-hover: #357abd;
+                --header-bg: #1e1e1e;
+                --header-text: #ffffff;
+                --sidebar-bg: #2d2d2d;
+                --code-bg: #3a3a3a;
+                --code-text: #ff6b9d;
+                --pre-bg: #2d2d2d;
+                --table-stripe: #2d2d2d;
+                --blockquote-bg: #2d2d2d;
+                --shadow: rgba(0, 0, 0, 0.3);
+            }
+
+            /* 莫兰迪色主题 */
+            [data-theme="morandi"] {
+                --bg-primary: oklch(0.99 0.0057 84.57);
+                --bg-secondary: oklch(0.95 0.008 84.57);
+                --bg-tertiary: oklch(0.9 0.012 84.57);
+                --text-primary: oklch(0.25 0.02 84.57);
+                --text-secondary: oklch(0.45 0.015 84.57);
+                --text-tertiary: oklch(0.35 0.018 84.57);
+                --border-color: oklch(0.85 0.01 84.57);
+                --accent-color: oklch(0.55 0.08 84.57);
+                --accent-hover: oklch(0.45 0.1 84.57);
+                --header-bg: oklch(0.3 0.025 84.57);
+                --header-text: oklch(0.95 0.005 84.57);
+                --sidebar-bg: oklch(0.95 0.008 84.57);
+                --code-bg: oklch(0.92 0.01 84.57);
+                --code-text: oklch(0.45 0.06 320);
+                --pre-bg: oklch(0.95 0.008 84.57);
+                --table-stripe: oklch(0.95 0.008 84.57);
+                --blockquote-bg: oklch(0.95 0.008 84.57);
+                --shadow: oklch(0.2 0.01 84.57 / 0.1);
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: var(--font-family);
+                font-size: calc(var(--font-size-base) * var(--font-size-scale));
+                height: 100vh;
+                overflow: hidden;
+                background-color: var(--bg-primary);
+                color: var(--text-primary);
+                transition: all 0.3s ease;
+            }
+
+            .header {
+                height: 60px;
+                background: var(--header-bg);
+                color: var(--header-text);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 2rem;
+                box-shadow: 0 2px 4px var(--shadow);
+                z-index: 1000;
+            }
+
+            .header-left {
+                display: flex;
+                align-items: center;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .header h1 {
+                font-size: calc(1.1rem * var(--font-size-scale));
+                font-weight: 300;
+            }
+
+            .header-subtitle {
+                font-size: calc(0.9rem * var(--font-size-scale));
+                color: var(--text-secondary);
+                font-weight: 400;
+            }
+
+            .settings-btn {
+                background: none;
+                border: none;
+                color: var(--header-text);
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .settings-btn:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                transform: rotate(90deg);
+            }
+
+            .settings-btn svg {
+                width: 20px;
+                height: 20px;
+                stroke: currentColor;
+            }
+
+            /* 设置面板样式 */
+            .settings-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 2000;
+                display: none;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .settings-panel {
+                background: var(--bg-primary);
+                border-radius: 12px;
+                padding: 2rem;
+                width: 90%;
+                max-width: 500px;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 10px 30px var(--shadow);
+                border: 1px solid var(--border-color);
+            }
+
+            .settings-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 2rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .settings-title {
+                font-size: calc(1.5rem * var(--font-size-scale));
+                font-weight: 600;
+                color: var(--text-primary);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .settings-title svg {
+                width: 20px;
+                height: 20px;
+                stroke: var(--text-primary);
+            }
+
+            .settings-close {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: var(--text-secondary);
+                padding: 0.5rem;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .settings-close:hover {
+                background-color: var(--bg-tertiary);
+                color: var(--text-primary);
+                transform: scale(1.1);
+            }
+
+            .settings-close svg {
+                width: 20px;
+                height: 20px;
+                stroke: currentColor;
+            }
+
+            .settings-section {
+                margin-bottom: 2rem;
+            }
+
+            .settings-section-title {
+                font-size: calc(1.1rem * var(--font-size-scale));
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 1rem;
+            }
+
+            .settings-group {
+                margin-bottom: 1.5rem;
+            }
+
+            .settings-label {
+                display: block;
+                font-size: calc(0.9rem * var(--font-size-scale));
+                font-weight: 500;
+                color: var(--text-tertiary);
+                margin-bottom: 0.5rem;
+            }
+
+            .theme-options {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 0.75rem;
+            }
+
+            .theme-option {
+                padding: 0.75rem;
+                border: 2px solid var(--border-color);
+                border-radius: 8px;
+                cursor: pointer;
+                text-align: center;
+                transition: all 0.2s ease;
+                background: var(--bg-secondary);
+                font-size: calc(0.85rem * var(--font-size-scale));
+                color: var(--text-primary);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .theme-option:hover {
+                border-color: var(--accent-color);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px var(--shadow);
+            }
+
+            .theme-option.active {
+                border-color: var(--accent-color);
+                background: var(--accent-color);
+                color: white;
+            }
+
+            /* 主题预览样式 */
+            .theme-preview {
+                width: 100%;
+                height: 60px;
+                border-radius: 6px;
+                margin-bottom: 0.5rem;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            .theme-option[data-theme="light"] .theme-preview {
+                background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+                color: #333333;
+                border-color: #e9ecef;
+            }
+
+            .theme-option[data-theme="dark"] .theme-preview {
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                color: #e0e0e0;
+                border-color: #404040;
+            }
+
+            .theme-option[data-theme="morandi"] .theme-preview {
+                background: linear-gradient(
+                    135deg,
+                    oklch(0.99 0.0057 84.57) 0%,
+                    oklch(0.95 0.008 84.57) 100%
+                );
+                color: oklch(0.25 0.02 84.57);
+                border-color: oklch(0.85 0.01 84.57);
+            }
+
+            .theme-name {
+                font-weight: 500;
+                color: var(--text-primary);
+                transition: color 0.2s ease;
+            }
+
+            .theme-option.active .theme-name {
+                color: white;
+            }
+
+            .font-select,
+            .font-size-select {
+                width: 100%;
+                padding: 0.75rem;
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                font-size: calc(0.9rem * var(--font-size-scale));
+                font-family: var(--font-family);
+            }
+
+            .font-size-controls {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .font-size-btn {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border-color);
+                color: var(--text-primary);
+                width: 36px;
+                height: 36px;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: calc(1.1rem * var(--font-size-scale));
+                transition: all 0.2s ease;
+            }
+
+            .font-size-btn:hover {
+                background: var(--accent-color);
+                color: white;
+                border-color: var(--accent-color);
+            }
+
+            .font-size-display {
+                font-size: calc(0.9rem * var(--font-size-scale));
+                color: var(--text-secondary);
+                min-width: 60px;
+                text-align: center;
+            }
+
+            .reset-btn {
+                background: var(--bg-tertiary);
+                border: 1px solid var(--border-color);
+                color: var(--text-primary);
+                padding: 0.75rem 1.5rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: calc(0.9rem * var(--font-size-scale));
+                transition: all 0.2s ease;
+                width: 100%;
+                margin-top: 1rem;
+            }
+
+            .reset-btn:hover {
+                background: var(--accent-color);
+                color: white;
+                border-color: var(--accent-color);
+            }
+
+            .container {
+                display: flex;
+                height: calc(100vh - 60px);
+            }
+
+            .sidebar {
+                width: 320px;
+                height: 100vh;
+                background: var(--sidebar-bg);
+                border-right: 1px solid var(--border-color);
+                display: flex;
+                flex-direction: column;
+                transition: width 0.3s ease;
+                overflow: hidden;
+            }
+
+            .sidebar.collapsed {
+                width: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            .sidebar-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+                padding: 1rem 1rem 0.5rem 1rem;
+                border-bottom: 1px solid var(--border-color);
+                flex-shrink: 0;
+                height: 60px;
+            }
+
+            .sidebar-title {
+                font-size: calc(1.1rem * var(--font-size-scale));
+                font-weight: 600;
+                color: var(--text-tertiary);
+            }
+
+            .toggle-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 6px;
+                color: var(--text-secondary);
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .toggle-btn:hover {
+                background-color: var(--bg-tertiary);
+                color: var(--text-primary);
+                transform: scale(1.1);
+            }
+
+            .toggle-btn svg {
+                width: 16px;
+                height: 16px;
+                stroke: currentColor;
+            }
+
+            .content {
+                flex: 1;
+                overflow-y: auto;
+                padding: 2rem;
+                background: var(--bg-primary);
+                position: relative;
+            }
+
+            .content-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+
+            .sidebar-toggle {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0.5rem 0rem 0.5rem 0rem;
+                border-radius: 6px;
+                margin-right: 1rem;
+                color: var(--text-secondary);
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .sidebar-toggle:hover {
+                background-color: var(--bg-secondary);
+                color: var(--text-primary);
+                transform: scale(1.05);
+            }
+
+            .sidebar-toggle svg {
+                width: 20px;
+                height: 20px;
+                stroke: currentColor;
+            }
+
+            .tree-node {
+                margin: 0.25rem 0;
+            }
+
+            .tree-item {
+                display: flex;
+                align-items: center;
+                padding: 0.5rem 0rem;
+                cursor: pointer;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+                font-size: calc(0.9rem * var(--font-size-scale));
+                color: var(--text-primary);
+            }
+
+            .tree-item:hover {
+                background-color: var(--bg-tertiary);
+            }
+
+            .tree-item.active {
+                background-color: var(--accent-color);
+                color: white;
+            }
+
+            .tree-item.file {
+                padding-left: 0rem;
+            }
+
+            .tree-icon {
+                margin-right: 0.5rem;
+                width: 16px;
+                text-align: center;
+                font-size: calc(0.9rem * var(--font-size-scale));
+            }
+
+            .tree-children {
+                margin-left: 1rem;
+                border-left: 2px solid var(--border-color);
+                padding-left: 0.5rem;
+            }
+
+            .tree-children.collapsed {
+                display: none;
+            }
+
+            .folder-icon::before {
+                content: "📁";
+            }
+
+            .folder-icon.open::before {
+                content: "📂";
+            }
+
+            .file-icon::before {
+                content: "📄";
+            }
+
+            .loading {
+                text-align: center;
+                padding: 4rem 2rem;
+                color: var(--text-secondary);
+            }
+
+            .loading-spinner {
+                display: inline-block;
+                width: 2rem;
+                height: 2rem;
+                border: 3px solid var(--bg-tertiary);
+                border-top: 3px solid var(--accent-color);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-bottom: 1rem;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .error {
+                color: #dc3545;
+                padding: 1.5rem;
+                background: var(--bg-secondary);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                margin: 1rem 0;
+            }
+
+            .error h3 {
+                margin-bottom: 0.5rem;
+            }
+
+            /* Markdown样式 */
+            .markdown-content {
+                max-width: none;
+                line-height: 1.7;
+                color: var(--text-primary);
+            }
+
+            .markdown-content h1,
+            .markdown-content h2,
+            .markdown-content h3,
+            .markdown-content h4,
+            .markdown-content h5,
+            .markdown-content h6 {
+                margin: 2rem 0 1rem 0;
+                color: var(--text-primary);
+                font-weight: 600;
+            }
+
+            .markdown-content h1 {
+                font-size: calc(2.25rem * var(--font-size-scale));
+                border-bottom: 3px solid var(--accent-color);
+                padding-bottom: 0.5rem;
+            }
+
+            .markdown-content h2 {
+                font-size: calc(1.75rem * var(--font-size-scale));
+                border-bottom: 2px solid var(--border-color);
+                padding-bottom: 0.3rem;
+            }
+
+            .markdown-content h3 {
+                font-size: calc(1.5rem * var(--font-size-scale));
+            }
+
+            .markdown-content h4 {
+                font-size: calc(1.25rem * var(--font-size-scale));
+            }
+
+            .markdown-content p {
+                margin: 1rem 0;
+                text-align: justify;
+            }
+
+            .markdown-content ul,
+            .markdown-content ol {
+                margin: 1rem 0;
+                padding-left: 2rem;
+            }
+
+            .markdown-content li {
+                margin: 0.5rem 0;
+            }
+
+            .markdown-content code {
+                background: var(--code-bg);
+                padding: 0.2rem 0.4rem;
+                border-radius: 4px;
+                font-family:
+                    "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
+                font-size: calc(0.9em * var(--font-size-scale));
+                color: var(--code-text);
+            }
+
+            .markdown-content pre {
+                background: var(--pre-bg);
+                padding: 1.5rem;
+                border-radius: 8px;
+                overflow-x: auto;
+                margin: 1.5rem 0;
+                border: 1px solid var(--border-color);
+            }
+
+            .markdown-content pre code {
+                background: none;
+                padding: 0;
+                color: var(--text-primary);
+            }
+
+            .markdown-content table {
+                border-collapse: collapse;
+                width: 100%;
+                margin: 1.5rem 0;
+                box-shadow: 0 1px 3px var(--shadow);
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .markdown-content th,
+            .markdown-content td {
+                border: 1px solid var(--border-color);
+                padding: 0.75rem 1rem;
+                text-align: left;
+            }
+
+            .markdown-content th {
+                background-color: var(--bg-secondary);
+                font-weight: 600;
+                color: var(--text-tertiary);
+            }
+
+            .markdown-content tr:nth-child(even) {
+                background-color: var(--table-stripe);
+            }
+
+            .markdown-content blockquote {
+                border-left: 4px solid var(--accent-color);
+                padding: 1rem 1.5rem;
+                color: var(--text-secondary);
+                margin: 1.5rem 0;
+                background: var(--blockquote-bg);
+                border-radius: 0 8px 8px 0;
+            }
+
+            .markdown-content blockquote p {
+                margin: 0.5rem 0;
+            }
+
+            /* Mermaid图表样式 */
+            .mermaid {
+                text-align: center;
+                margin: 2rem 0;
+                background: var(--bg-primary);
+                border-radius: 8px;
+                padding: 1rem;
+                box-shadow: 0 2px 8px var(--shadow);
+            }
+
+            /* 搜索框样式 */
+            .search-box {
+                padding: 0 1rem;
+                flex-shrink: 0;
+            }
+
+            .search-input {
+                width: 100%;
+                padding: 0.5rem 0.75rem;
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                font-size: calc(0.9rem * var(--font-size-scale));
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+            }
+
+            .search-input:focus {
+                outline: none;
+                border-color: var(--accent-color);
+                box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+            }
+
+            /* 目录容器样式 */
+            .tree-container {
+                height: calc(100vh - 120px);
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding: 0 1rem 1rem 1rem;
+            }
+
+            /* 响应式设计 */
+            @media (max-width: 768px) {
+                .sidebar {
+                    position: fixed;
+                    left: 0;
+                    top: 60px;
+                    height: calc(100vh - 60px);
+                    z-index: 999;
+                    transform: translateX(-100%);
+                    transition: transform 0.3s ease;
+                }
+
+                .sidebar.show {
+                    transform: translateX(0);
+                }
+
+                .sidebar-header {
+                    padding: 1rem;
+                }
+
+                .search-box {
+                    padding: 0 1rem;
+                }
+
+                .tree-container {
+                    padding: 0 1rem 1rem 1rem;
+                }
+
+                .content {
+                    padding: 1rem;
+                }
+
+                .markdown-content h1 {
+                    font-size: calc(1.75rem * var(--font-size-scale));
+                }
+
+                .markdown-content h2 {
+                    font-size: calc(1.5rem * var(--font-size-scale));
+                }
+
+                .settings-panel {
+                    width: 95%;
+                    margin: 1rem;
+                    padding: 1.5rem;
+                }
+
+                .theme-options {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* 文档目录样式 */
+            .doc-toc {
+                position: fixed;
+                right: 2rem;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--bg-primary);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                box-shadow: 0 8px 24px var(--shadow);
+                max-width: 280px;
+                max-height: 70vh;
+                overflow: hidden;
+                z-index: 1500;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+            }
+
+            .doc-toc.collapsed {
+                transform: translateY(-50%) translateX(calc(100% - 40px));
+            }
+
+            .doc-toc-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.2rem;
+                border-bottom: 1px solid var(--border-color);
+                background: var(--bg-secondary);
+                border-radius: 12px 12px 0 0;
+            }
+
+            .doc-toc-title {
+                font-size: calc(0.9rem * var(--font-size-scale));
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-left: 0.5em;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .doc-toc-title svg {
+                width: 16px;
+                height: 16px;
+                stroke: var(--text-primary);
+            }
+
+            .doc-toc-toggle {
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+                min-width: 32px;
+                min-height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .doc-toc-toggle:hover {
+                background: var(--bg-tertiary);
+                color: var(--text-primary);
+                transform: scale(1.05);
+            }
+
+            .doc-toc-toggle svg {
+                width: 18px;
+                height: 18px;
+                stroke: currentColor;
+                transition: all 0.2s ease;
+            }
+
+            .doc-toc-content {
+                padding: 0.5rem 0;
+                max-height: calc(70vh - 60px);
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            .doc-toc.collapsed .doc-toc-content {
+                display: none;
+            }
+
+            .toc-item {
+                display: block;
+                padding: 0.4rem 1rem;
+                color: var(--text-secondary);
+                text-decoration: none;
+                font-size: calc(0.85rem * var(--font-size-scale));
+                line-height: 1.4;
+                border-left: 3px solid transparent;
+                transition: all 0.2s ease;
+                cursor: pointer;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .toc-item:hover {
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                border-left-color: var(--accent-color);
+            }
+
+            .toc-item.active {
+                background: var(--bg-secondary);
+                color: var(--accent-color);
+                border-left-color: var(--accent-color);
+                font-weight: 500;
+            }
+
+            .toc-item.level-1 {
+                padding-left: 1rem;
+                font-weight: 600;
+                font-size: calc(0.9rem * var(--font-size-scale));
+            }
+
+            .toc-item.level-2 {
+                padding-left: 1.5rem;
+            }
+
+            .toc-item.level-3 {
+                padding-left: 2rem;
+                font-size: calc(0.8rem * var(--font-size-scale));
+            }
+
+            .toc-item.level-4 {
+                padding-left: 2.5rem;
+                font-size: calc(0.8rem * var(--font-size-scale));
+            }
+
+            .toc-item.level-5 {
+                padding-left: 3rem;
+                font-size: calc(0.75rem * var(--font-size-scale));
+            }
+
+            .toc-item.level-6 {
+                padding-left: 3.5rem;
+                font-size: calc(0.75rem * var(--font-size-scale));
+            }
+
+            /* 当目录折叠时的样式 */
+            .doc-toc.collapsed .doc-toc-header {
+                border-radius: 12px;
+                border-bottom: none;
+            }
+
+            .doc-toc.collapsed .doc-toc-title {
+                display: none;
+            }
+
+            /* 响应式设计 - 移动端隐藏目录 */
+            @media (max-width: 1024px) {
+                .doc-toc {
+                    display: none;
+                }
+            }
+
+            /* 滚动条样式 */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: var(--bg-secondary);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--text-secondary);
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--text-tertiary);
+            }
+
+            /* 目录滚动条样式 */
+            .doc-toc-content::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .doc-toc-content::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .doc-toc-content::-webkit-scrollbar-thumb {
+                background: var(--border-color);
+                border-radius: 2px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="header-left">
+                <h1>📚 Litho Book</h1>
+            </div>
+            <div class="header-right">
+                <div class="header-subtitle" id="docs-path"></div>
+                <button
+                    class="settings-btn"
+                    onclick="openSettings()"
+                    title="设置"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                        ></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 设置面板 -->
+        <div class="settings-overlay" id="settingsOverlay">
+            <div class="settings-panel">
+                <div class="settings-header">
+                    <div class="settings-title">
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                            ></path>
+                        </svg>
+                        设置
+                    </div>
+                    <button class="settings-close" onclick="closeSettings()">
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M18 6L6 18M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">🎨 主题</div>
+                    <div class="settings-group">
+                        <div class="theme-options">
+                            <div class="theme-option active" data-theme="light">
+                                <div class="theme-preview">🌕</div>
+                                <div class="theme-name">白月光</div>
+                            </div>
+                            <div class="theme-option" data-theme="dark">
+                                <div class="theme-preview">🌑</div>
+                                <div class="theme-name">暮光黑</div>
+                            </div>
+                            <div class="theme-option" data-theme="morandi">
+                                <div class="theme-preview">🎨</div>
+                                <div class="theme-name">莫兰迪色</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">🔤 字体</div>
+                    <div class="settings-group">
+                        <label class="settings-label">字体族</label>
+                        <select class="font-select" id="fontSelect">
+                            <option value="geist">
+                                Geist（现代无衬线字体，简洁清晰）
+                            </option>
+                            <option value="noto-sans-sc">
+                                Noto Sans SC（Google 开发的中文字体）
+                            </option>
+                            <option value="inter">
+                                Inter（优秀的界面字体，可读性强）
+                            </option>
+                            <option value="source-han-sans">
+                                Source Han Sans SC（Adobe 思源黑体）
+                            </option>
+                            <option value="pingfang">
+                                PingFang SC（苹果苹方字体，优雅现代）
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">📏 字号</div>
+                    <div class="settings-group">
+                        <label class="settings-label">字体大小</label>
+                        <div class="font-size-controls">
+                            <button
+                                class="font-size-btn"
+                                onclick="adjustFontSize(-0.05)"
+                            >
+                                −
+                            </button>
+                            <div class="font-size-display" id="fontSizeDisplay">
+                                100%
+                            </div>
+                            <button
+                                class="font-size-btn"
+                                onclick="adjustFontSize(0.05)"
+                            >
+                                +
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="reset-btn" onclick="resetSettings()">
+                    🔄 恢复默认设置
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">文档目录</div>
+                    <button class="toggle-btn" onclick="toggleSidebar()">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M18 6L6 18M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="search-box">
+                    <input
+                        type="text"
+                        class="search-input"
+                        placeholder="搜索文档..."
+                        id="searchInput"
+                        onkeyup="searchFiles()"
+                    />
+                </div>
+                <div id="tree-container" class="tree-container"></div>
+            </div>
+
+            <div class="content">
+                <div class="content-header">
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M3 6h18M3 12h18M3 18h18"></path>
+                        </svg>
+                    </button>
+                    <div id="breadcrumb"></div>
+                </div>
+                <div id="content-container">
+                    <div class="loading">
+                        <p>📖 选择左侧文档开始阅读</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 文档目录 -->
+        <div class="doc-toc collapsed" id="docToc">
+            <div class="doc-toc-header">
+                <h3 class="doc-toc-title">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                    目录
+                </h3>
+                <button
+                    class="doc-toc-toggle"
+                    onclick="toggleToc()"
+                    id="tocToggleBtn"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="doc-toc-content" id="tocContent">
+                <!-- 目录项将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 引入Mermaid.js -->
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+        <script>
+            // 设置管理
+            const Settings = {
+                theme: 'light',
+                fontFamily: 'geist',
+                fontSizeScale: 1,
+
+                // 字体映射
+                fontFamilies: {
+                    'geist': "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                    'noto-sans-sc': "'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                    'inter': "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                    'source-han-sans': "'Source Han Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                    'pingfang': "'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+                },
+
+                // 加载设置
+                load() {
+                    const saved = localStorage.getItem('litho-book-settings');
+                    if (saved) {
+                        const settings = JSON.parse(saved);
+                        this.theme = settings.theme || 'light';
+                        this.fontFamily = settings.fontFamily || 'geist';
+                        this.fontSizeScale = settings.fontSizeScale || 1;
+                    }
+                    this.apply();
+                },
+
+                // 保存设置
+                save() {
+                    localStorage.setItem('litho-book-settings', JSON.stringify({
+                        theme: this.theme,
+                        fontFamily: this.fontFamily,
+                        fontSizeScale: this.fontSizeScale
+                    }));
+                },
+
+                // 应用设置
+                apply() {
+                    // 应用主题
+                    if (this.theme === 'light') {
+                        document.documentElement.removeAttribute('data-theme');
+                    } else {
+                        document.documentElement.setAttribute('data-theme', this.theme);
+                    }
+
+                    // 应用字体
+                    document.documentElement.style.setProperty('--font-family', this.fontFamilies[this.fontFamily]);
+
+                    // 应用字号
+                    document.documentElement.style.setProperty('--font-size-scale', this.fontSizeScale);
+
+                    // 更新UI
+                    this.updateUI();
+                },
+
+                // 更新UI显示
+                updateUI() {
+                    // 更新主题选择
+                    document.querySelectorAll('.theme-option').forEach(option => {
+                        option.classList.remove('active');
+                        if (option.dataset.theme === this.theme) {
+                            option.classList.add('active');
+                        }
+                    });
+
+                    // 更新字体选择
+                    const fontSelect = document.getElementById('fontSelect');
+                    if (fontSelect) {
+                        fontSelect.value = this.fontFamily;
+                    }
+
+                    // 更新字号显示
+                    const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+                    if (fontSizeDisplay) {
+                        fontSizeDisplay.textContent = Math.round(this.fontSizeScale * 100) + '%';
+                    }
+                },
+
+                // 设置主题
+                setTheme(theme) {
+                    this.theme = theme;
+                    this.apply();
+                    this.save();
+                },
+
+                // 设置字体
+                setFont(fontFamily) {
+                    this.fontFamily = fontFamily;
+                    this.apply();
+                    this.save();
+                },
+
+                // 调整字号
+                adjustFontSize(delta) {
+                    this.fontSizeScale = Math.max(0.5, Math.min(2, this.fontSizeScale + delta));
+                    this.apply();
+                    this.save();
+                },
+
+                // 重置设置
+                reset() {
+                    this.theme = 'light';
+                    this.fontFamily = 'geist';
+                    this.fontSizeScale = 1;
+                    this.apply();
+                    this.save();
+                }
+            };
+
+            // 设置面板控制
+            function openSettings() {
+                document.getElementById('settingsOverlay').style.display = 'flex';
+                Settings.updateUI();
+            }
+
+            function closeSettings() {
+                document.getElementById('settingsOverlay').style.display = 'none';
+            }
+
+            function adjustFontSize(delta) {
+                Settings.adjustFontSize(delta);
+            }
+
+            function resetSettings() {
+                Settings.reset();
+            }
+
+            // 目录功能
+            const TableOfContents = {
+                isCollapsed: true,
+                headings: [],
+                activeHeading: null,
+
+                // 切换目录显示/隐藏
+                toggle() {
+                    const toc = document.getElementById('docToc');
+                    const toggleBtn = document.getElementById('tocToggleBtn');
+
+                    this.isCollapsed = !this.isCollapsed;
+
+                    if (this.isCollapsed) {
+                        toc.classList.add('collapsed');
+                        toggleBtn.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="8" y1="6" x2="21" y2="6"></line>
+                                <line x1="8" y1="12" x2="21" y2="12"></line>
+                                <line x1="8" y1="18" x2="21" y2="18"></line>
+                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                            </svg>
+                        `;
+                        toggleBtn.title = '展开目录';
+                    } else {
+                        toc.classList.remove('collapsed');
+                        toggleBtn.innerHTML = `
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 6L6 18M6 6l12 12"></path>
+                            </svg>
+                        `;
+                        toggleBtn.title = '收起目录';
+                    }
+                },
+
+                // 生成目录
+                generate() {
+                    const content = document.querySelector('.markdown-content');
+                    if (!content) {
+                        this.hide();
+                        return;
+                    }
+
+                    const headings = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                    if (headings.length === 0) {
+                        this.hide();
+                        return;
+                    }
+
+                    this.headings = Array.from(headings);
+                    this.show();
+                    this.render();
+                    this.setupScrollSpy();
+                },
+
+                // 渲染目录
+                render() {
+                    const tocContent = document.getElementById('tocContent');
+                    tocContent.innerHTML = '';
+
+                    this.headings.forEach((heading, index) => {
+                        const level = parseInt(heading.tagName.charAt(1));
+                        const text = heading.textContent.trim();
+                        const id = `heading-${index}`;
+
+                        // 为标题添加ID，用于锚点跳转
+                        heading.id = id;
+
+                        // 创建目录项
+                        const tocItem = document.createElement('a');
+                        tocItem.className = `toc-item level-${level}`;
+                        tocItem.textContent = text;
+                        tocItem.href = `#${id}`;
+                        tocItem.dataset.target = id;
+
+                        // 点击事件
+                        tocItem.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            this.scrollToHeading(heading);
+                            this.setActiveHeading(tocItem);
+                        });
+
+                        tocContent.appendChild(tocItem);
+                    });
+                },
+
+                // 滚动到指定标题
+                scrollToHeading(heading) {
+                    const contentContainer = document.querySelector('.content');
+                    const headerHeight = 60; // 头部高度
+                    const offset = 20; // 额外偏移
+
+                    const targetPosition = heading.offsetTop - headerHeight - offset;
+
+                    contentContainer.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                },
+
+                // 设置活跃标题
+                setActiveHeading(tocItem) {
+                    // 移除所有活跃状态
+                    document.querySelectorAll('.toc-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+
+                    // 设置当前活跃状态
+                    if (tocItem) {
+                        tocItem.classList.add('active');
+                        this.activeHeading = tocItem;
+                    }
+                },
+
+                // 设置滚动监听
+                setupScrollSpy() {
+                    const contentContainer = document.querySelector('.content');
+                    if (!contentContainer) return;
+
+                    let ticking = false;
+
+                    const updateActiveHeading = () => {
+                        const scrollTop = contentContainer.scrollTop;
+                        const headerHeight = 60;
+                        const threshold = 100;
+
+                        let activeHeading = null;
+                        let minDistance = Infinity;
+
+                        this.headings.forEach((heading, index) => {
+                            const rect = heading.getBoundingClientRect();
+                            const containerRect = contentContainer.getBoundingClientRect();
+                            const headingTop = rect.top - containerRect.top + scrollTop;
+                            const distance = Math.abs(headingTop - scrollTop - headerHeight);
+
+                            if (headingTop <= scrollTop + headerHeight + threshold && distance < minDistance) {
+                                minDistance = distance;
+                                activeHeading = document.querySelector(`[data-target="heading-${index}"]`);
+                            }
+                        });
+
+                        if (activeHeading !== this.activeHeading) {
+                            this.setActiveHeading(activeHeading);
+                        }
+
+                        ticking = false;
+                    };
+
+                    contentContainer.addEventListener('scroll', () => {
+                        if (!ticking) {
+                            requestAnimationFrame(updateActiveHeading);
+                            ticking = true;
+                        }
+                    });
+                },
+
+                // 显示目录
+                show() {
+                    const toc = document.getElementById('docToc');
+                    toc.style.display = 'block';
+                },
+
+                // 隐藏目录
+                hide() {
+                    const toc = document.getElementById('docToc');
+                    toc.style.display = 'none';
+                },
+
+                // 清空目录
+                clear() {
+                    const tocContent = document.getElementById('tocContent');
+                    tocContent.innerHTML = '';
+                    this.headings = [];
+                    this.activeHeading = null;
+                }
+            };
+
+            // 目录切换函数
+            function toggleToc() {
+                TableOfContents.toggle();
+            }
+
+            // 初始化Mermaid
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: 'default',
+                securityLevel: 'loose',
+                fontFamily: 'inherit'
+            });
+
+            // 文档树数据
+            const treeData = {{ tree_json|safe }};
+            let currentFile = null;
+            let allFiles = [];
+            let originalTreeData = null;
+
+            // 收集所有文件用于搜索
+            function collectFiles(node, path = '') {
+                const currentPath = path ? `${path}/${node.name}` : node.name;
+
+                if (node.is_file) {
+                    allFiles.push({
+                        name: node.name,
+                        path: node.path,
+                        fullPath: currentPath
+                    });
+                }
+
+                if (node.children) {
+                    node.children.forEach(child => collectFiles(child, currentPath));
+                }
+            }
+
+            // 搜索文件
+            function searchFiles() {
+                const query = document.getElementById('searchInput').value.toLowerCase().trim();
+                const treeContainer = document.getElementById('tree-container');
+
+                if (!query) {
+                    // 清空搜索时，重新渲染原始树结构
+                    treeContainer.innerHTML = '';
+                    if (originalTreeData) {
+                        renderTreeChildren(originalTreeData, treeContainer);
+                    }
+                    return;
+                }
+
+                const filteredFiles = allFiles.filter(file =>
+                    file.name.toLowerCase().includes(query) ||
+                    file.fullPath.toLowerCase().includes(query)
+                );
+
+                treeContainer.innerHTML = '';
+
+                if (filteredFiles.length === 0) {
+                    treeContainer.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;">未找到匹配的文档</div>';
+                    return;
+                }
+
+                filteredFiles.forEach(file => {
+                    const nodeDiv = document.createElement('div');
+                    nodeDiv.className = 'tree-node';
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'tree-item file';
+
+                    const iconSpan = document.createElement('span');
+                    iconSpan.className = 'tree-icon file-icon';
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = file.name;
+                    nameSpan.title = file.fullPath;
+
+                    itemDiv.addEventListener('click', () => loadFile(file.path));
+
+                    itemDiv.appendChild(iconSpan);
+                    itemDiv.appendChild(nameSpan);
+                    nodeDiv.appendChild(itemDiv);
+                    treeContainer.appendChild(nodeDiv);
+                });
+            }
+
+            // 渲染文档树的子节点（不包含根节点）
+            function renderTreeChildren(node, container) {
+                if (node.children && node.children.length > 0) {
+                    node.children.forEach(child => {
+                        renderTree(child, container, 0);
+                    });
+                }
+            }
+
+            // 渲染文档树
+            function renderTree(node, container, level = 0) {
+                const nodeDiv = document.createElement('div');
+                nodeDiv.className = 'tree-node';
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'tree-item';
+
+                const iconSpan = document.createElement('span');
+                iconSpan.className = 'tree-icon';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = node.name;
+
+                if (node.is_file) {
+                    iconSpan.className += ' file-icon';
+                    itemDiv.className += ' file';
+                    itemDiv.addEventListener('click', () => loadFile(node.path));
+                } else {
+                    iconSpan.className += ' folder-icon';
+                    itemDiv.addEventListener('click', () => toggleFolder(nodeDiv, iconSpan));
+                }
+
+                itemDiv.appendChild(iconSpan);
+                itemDiv.appendChild(nameSpan);
+                nodeDiv.appendChild(itemDiv);
+
+                if (!node.is_file && node.children && node.children.length > 0) {
+                    const childrenDiv = document.createElement('div');
+                    // 默认折叠所有文件夹
+                    childrenDiv.className = 'tree-children collapsed';
+
+                    node.children.forEach(child => {
+                        renderTree(child, childrenDiv, level + 1);
+                    });
+
+                    nodeDiv.appendChild(childrenDiv);
+                }
+
+                container.appendChild(nodeDiv);
+            }
+
+            // 切换文件夹展开/收起
+            function toggleFolder(nodeDiv, iconSpan) {
+                const childrenDiv = nodeDiv.querySelector('.tree-children');
+                if (childrenDiv) {
+                    childrenDiv.classList.toggle('collapsed');
+                    iconSpan.classList.toggle('open');
+                }
+            }
+
+            // 切换侧边栏
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('show');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                }
+            }
+
+            // 更新面包屑导航
+            function updateBreadcrumb(filePath) {
+                const breadcrumb = document.getElementById('breadcrumb');
+                if (!filePath) {
+                    breadcrumb.innerHTML = '';
+                    return;
+                }
+
+                const parts = filePath.split('/');
+                const breadcrumbHtml = parts.map((part, index) => {
+                    if (index === parts.length - 1) {
+                        return `<span style="color: var(--accent-color); font-weight: 600;">${part}</span>`;
+                    }
+                    return `<span style="color: var(--text-secondary);">${part}</span>`;
+                }).join(' <span style="color: var(--text-secondary);">></span> ');
+
+                breadcrumb.innerHTML = breadcrumbHtml;
+            }
+
+            // 加载文件内容
+            async function loadFile(filePath) {
+                if (currentFile === filePath) return;
+
+                const contentContainer = document.getElementById('content-container');
+                contentContainer.innerHTML = `
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>正在加载文档...</p>
+                    </div>
+                `;
+
+                try {
+                    const response = await fetch(`/api/file?file=${encodeURIComponent(filePath)}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+
+                    // 更新当前选中状态
+                    document.querySelectorAll('.tree-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+
+                    const activeItem = Array.from(document.querySelectorAll('.tree-item'))
+                        .find(item => {
+                            const span = item.querySelector('span:last-child');
+                            return span && span.textContent.trim() === filePath.split('/').pop();
+                        });
+                    if (activeItem) {
+                        activeItem.classList.add('active');
+                    }
+
+                    currentFile = filePath;
+                    updateBreadcrumb(filePath);
+
+                    // 渲染Markdown内容
+                    contentContainer.innerHTML = `<div class="markdown-content">${data.html}</div>`;
+
+                    // 渲染Mermaid图表
+                    const mermaidElements = contentContainer.querySelectorAll('code.language-mermaid, pre code.language-mermaid');
+                    mermaidElements.forEach((element, index) => {
+                        const mermaidCode = element.textContent;
+                        const mermaidId = `mermaid-${Date.now()}-${index}`;
+
+                        const mermaidDiv = document.createElement('div');
+                        mermaidDiv.className = 'mermaid';
+                        mermaidDiv.id = mermaidId;
+                        mermaidDiv.textContent = mermaidCode;
+
+                        element.closest('pre') ?
+                            element.closest('pre').replaceWith(mermaidDiv) :
+                            element.replaceWith(mermaidDiv);
+                    });
+
+                    // 初始化新的Mermaid图表
+                    if (mermaidElements.length > 0) {
+                        await mermaid.init(undefined, contentContainer.querySelectorAll('.mermaid'));
+                    }
+
+                    // 生成文档目录
+                    setTimeout(() => {
+                        TableOfContents.generate();
+                    }, 100);
+
+                    // 滚动到顶部
+                    contentContainer.scrollTop = 0;
+
+                    // 在移动端自动隐藏侧边栏
+                    if (window.innerWidth <= 768) {
+                        document.getElementById('sidebar').classList.remove('show');
+                    }
+
+                } catch (error) {
+                    contentContainer.innerHTML = `
+                        <div class="error">
+                            <h3>📋 加载失败</h3>
+                            <p><strong>文件:</strong> ${filePath}</p>
+                            <p><strong>错误:</strong> ${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // 响应式处理
+            window.addEventListener('resize', () => {
+                const sidebar = document.getElementById('sidebar');
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('show');
+                }
+            });
+
+            // 初始化页面
+            document.addEventListener('DOMContentLoaded', () => {
+                // 加载设置
+                Settings.load();
+
+                // 主题选择事件
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        Settings.setTheme(option.dataset.theme);
+                    });
+                });
+
+                // 字体选择事件
+                const fontSelect = document.getElementById('fontSelect');
+                if (fontSelect) {
+                    fontSelect.addEventListener('change', (e) => {
+                        Settings.setFont(e.target.value);
+                    });
+                }
+
+                // 点击遮罩关闭设置面板
+                document.getElementById('settingsOverlay').addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        closeSettings();
+                    }
+                });
+
+                // ESC键关闭设置面板
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        closeSettings();
+                    }
+                });
+
+                // 设置文档路径
+                const docsPath = '{{ docs_path }}';
+                document.getElementById('docs-path').textContent = docsPath;
+
+                // 保存原始树数据
+                originalTreeData = treeData;
+
+                // 收集所有文件用于搜索
+                collectFiles(treeData);
+
+                // 渲染目录树（不包含根节点）
+                const treeContainer = document.getElementById('tree-container');
+                renderTreeChildren(treeData, treeContainer);
+            });
+
+            loadFile("Overview.md");
+        </script>
+    </body>
+</html>
