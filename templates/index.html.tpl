@@ -42,7 +42,7 @@
                 --font-size-scale: 1;
             }
 
-            /* 暮光黑主题 */
+            /* 暮光影主题 */
             [data-theme="dark"] {
                 --bg-primary: #1a1a1a;
                 --bg-secondary: #2d2d2d;
@@ -1082,11 +1082,11 @@
                             </div>
                             <div class="theme-option" data-theme="dark">
                                 <div class="theme-preview">🌑</div>
-                                <div class="theme-name">暮光黑</div>
+                                <div class="theme-name">暮光影</div>
                             </div>
                             <div class="theme-option" data-theme="morandi">
                                 <div class="theme-preview">🎨</div>
-                                <div class="theme-name">莫兰迪色</div>
+                                <div class="theme-name">莫兰迪</div>
                             </div>
                         </div>
                     </div>
@@ -1609,7 +1609,28 @@
                 const filteredFiles = allFiles.filter(file =>
                     file.name.toLowerCase().includes(query) ||
                     file.fullPath.toLowerCase().includes(query)
-                );
+                ).sort((a, b) => {
+                    // 对搜索结果也使用智能排序
+                    const getNumberPrefix = (name) => {
+                        const match = name.match(/^(\d+)[^\d]/);
+                        return match ? parseInt(match[1], 10) : null;
+                    };
+                    
+                    const aNumber = getNumberPrefix(a.name);
+                    const bNumber = getNumberPrefix(b.name);
+                    
+                    if (aNumber !== null && bNumber !== null) {
+                        if (aNumber !== bNumber) {
+                            return aNumber - bNumber;
+                        }
+                        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+                    }
+                    
+                    if (aNumber !== null && bNumber === null) return -1;
+                    if (aNumber === null && bNumber !== null) return 1;
+                    
+                    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+                });
 
                 treeContainer.innerHTML = '';
 
@@ -1641,10 +1662,41 @@
                 });
             }
 
+            // 文件名智能排序函数（完全按名称排序，不区分文件夹和文件）
+            function smartSort(a, b) {
+                // 提取数字前缀的正则表达式
+                const getNumberPrefix = (name) => {
+                    const match = name.match(/^(\d+)[^\d]/);
+                    return match ? parseInt(match[1], 10) : null;
+                };
+                
+                const aNumber = getNumberPrefix(a.name);
+                const bNumber = getNumberPrefix(b.name);
+                
+                // 如果两个都有数字前缀，按数字大小排序
+                if (aNumber !== null && bNumber !== null) {
+                    if (aNumber !== bNumber) {
+                        return aNumber - bNumber;
+                    }
+                    // 数字相同时，按字符串排序
+                    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+                }
+                
+                // 如果只有一个有数字前缀，有数字的在前
+                if (aNumber !== null && bNumber === null) return -1;
+                if (aNumber === null && bNumber !== null) return 1;
+                
+                // 都没有数字前缀，按字母顺序排序
+                return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+            }
+
             // 渲染文档树的子节点（不包含根节点）
             function renderTreeChildren(node, container) {
                 if (node.children && node.children.length > 0) {
-                    node.children.forEach(child => {
+                    // 使用智能排序函数对子节点进行排序
+                    const sortedChildren = [...node.children].sort(smartSort);
+                    
+                    sortedChildren.forEach(child => {
                         renderTree(child, container, 0);
                     });
                 }
@@ -1682,7 +1734,10 @@
                     // 默认折叠所有文件夹
                     childrenDiv.className = 'tree-children collapsed';
 
-                    node.children.forEach(child => {
+                    // 使用智能排序函数对子节点进行排序
+                    const sortedChildren = [...node.children].sort(smartSort);
+
+                    sortedChildren.forEach(child => {
                         renderTree(child, childrenDiv, level + 1);
                     });
 
@@ -1772,23 +1827,118 @@
 
                     // 渲染Mermaid图表
                     const mermaidElements = contentContainer.querySelectorAll('code.language-mermaid, pre code.language-mermaid');
-                    mermaidElements.forEach((element, index) => {
+                    
+                    // 为每个 Mermaid 元素单独处理，避免一个错误影响所有渲染
+                    for (let i = 0; i < mermaidElements.length; i++) {
+                        const element = mermaidElements[i];
                         const mermaidCode = element.textContent;
-                        const mermaidId = `mermaid-${Date.now()}-${index}`;
+                        const mermaidId = `mermaid-${Date.now()}-${i}`;
 
                         const mermaidDiv = document.createElement('div');
                         mermaidDiv.className = 'mermaid';
                         mermaidDiv.id = mermaidId;
                         mermaidDiv.textContent = mermaidCode;
 
-                        element.closest('pre') ?
-                            element.closest('pre').replaceWith(mermaidDiv) :
-                            element.replaceWith(mermaidDiv);
-                    });
+                        // 替换原始元素
+                        const parentElement = element.closest('pre') || element;
+                        parentElement.replaceWith(mermaidDiv);
 
-                    // 初始化新的Mermaid图表
-                    if (mermaidElements.length > 0) {
-                        await mermaid.init(undefined, contentContainer.querySelectorAll('.mermaid'));
+                        // 尝试渲染单个 Mermaid 图表
+                        try {
+                            await mermaid.init(undefined, `#${mermaidId}`);
+                        } catch (error) {
+                            console.warn(`Mermaid 图表渲染失败 (${mermaidId}):`, error);
+                            
+                            // 创建错误显示容器
+                            const errorContainer = document.createElement('div');
+                            errorContainer.style.cssText = `
+                                border: 2px dashed var(--border-color);
+                                border-radius: 8px;
+                                padding: 1rem;
+                                margin: 1rem 0;
+                                background: var(--bg-secondary);
+                                position: relative;
+                            `;
+
+                            // 添加错误提示标题
+                            const errorTitle = document.createElement('div');
+                            errorTitle.style.cssText = `
+                                color: #dc3545;
+                                font-weight: 600;
+                                font-size: 0.9rem;
+                                margin-bottom: 0.5rem;
+                                display: flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                            `;
+                            errorTitle.innerHTML = `
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                                Mermaid 图表渲染失败
+                            `;
+
+                            // 添加原始代码显示
+                            const codeBlock = document.createElement('pre');
+                            codeBlock.style.cssText = `
+                                background: var(--pre-bg);
+                                padding: 1rem;
+                                border-radius: 6px;
+                                margin: 0;
+                                border: 1px solid var(--border-color);
+                                font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+                                font-size: 0.9em;
+                                color: var(--text-primary);
+                                overflow-x: auto;
+                                white-space: pre-wrap;
+                                word-wrap: break-word;
+                            `;
+
+                            const code = document.createElement('code');
+                            code.textContent = mermaidCode;
+                            codeBlock.appendChild(code);
+
+                            // 添加错误详情（可选显示）
+                            const errorDetails = document.createElement('details');
+                            errorDetails.style.cssText = `
+                                margin-top: 0.5rem;
+                                color: var(--text-secondary);
+                                font-size: 0.85rem;
+                            `;
+                            
+                            const errorSummary = document.createElement('summary');
+                            errorSummary.style.cssText = `
+                                cursor: pointer;
+                                color: #dc3545;
+                                font-weight: 500;
+                            `;
+                            errorSummary.textContent = '查看错误详情';
+                            
+                            const errorMessage = document.createElement('pre');
+                            errorMessage.style.cssText = `
+                                margin-top: 0.5rem;
+                                padding: 0.5rem;
+                                background: var(--bg-tertiary);
+                                border-radius: 4px;
+                                font-size: 0.8rem;
+                                white-space: pre-wrap;
+                                word-wrap: break-word;
+                            `;
+                            errorMessage.textContent = error.message || error.toString();
+                            
+                            errorDetails.appendChild(errorSummary);
+                            errorDetails.appendChild(errorMessage);
+
+                            // 组装错误容器
+                            errorContainer.appendChild(errorTitle);
+                            errorContainer.appendChild(codeBlock);
+                            errorContainer.appendChild(errorDetails);
+
+                            // 替换失败的 Mermaid 元素
+                            mermaidDiv.replaceWith(errorContainer);
+                        }
                     }
 
                     // 生成文档目录
@@ -1872,7 +2022,48 @@
                 renderTreeChildren(treeData, treeContainer);
             });
 
-            loadFile("Overview.md");
+            // 初始化默认文档加载（带降级策略）
+            async function initializeDefaultDocument() {
+                const defaultFiles = ['1、项目概述.md', '1、Overview.md', 'README.md', 'Overview.md', '项目概述.md'];
+                
+                for (const fileName of defaultFiles) {
+                    try {
+                        const response = await fetch(`/api/file?file=${encodeURIComponent(fileName)}`);
+                        if (response.ok) {
+                            // 找到可用文件，加载它
+                            await loadFile(fileName);
+                            console.info(`成功加载默认文档: ${fileName}`);
+                            return;
+                        }
+                    } catch (error) {
+                        console.warn(`尝试加载 ${fileName} 失败:`, error);
+                    }
+                }
+                
+                // 如果所有默认文件都失败，显示欢迎信息
+                console.info('未找到默认文档文件，显示欢迎界面');
+                const contentContainer = document.getElementById('content-container');
+                contentContainer.innerHTML = `
+                    <div class="loading">
+                        <div style="text-align: center; padding: 4rem 2rem; color: var(--text-secondary);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
+                            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">欢迎使用 Litho Book</h2>
+                            <p style="margin-bottom: 1.5rem;">选择左侧文档开始阅读</p>
+                            <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: left; max-width: 500px; margin: 0 auto;">
+                                <h4 style="color: var(--text-primary); margin-bottom: 1rem;">💡 提示</h4>
+                                <ul style="color: var(--text-secondary); line-height: 1.6; margin: 0; padding-left: 1.5rem;">
+                                    <li>支持完整的 Markdown 语法渲染</li>
+                                    <li>自动渲染 Mermaid 图表和流程图</li>
+                                    <li>提供实时搜索和智能导航</li>
+                                    <li>响应式设计，支持多设备访问</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            initializeDefaultDocument();
         </script>
     </body>
 </html>
