@@ -28,7 +28,18 @@
 
 ❤️ Like **Litho Book**? Star it 🌟 and learn more about the [**Litho project**](https://github.com/sopaco/deepwiki-rs)! ❤️
 
-# 🌠 Key Features
+
+# 🌠 Snapshoots
+<div style="text-align: center;">
+  <table style="width: 100%; margin: 0 auto;">
+    <tr>
+      <td style="width: 50%;"><img src="assets/snapshot-1.webp" alt="snapshot-1" style="width: 100%; height: auto; display: block;"></td>
+      <td style="width: 50%;"><img src="assets/snapshot-2.webp" alt="snapshot-2" style="width: 100%; height: auto; display: block;"></td>
+    </tr>
+  </table>
+</div>
+
+# 🌟 Key Features
 
 - **🌲 Smart Directory Tree** - Left panel displays document directory structure with collapsible folders and expand/collapse operations
 - **📖 Real-time Rendering** - Right panel renders markdown content in real-time with syntax highlighting and formatting
@@ -236,25 +247,6 @@ Litho Book provides the following API endpoints to support dynamic frontend func
 | `/api/search` | GET | Search files based on a query keyword | `q=<query>` |
 | `/api/stats` | GET | Get statistics of the document library (e.g., number of files, size, etc.) | - |
 | `/health` | GET | Health check | - |
-
-# 🌟 Interface Preview
-
-### Desktop Experience
-- **Left Panel**: Collapsible document directory tree with real-time search and quick navigation
-- **Right Panel**: Rendered markdown content with syntax highlighting and Mermaid charts
-- **Top Navigation**: Application title, path navigation, and function buttons
-- **Bottom Status**: Document statistics and loading status
-
-### Mobile Adaptation
-- **Responsive Layout**: Automatically adapts to small screens with optimized touch experience
-- **Collapsible Sidebar**: Retractable sidebar to maximize content display area
-- **Touch-Friendly**: Interaction design and gesture support optimized for mobile devices
-- **Quick Access**: Floating buttons provide quick search and navigation functions
-
-### Main Feature Interfaces
-- **Document Browsing**: Clear document content display supporting various markdown syntax
-- **Search Interface**: Real-time search results display with keyword highlighting
-- **Chart Rendering**: Perfect support for Mermaid charts with automatic theme adaptation
 
 # 🔧 Development Guide
 

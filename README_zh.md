@@ -28,7 +28,17 @@
 
 ❤️ 喜欢 **Litho Book**? 点亮小星星 🌟 并了解更多关于 [**Litho 项目**](https://github.com/sopaco/deepwiki-rs)! ❤️
 
-# 🌠 核心特性
+# 🌠 界面预览
+<div style="text-align: center;">
+  <table style="width: 100%; margin: 0 auto;">
+    <tr>
+      <td style="width: 50%;"><img src="assets/snapshot-1.webp" alt="snapshot-1" style="width: 100%; height: auto; display: block;"></td>
+      <td style="width: 50%;"><img src="assets/snapshot-2.webp" alt="snapshot-2" style="width: 100%; height: auto; display: block;"></td>
+    </tr>
+  </table>
+</div>
+
+# 🌟 核心特性
 
 - **🌲 智能目录树** - 左侧显示文档目录结构，文件夹默认折叠，支持展开/收起操作
 - **📖 实时渲染** - 右侧实时渲染markdown文档内容，支持代码高亮和格式化
@@ -236,25 +246,6 @@ Litho Book提供了以下API端点，用于支持前端的动态功能：
 | `/api/search` | GET | 根据查询关键词搜索文件 | `q=<query>` |
 | `/api/stats` | GET | 获取文档库的统计信息（文件数、大小等） | - |
 | `/health` | GET | 健康检查 | - |
-
-# 🌟 界面预览
-
-### 桌面端体验
-- **左侧面板**: 可折叠的文档目录树，支持实时搜索和快速导航
-- **右侧面板**: 渲染后的markdown内容，支持代码高亮和Mermaid图表
-- **顶部导航**: 应用标题、路径导航和功能按钮
-- **底部状态**: 文档统计信息和加载状态
-
-### 移动端适配
-- **响应式布局**: 自动适配小屏幕，优化触摸操作体验
-- **侧边栏收起**: 可收起的侧边栏，最大化内容显示区域
-- **触摸友好**: 针对移动设备优化的交互设计和手势支持
-- **快速访问**: 浮动按钮提供快速搜索和导航功能
-
-### 主要功能界面
-- **文档浏览**: 清晰的文档内容展示，支持各种markdown语法
-- **搜索界面**: 实时搜索结果展示，支持关键词高亮
-- **图表渲染**: 完美支持Mermaid图表，自动适配主题样式
 
 # 🔧 开发指南
 
