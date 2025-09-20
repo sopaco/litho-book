@@ -175,7 +175,27 @@ flowchart TB
     N --> O
 ```
 
-### Core Components
+### ♻️ Execution Workflow
+``` mermaid
+sequenceDiagram
+participant Developer as Developer
+participant Litho as Litho Engine
+participant LithoBook as Litho Book
+participant Browser as Browser
+Developer->>Litho : litho --project ./my-project --output ./docs
+Litho-->>Developer : Documentation generation completed
+Developer->>LithoBook : cargo run -- --docs-dir ./docs --open
+LithoBook-->>Developer : Server started successfully
+LithoBook->>Browser : Automatically opens http://127.0.0.1:3000
+Browser->>LithoBook : Requests main page
+LithoBook-->>Browser : Returns HTML page
+Browser->>LithoBook : Requests document tree (/api/tree)
+LithoBook-->>Browser : Returns JSON-formatted tree structure
+Browser->>LithoBook : Requests file content (/api/file?file=...)
+LithoBook-->>Browser : Returns rendered HTML content
+```
+
+### 📦 Core Components
 
 - **CLI Handler**: Responsible for command-line argument parsing, configuration validation, and server startup
 - **Web Server**: High-performance HTTP server based on Axum, providing API and static file services
@@ -203,6 +223,19 @@ litho-book/
 ├── Cargo.lock               # Dependency version lock
 └── README.md                # Project documentation
 ```
+
+## 🧩 API Interface Documentation
+
+Litho Book provides the following API endpoints to support dynamic frontend functionality:
+
+| Endpoint | Method | Description | Parameters |
+|----------|--------|-------------|------------|
+| `/` | GET | Main page | - |
+| `/api/file` | GET | Retrieve the content and rendered HTML of a specified file | `file=<path>` |
+| `/api/tree` | GET | Get the tree structure of the entire document directory | - |
+| `/api/search` | GET | Search files based on a query keyword | `q=<query>` |
+| `/api/stats` | GET | Get statistics of the document library (e.g., number of files, size, etc.) | - |
+| `/health` | GET | Health check | - |
 
 # 🌟 Interface Preview
 

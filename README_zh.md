@@ -175,7 +175,27 @@ flowchart TB
     N --> O
 ```
 
-### 核心组件
+### ♻️ 执行流程
+```mermaid
+sequenceDiagram
+participant 开发者 as 开发者
+participant Litho as Litho引擎
+participant LithoBook as Litho Book
+participant 浏览器 as 浏览器
+开发者->>Litho : litho --project ./my-project --output ./docs
+Litho-->>开发者 : 生成文档完成
+开发者->>LithoBook : cargo run -- --docs-dir ./docs --open
+LithoBook-->>开发者 : 服务器启动成功
+LithoBook->>浏览器 : 自动打开 http : //127.0.0.1 : 3000
+浏览器->>LithoBook : 请求主页面
+LithoBook-->>浏览器 : 返回HTML页面
+浏览器->>LithoBook : 请求文档树 (/api/tree)
+LithoBook-->>浏览器 : 返回JSON格式的树结构
+浏览器->>LithoBook : 请求文件内容 (/api/file?file=...)
+LithoBook-->>浏览器 : 返回渲染后的HTML内容
+```
+
+### 📦 核心组件
 
 - **CLI处理器**: 负责命令行参数解析、配置验证和服务器启动
 - **Web服务器**: 基于Axum的高性能HTTP服务器，提供API和静态文件服务
@@ -203,6 +223,19 @@ litho-book/
 ├── Cargo.lock               # 依赖版本锁定
 └── README.md                # 项目文档
 ```
+
+## 🧩 API接口说明
+
+Litho Book提供了以下API端点，用于支持前端的动态功能：
+
+| 端点 | 方法 | 描述 | 参数 |
+|------|------|------|------|
+| `/` | GET | 主页面 | - |
+| `/api/file` | GET | 获取指定文件的内容和渲染后的HTML | `file=<path>` |
+| `/api/tree` | GET | 获取整个文档目录的树形结构 | - |
+| `/api/search` | GET | 根据查询关键词搜索文件 | `q=<query>` |
+| `/api/stats` | GET | 获取文档库的统计信息（文件数、大小等） | - |
+| `/health` | GET | 健康检查 | - |
 
 # 🌟 界面预览
 
