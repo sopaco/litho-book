@@ -28,7 +28,18 @@
 
 ❤️ Like **Litho Book**? Star it 🌟 and learn more about the [**Litho project**](https://github.com/sopaco/deepwiki-rs)! ❤️
 
-# 🌠 Key Features
+
+# 🌠 Snapshoots
+<div style="text-align: center;">
+  <table style="width: 100%; margin: 0 auto;">
+    <tr>
+      <td style="width: 50%;"><img src="assets/snapshot-1.webp" alt="snapshot-1" style="width: 100%; height: auto; display: block;"></td>
+      <td style="width: 50%;"><img src="assets/snapshot-2.webp" alt="snapshot-2" style="width: 100%; height: auto; display: block;"></td>
+    </tr>
+  </table>
+</div>
+
+# 🌟 Key Features
 
 - **🌲 Smart Directory Tree** - Left panel displays document directory structure with collapsible folders and expand/collapse operations
 - **📖 Real-time Rendering** - Right panel renders markdown content in real-time with syntax highlighting and formatting
@@ -175,7 +186,27 @@ flowchart TB
     N --> O
 ```
 
-### Core Components
+### ♻️ Execution Workflow
+``` mermaid
+sequenceDiagram
+participant Developer as Developer
+participant Litho as Litho Engine
+participant LithoBook as Litho Book
+participant Browser as Browser
+Developer->>Litho : litho --project ./my-project --output ./docs
+Litho-->>Developer : Documentation generation completed
+Developer->>LithoBook : cargo run -- --docs-dir ./docs --open
+LithoBook-->>Developer : Server started successfully
+LithoBook->>Browser : Automatically opens http://127.0.0.1:3000
+Browser->>LithoBook : Requests main page
+LithoBook-->>Browser : Returns HTML page
+Browser->>LithoBook : Requests document tree (/api/tree)
+LithoBook-->>Browser : Returns JSON-formatted tree structure
+Browser->>LithoBook : Requests file content (/api/file?file=...)
+LithoBook-->>Browser : Returns rendered HTML content
+```
+
+### 📦 Core Components
 
 - **CLI Handler**: Responsible for command-line argument parsing, configuration validation, and server startup
 - **Web Server**: High-performance HTTP server based on Axum, providing API and static file services
@@ -204,24 +235,18 @@ litho-book/
 └── README.md                # Project documentation
 ```
 
-# 🌟 Interface Preview
+## 🧩 API Interface Documentation
 
-### Desktop Experience
-- **Left Panel**: Collapsible document directory tree with real-time search and quick navigation
-- **Right Panel**: Rendered markdown content with syntax highlighting and Mermaid charts
-- **Top Navigation**: Application title, path navigation, and function buttons
-- **Bottom Status**: Document statistics and loading status
+Litho Book provides the following API endpoints to support dynamic frontend functionality:
 
-### Mobile Adaptation
-- **Responsive Layout**: Automatically adapts to small screens with optimized touch experience
-- **Collapsible Sidebar**: Retractable sidebar to maximize content display area
-- **Touch-Friendly**: Interaction design and gesture support optimized for mobile devices
-- **Quick Access**: Floating buttons provide quick search and navigation functions
-
-### Main Feature Interfaces
-- **Document Browsing**: Clear document content display supporting various markdown syntax
-- **Search Interface**: Real-time search results display with keyword highlighting
-- **Chart Rendering**: Perfect support for Mermaid charts with automatic theme adaptation
+| Endpoint | Method | Description | Parameters |
+|----------|--------|-------------|------------|
+| `/` | GET | Main page | - |
+| `/api/file` | GET | Retrieve the content and rendered HTML of a specified file | `file=<path>` |
+| `/api/tree` | GET | Get the tree structure of the entire document directory | - |
+| `/api/search` | GET | Search files based on a query keyword | `q=<query>` |
+| `/api/stats` | GET | Get statistics of the document library (e.g., number of files, size, etc.) | - |
+| `/health` | GET | Health check | - |
 
 # 🔧 Development Guide
 
