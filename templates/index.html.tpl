@@ -468,7 +468,7 @@
             .content {
                 flex: 1;
                 overflow-y: auto;
-                padding: 2rem;
+                padding: 0;
                 background: var(--bg-primary);
                 position: relative;
             }
@@ -476,14 +476,25 @@
             .content-header {
                 display: flex;
                 align-items: center;
-                margin-bottom: 1rem;
+                padding: 1rem 2rem;
+                background: var(--bg-primary);
+                border-bottom: 1px solid var(--border-color);
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 2px 4px var(--shadow);
+            }
+
+            #content-container {
+                padding: 2rem;
             }
 
             .sidebar-toggle {
                 background: none;
                 border: none;
                 cursor: pointer;
-                padding: 0.5rem 0rem 0.5rem 0rem;
+                padding: 0.5rem;
                 border-radius: 6px;
                 margin-right: 1rem;
                 color: var(--text-secondary);
@@ -988,7 +999,11 @@
                     padding: 0 1rem 1rem 1rem;
                 }
 
-                .content {
+                .content-header {
+                    padding: 1rem;
+                }
+
+                #content-container {
                     padding: 1rem;
                 }
 
