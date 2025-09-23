@@ -729,25 +729,227 @@
             }
 
             /* 搜索框样式 */
-            .search-box {
+            .search-input-container {
+                position: relative;
                 padding: 0 1rem;
                 flex-shrink: 0;
             }
 
             .search-input {
                 width: 100%;
-                padding: 0.5rem 0.75rem;
+                padding: 0.5rem 2.5rem 0.5rem 0.75rem;
                 border: 1px solid var(--border-color);
                 border-radius: 6px;
                 font-size: calc(0.9rem * var(--font-size-scale));
                 background: var(--bg-secondary);
                 color: var(--text-primary);
+                transition: all 0.2s ease;
             }
 
             .search-input:focus {
                 outline: none;
                 border-color: var(--accent-color);
                 box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+            }
+
+            .search-clear-btn {
+                position: absolute;
+                right: 1.5rem;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                cursor: pointer;
+                padding: 0.25rem;
+                border-radius: 3px;
+                display: none;
+                transition: all 0.2s ease;
+            }
+
+            .search-clear-btn:hover {
+                color: var(--text-primary);
+                background: var(--bg-tertiary);
+            }
+
+            .search-clear-btn.show {
+                display: block;
+            }
+
+            /* 搜索模式切换 */
+            .search-mode-toggle {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 1rem;
+                border-bottom: 1px solid var(--border-color);
+                background: var(--bg-secondary);
+            }
+
+            .search-mode-btn {
+                padding: 0.25rem 0.5rem;
+                border: 1px solid var(--border-color);
+                background: var(--bg-primary);
+                color: var(--text-secondary);
+                border-radius: 4px;
+                font-size: calc(0.8rem * var(--font-size-scale));
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .search-mode-btn.active {
+                background: var(--accent-color);
+                color: white;
+                border-color: var(--accent-color);
+            }
+
+            .search-mode-btn:hover:not(.active) {
+                background: var(--bg-tertiary);
+                color: var(--text-primary);
+            }
+
+            /* 搜索结果样式 */
+            .search-results {
+                padding: 0;
+            }
+
+            .search-result-item {
+                margin-bottom: 1rem;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                background: var(--bg-secondary);
+                transition: all 0.2s ease;
+                cursor: pointer;
+            }
+
+            .search-result-item:hover {
+                border-color: var(--accent-color);
+                box-shadow: 0 2px 8px var(--shadow);
+                transform: translateY(-1px);
+            }
+
+            .search-result-header {
+                padding: 0.75rem 1rem;
+                border-bottom: 1px solid var(--border-color);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .search-result-title {
+                font-weight: 600;
+                color: var(--text-primary);
+                font-size: calc(0.9rem * var(--font-size-scale));
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .search-result-title .file-icon::before {
+                content: "📄";
+                font-size: calc(0.8rem * var(--font-size-scale));
+            }
+
+            .search-result-score {
+                background: var(--accent-color);
+                color: white;
+                padding: 0.2rem 0.5rem;
+                border-radius: 12px;
+                font-size: calc(0.75rem * var(--font-size-scale));
+                font-weight: 500;
+            }
+
+            .search-result-matches {
+                padding: 0;
+            }
+
+            .search-match {
+                padding: 0.75rem 1rem;
+                border-bottom: 1px solid var(--border-color);
+                position: relative;
+            }
+
+            .search-match:last-child {
+                border-bottom: none;
+            }
+
+            .search-match-line {
+                font-size: calc(0.85rem * var(--font-size-scale));
+                color: var(--text-secondary);
+                margin-bottom: 0.25rem;
+            }
+
+            .search-match-content {
+                font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+                font-size: calc(0.85rem * var(--font-size-scale));
+                line-height: 1.5;
+                color: var(--text-primary);
+                background: var(--bg-primary);
+                padding: 0.5rem;
+                border-radius: 4px;
+                border: 1px solid var(--border-color);
+                margin-bottom: 0.5rem;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .search-match-content mark {
+                background: var(--accent-color);
+                color: white;
+                padding: 0.1rem 0.2rem;
+                border-radius: 2px;
+                font-weight: 600;
+            }
+
+            .search-match-context {
+                font-size: calc(0.8rem * var(--font-size-scale));
+                color: var(--text-secondary);
+                font-style: italic;
+                margin-top: 0.25rem;
+                padding-left: 1rem;
+                border-left: 2px solid var(--border-color);
+            }
+
+            .search-stats {
+                padding: 0.75rem 1rem;
+                margin: 0 0 1rem 0;
+                background: var(--bg-secondary);
+                border-bottom: 1px solid var(--border-color);
+                border-radius: 6px;
+                font-size: calc(0.85rem * var(--font-size-scale));
+                color: var(--text-secondary);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .search-loading {
+                text-align: center;
+                padding: 2rem 1rem;
+                color: var(--text-secondary);
+            }
+
+            .search-loading-spinner {
+                display: inline-block;
+                width: 1.5rem;
+                height: 1.5rem;
+                border: 2px solid var(--bg-tertiary);
+                border-top: 2px solid var(--accent-color);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-bottom: 0.5rem;
+            }
+
+            .search-empty {
+                text-align: center;
+                padding: 3rem 1rem;
+                color: var(--text-secondary);
+            }
+
+            .search-empty-icon {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+                opacity: 0.5;
             }
 
             /* 目录容器样式 */
@@ -1165,14 +1367,28 @@
                         </svg>
                     </button>
                 </div>
-                <div class="search-box">
+                <div class="search-input-container">
                     <input
                         type="text"
                         class="search-input"
-                        placeholder="搜索文档..."
+                        placeholder="搜索文档内容..."
                         id="searchInput"
-                        onkeyup="searchFiles()"
+                        onkeyup="handleSearchInput()"
                     />
+                    <button class="search-clear-btn" id="searchClearBtn" onclick="clearSearch()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="search-mode-toggle" id="searchModeToggle" style="display: none;">
+                    <button class="search-mode-btn active" data-mode="content" onclick="setSearchMode('content')">
+                        内容搜索
+                    </button>
+                    <button class="search-mode-btn" data-mode="filename" onclick="setSearchMode('filename')">
+                        文件名
+                    </button>
                 </div>
                 <div id="tree-container" class="tree-container"></div>
             </div>
@@ -1575,6 +1791,11 @@
             let allFiles = [];
             let originalTreeData = null;
 
+            // 搜索相关变量
+            let searchMode = 'content'; // 'content' or 'filename'
+            let searchTimeout = null;
+            let isSearching = false;
+
             // 收集所有文件用于搜索
             function collectFiles(node, path = '') {
                 const currentPath = path ? `${path}/${node.name}` : node.name;
@@ -1592,7 +1813,207 @@
                 }
             }
 
-            // 搜索文件
+            // 处理搜索输入
+            function handleSearchInput() {
+                const query = document.getElementById('searchInput').value.trim();
+                const clearBtn = document.getElementById('searchClearBtn');
+                const modeToggle = document.getElementById('searchModeToggle');
+                
+                // 显示/隐藏清除按钮
+                if (query) {
+                    clearBtn.classList.add('show');
+                    modeToggle.style.display = 'flex';
+                } else {
+                    clearBtn.classList.remove('show');
+                    modeToggle.style.display = 'none';
+                }
+
+                // 防抖搜索
+                if (searchTimeout) {
+                    clearTimeout(searchTimeout);
+                }
+
+                searchTimeout = setTimeout(() => {
+                    if (query) {
+                        performSearch(query);
+                    } else {
+                        clearSearch();
+                    }
+                }, 300);
+            }
+
+            // 执行搜索
+            async function performSearch(query) {
+                if (isSearching) return;
+                
+                isSearching = true;
+                const treeContainer = document.getElementById('tree-container');
+
+                if (searchMode === 'filename') {
+                    // 文件名搜索（原有逻辑）
+                    searchFiles();
+                    isSearching = false;
+                    return;
+                }
+
+                // 显示加载状态
+                treeContainer.innerHTML = `
+                    <div class="search-loading">
+                        <div class="search-loading-spinner"></div>
+                        <p>正在搜索...</p>
+                    </div>
+                `;
+
+                try {
+                    const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                    if (!response.ok) {
+                        throw new Error(`搜索失败: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    displaySearchResults(data);
+                } catch (error) {
+                    console.error('搜索错误:', error);
+                    treeContainer.innerHTML = `
+                        <div class="search-empty">
+                            <div class="search-empty-icon">⚠️</div>
+                            <p>搜索失败</p>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">${error.message}</p>
+                        </div>
+                    `;
+                } finally {
+                    isSearching = false;
+                }
+            }
+
+            // 显示搜索结果
+            function displaySearchResults(data) {
+                const treeContainer = document.getElementById('tree-container');
+                
+                if (data.total === 0) {
+                    treeContainer.innerHTML = `
+                        <div class="search-empty">
+                            <div class="search-empty-icon">🔍</div>
+                            <p>未找到匹配内容</p>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">尝试使用不同的关键词</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `
+                    <div class="search-stats">
+                        <span>找到 ${data.total} 个结果</span>
+                        <span>查询: "${data.query}"</span>
+                    </div>
+                    <div class="search-results">
+                `;
+
+                data.results.forEach(result => {
+                    const title = result.title || result.file_name;
+                    const score = Math.round(result.relevance_score * 10) / 10;
+                    
+                    html += `
+                        <div class="search-result-item" onclick="loadFile('${result.file_path}')">
+                            <div class="search-result-header">
+                                <div class="search-result-title">
+                                    <span class="file-icon"></span>
+                                    <span>${title}</span>
+                                </div>
+                                <div class="search-result-score">${score}</div>
+                            </div>
+                            <div class="search-result-matches">
+                    `;
+
+                    // 限制显示的匹配数量
+                    const maxMatches = 3;
+                    const matches = result.matches.slice(0, maxMatches);
+                    
+                    matches.forEach(match => {
+                        html += `
+                            <div class="search-match">
+                                <div class="search-match-line">第 ${match.line_number} 行</div>
+                                <div class="search-match-content">${match.highlighted_content}</div>
+                        `;
+                        
+                        if (match.context_before || match.context_after) {
+                            html += '<div class="search-match-context">';
+                            if (match.context_before) {
+                                html += `<div>... ${match.context_before}</div>`;
+                            }
+                            if (match.context_after) {
+                                html += `<div>${match.context_after} ...</div>`;
+                            }
+                            html += '</div>';
+                        }
+                        
+                        html += '</div>';
+                    });
+
+                    if (result.matches.length > maxMatches) {
+                        html += `
+                            <div class="search-match" style="text-align: center; color: var(--text-secondary); font-style: italic;">
+                                还有 ${result.matches.length - maxMatches} 个匹配项...
+                            </div>
+                        `;
+                    }
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+                treeContainer.innerHTML = html;
+            }
+
+            // 设置搜索模式
+            function setSearchMode(mode) {
+                searchMode = mode;
+                
+                // 更新按钮状态
+                document.querySelectorAll('.search-mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.mode === mode) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                // 更新搜索框占位符
+                const searchInput = document.getElementById('searchInput');
+                if (mode === 'content') {
+                    searchInput.placeholder = '搜索文档内容...';
+                } else {
+                    searchInput.placeholder = '搜索文件名...';
+                }
+
+                // 如果有查询，重新搜索
+                const query = searchInput.value.trim();
+                if (query) {
+                    performSearch(query);
+                }
+            }
+
+            // 清除搜索
+            function clearSearch() {
+                const searchInput = document.getElementById('searchInput');
+                const clearBtn = document.getElementById('searchClearBtn');
+                const modeToggle = document.getElementById('searchModeToggle');
+                const treeContainer = document.getElementById('tree-container');
+                
+                searchInput.value = '';
+                clearBtn.classList.remove('show');
+                modeToggle.style.display = 'none';
+                
+                // 恢复原始目录树
+                treeContainer.innerHTML = '';
+                if (originalTreeData) {
+                    renderTreeChildren(originalTreeData, treeContainer);
+                }
+            }
+
+            // 原有的文件名搜索函数（保持向后兼容）
             function searchFiles() {
                 const query = document.getElementById('searchInput').value.toLowerCase().trim();
                 const treeContainer = document.getElementById('tree-container');
@@ -1635,7 +2056,12 @@
                 treeContainer.innerHTML = '';
 
                 if (filteredFiles.length === 0) {
-                    treeContainer.innerHTML = '<div style="padding: 1rem; color: var(--text-secondary); text-align: center;">未找到匹配的文档</div>';
+                    treeContainer.innerHTML = `
+                        <div class="search-empty">
+                            <div class="search-empty-icon">📁</div>
+                            <p>未找到匹配的文件</p>
+                        </div>
+                    `;
                     return;
                 }
 
