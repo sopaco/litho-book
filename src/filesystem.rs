@@ -15,11 +15,30 @@ pub struct FileNode {
     pub modified: Option<String>,
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct SearchResult {
+    pub file_path: String,
+    pub file_name: String,
+    pub title: Option<String>,
+    pub matches: Vec<SearchMatch>,
+    pub relevance_score: f32,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct SearchMatch {
+    pub line_number: usize,
+    pub content: String,
+    pub highlighted_content: String,
+    pub context_before: Option<String>,
+    pub context_after: Option<String>,
+}
+
 #[derive(Debug, Clone)]
 pub struct DocumentTree {
     pub root: FileNode,
     pub file_map: HashMap<String, PathBuf>,
     pub stats: TreeStats,
+    pub search_index: HashMap<String, Vec<String>>, // file_path -> lines
 }
 
 #[derive(Debug, Clone)]
@@ -33,6 +52,7 @@ impl DocumentTree {
     /// Create a new document tree from the given directory
     pub fn new(docs_dir: &Path) -> anyhow::Result<Self> {
         let mut file_map = HashMap::new();
+        let mut search_index = HashMap::new();
         let mut stats = TreeStats {
             total_files: 0,
             total_dirs: 0,
@@ -77,7 +97,7 @@ impl DocumentTree {
                 }
             }
             
-            match Self::build_tree(&path, docs_dir, &mut file_map, &mut stats) {
+            match Self::build_tree(&path, docs_dir, &mut file_map, &mut search_index, &mut stats) {
                 Ok(child) => children.push(child),
                 Err(e) => {
                     warn!("Failed to process path {}: {}", path.display(), e);
@@ -101,7 +121,7 @@ impl DocumentTree {
             stats.total_files, stats.total_dirs, stats.total_size
         );
         
-        Ok(DocumentTree { root, file_map, stats })
+        Ok(DocumentTree { root, file_map, stats, search_index })
     }
     
     /// Recursively build the file tree
@@ -109,6 +129,7 @@ impl DocumentTree {
         current_path: &Path,
         base_path: &Path,
         file_map: &mut HashMap<String, PathBuf>,
+        search_index: &mut HashMap<String, Vec<String>>,
         stats: &mut TreeStats,
     ) -> anyhow::Result<FileNode> {
         let name = current_path
@@ -141,6 +162,13 @@ impl DocumentTree {
             
             if current_path.extension().and_then(|s| s.to_str()) == Some("md") {
                 file_map.insert(relative_path.clone(), current_path.to_path_buf());
+                
+                // Build search index for this file
+                if let Ok(content) = std::fs::read_to_string(current_path) {
+                    let lines: Vec<String> = content.lines().map(|line| line.to_string()).collect();
+                    search_index.insert(relative_path.clone(), lines);
+                }
+                
                 stats.total_files += 1;
                 stats.total_size += size;
             }
@@ -196,7 +224,7 @@ impl DocumentTree {
                 }
             }
             
-            match Self::build_tree(&path, base_path, file_map, stats) {
+            match Self::build_tree(&path, base_path, file_map, search_index, stats) {
                 Ok(child) => children.push(child),
                 Err(e) => {
                     warn!("Failed to process path {}: {}", path.display(), e);
@@ -251,7 +279,115 @@ impl DocumentTree {
         &self.stats
     }
     
-    /// Search for files matching a query
+    /// Advanced search with full-text search and content preview
+    pub fn search_content(&self, query: &str) -> Vec<SearchResult> {
+        if query.trim().is_empty() {
+            return vec![];
+        }
+
+        let query_lower = query.to_lowercase();
+        let mut results = Vec::new();
+
+        for (file_path, lines) in &self.search_index {
+            let mut matches = Vec::new();
+            let mut relevance_score = 0.0;
+
+            // Extract title from first heading
+            let title = lines.iter()
+                .find(|line| line.trim().starts_with('#'))
+                .map(|line| line.trim_start_matches('#').trim().to_string());
+
+            // Search through all lines
+            for (line_number, line) in lines.iter().enumerate() {
+                let line_lower = line.to_lowercase();
+                
+                if line_lower.contains(&query_lower) {
+                    // Calculate relevance score
+                    let mut line_score = 1.0;
+                    
+                    // Higher score for title matches
+                    if line.trim().starts_with('#') {
+                        line_score *= 3.0;
+                    }
+                    
+                    // Higher score for exact word matches
+                    if line_lower.split_whitespace().any(|word| word == query_lower) {
+                        line_score *= 2.0;
+                    }
+                    
+                    // Higher score for matches at the beginning of the line
+                    if line_lower.trim_start().starts_with(&query_lower) {
+                        line_score *= 1.5;
+                    }
+
+                    relevance_score += line_score;
+
+                    // Create highlighted content
+                    let highlighted_content = self.highlight_matches(line, query);
+                    
+                    // Get context lines
+                    let context_before = if line_number > 0 {
+                        lines.get(line_number - 1).cloned()
+                    } else {
+                        None
+                    };
+                    
+                    let context_after = lines.get(line_number + 1).cloned();
+
+                    matches.push(SearchMatch {
+                        line_number: line_number + 1, // 1-based line numbers
+                        content: line.clone(),
+                        highlighted_content,
+                        context_before,
+                        context_after,
+                    });
+                }
+            }
+
+            // Also check filename matches
+            let file_name = file_path.split('/').last().unwrap_or(file_path);
+            if file_name.to_lowercase().contains(&query_lower) {
+                relevance_score += 2.0; // Bonus for filename matches
+            }
+
+            if !matches.is_empty() {
+                results.push(SearchResult {
+                    file_path: file_path.clone(),
+                    file_name: file_name.to_string(),
+                    title,
+                    matches,
+                    relevance_score,
+                });
+            }
+        }
+
+        // Sort by relevance score (descending)
+        results.sort_by(|a, b| b.relevance_score.partial_cmp(&a.relevance_score).unwrap_or(std::cmp::Ordering::Equal));
+        
+        // Limit results to prevent overwhelming the UI
+        results.truncate(50);
+        
+        results
+    }
+
+    /// Highlight search matches in content
+    fn highlight_matches(&self, content: &str, query: &str) -> String {
+        let query_lower = query.to_lowercase();
+        let content_lower = content.to_lowercase();
+        
+        if let Some(start) = content_lower.find(&query_lower) {
+            let end = start + query.len();
+            let before = &content[..start];
+            let matched = &content[start..end];
+            let after = &content[end..];
+            
+            format!("{}<mark>{}</mark>{}", before, matched, after)
+        } else {
+            content.to_string()
+        }
+    }
+
+    /// Search for files matching a query (legacy method for backward compatibility)
     pub fn search_files(&self, query: &str) -> Vec<&String> {
         let query_lower = query.to_lowercase();
         self.file_map

@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use tower_http::cors::CorsLayer;
 use tracing::{debug, error, info};
 
-use crate::filesystem::DocumentTree;
+use crate::filesystem::{DocumentTree, SearchResult};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -38,8 +38,9 @@ pub struct FileResponse {
 
 #[derive(Serialize)]
 pub struct SearchResponse {
-    pub files: Vec<String>,
+    pub results: Vec<SearchResult>,
     pub total: usize,
+    pub query: String,
 }
 
 #[derive(Serialize)]
@@ -138,34 +139,33 @@ async fn get_tree_handler(State(state): State<AppState>) -> Json<serde_json::Val
     Json(serde_json::to_value(&state.doc_tree.root).unwrap_or_default())
 }
 
-/// Search for files
+/// Search for content with full-text search
 async fn search_handler(
     Query(params): Query<SearchQuery>,
     State(state): State<AppState>,
 ) -> Result<Json<SearchResponse>, StatusCode> {
     let query = params.q.unwrap_or_default();
 
-    if query.is_empty() {
+    if query.trim().is_empty() {
         return Ok(Json(SearchResponse {
-            files: vec![],
+            results: vec![],
             total: 0,
+            query: query.clone(),
         }));
     }
 
     debug!("Searching for: {}", query);
 
-    let files = state
-        .doc_tree
-        .search_files(&query)
-        .into_iter()
-        .cloned()
-        .collect::<Vec<_>>();
+    let results = state.doc_tree.search_content(&query);
+    let total = results.len();
 
-    let total = files.len();
+    debug!("Found {} results matching query: {}", total, query);
 
-    debug!("Found {} files matching query: {}", total, query);
-
-    Ok(Json(SearchResponse { files, total }))
+    Ok(Json(SearchResponse { 
+        results, 
+        total, 
+        query 
+    }))
 }
 
 /// Get statistics about the document tree

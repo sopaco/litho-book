@@ -1,0 +1,56 @@
+# Litho Book 配置文件示例
+# 这个文件展示了可能的配置选项（当前版本通过命令行参数配置）
+
+[server]
+# 服务器绑定地址
+host = "127.0.0.1"
+# 服务器端口
+port = 3000
+# 是否自动打开浏览器
+auto_open = false
+
+[docs]
+# 文档根目录
+root_dir = "./sample-markdowns-docdir"
+# 支持的文件扩展名
+extensions = ["md", "markdown"]
+# 是否包含隐藏文件
+include_hidden = false
+
+[ui]
+# 界面主题
+theme = "default"
+# 侧边栏默认宽度
+sidebar_width = 320
+# 是否启用搜索
+enable_search = true
+# 是否启用目录树
+enable_tree = true
+
+[markdown]
+# 是否启用表格支持
+enable_tables = true
+# 是否启用脚注
+enable_footnotes = true
+# 是否启用删除线
+enable_strikethrough = true
+# 是否启用任务列表
+enable_tasklists = true
+# 是否启用智能标点
+enable_smart_punctuation = true
+
+[mermaid]
+# Mermaid 主题
+theme = "default"
+# 安全级别
+security_level = "loose"
+# 字体族
+font_family = "inherit"
+
+[logging]
+# 日志级别: error, warn, info, debug, trace
+level = "info"
+# 是否显示时间戳
+show_timestamp = true
+# 是否显示目标模块
+show_target = false
