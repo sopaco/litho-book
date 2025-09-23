@@ -2490,6 +2490,716 @@
             }
 
             initializeDefaultDocument();
+
+            // Mermaid图表增强功能
+            function enhanceMermaidDiagrams() {
+                document.querySelectorAll('.mermaid').forEach(mermaidElement => {
+                    // 避免重复增强
+                    if (mermaidElement.dataset.enhanced) return;
+                    mermaidElement.dataset.enhanced = 'true';
+                    
+                    // 确保mermaid元素有相对定位
+                    mermaidElement.style.position = 'relative';
+                    mermaidElement.style.cursor = 'pointer';
+                    mermaidElement.style.transition = 'all 0.2s ease';
+                    
+                    // 添加悬停效果
+                    mermaidElement.addEventListener('mouseenter', () => {
+                        mermaidElement.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.1)';
+                        mermaidElement.style.transform = 'translateY(-2px)';
+                    });
+                    
+                    mermaidElement.addEventListener('mouseleave', () => {
+                        mermaidElement.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                        mermaidElement.style.transform = 'translateY(0)';
+                    });
+                    
+                    // 添加点击预览功能
+                    mermaidElement.addEventListener('click', () => {
+                        openMermaidPreview(mermaidElement);
+                    });
+                    
+                    // 创建控制按钮容器
+                    const controlsContainer = document.createElement('div');
+                    controlsContainer.className = 'mermaid-controls';
+                    controlsContainer.style.cssText = `
+                        position: absolute;
+                        top: 0.5rem;
+                        right: 0.5rem;
+                        display: flex;
+                        gap: 0.25rem;
+                        opacity: 0;
+                        transition: opacity 0.2s ease;
+                        z-index: 10;
+                    `;
+                    
+                    // 下载按钮
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.innerHTML = '⬇️';
+                    downloadBtn.title = '下载图片';
+                    downloadBtn.style.cssText = `
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        padding: 0.25rem;
+                        cursor: pointer;
+                        width: 28px;
+                        height: 28px;
+                        font-size: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                        transition: all 0.2s ease;
+                    `;
+                    
+                    downloadBtn.addEventListener('mouseenter', () => {
+                        downloadBtn.style.background = '#0056b3';
+                        downloadBtn.style.transform = 'scale(1.1)';
+                    });
+                    
+                    downloadBtn.addEventListener('mouseleave', () => {
+                        downloadBtn.style.background = '#007bff';
+                        downloadBtn.style.transform = 'scale(1)';
+                    });
+                    
+                    downloadBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        downloadMermaidImage(mermaidElement);
+                    });
+                    
+                    // 复制按钮
+                    const copyBtn = document.createElement('button');
+                    copyBtn.innerHTML = '📋';
+                    copyBtn.title = '复制图片';
+                    copyBtn.style.cssText = `
+                        background: #28a745;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        padding: 0.25rem;
+                        cursor: pointer;
+                        width: 28px;
+                        height: 28px;
+                        font-size: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                        transition: all 0.2s ease;
+                    `;
+                    
+                    copyBtn.addEventListener('mouseenter', () => {
+                        copyBtn.style.background = '#1e7e34';
+                        copyBtn.style.transform = 'scale(1.1)';
+                    });
+                    
+                    copyBtn.addEventListener('mouseleave', () => {
+                        copyBtn.style.background = '#28a745';
+                        copyBtn.style.transform = 'scale(1)';
+                    });
+                    
+                    copyBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        copyMermaidImage(mermaidElement);
+                    });
+                    
+                    // 添加按钮到容器
+                    controlsContainer.appendChild(downloadBtn);
+                    controlsContainer.appendChild(copyBtn);
+                    mermaidElement.appendChild(controlsContainer);
+                    
+                    // 悬停显示/隐藏控制按钮
+                    mermaidElement.addEventListener('mouseenter', () => {
+                        controlsContainer.style.opacity = '1';
+                    });
+                    
+                    mermaidElement.addEventListener('mouseleave', () => {
+                        controlsContainer.style.opacity = '0';
+                    });
+                });
+            }
+            
+            // 打开Mermaid预览模态框
+            function openMermaidPreview(mermaidElement) {
+                const svg = mermaidElement.querySelector('svg');
+                if (!svg) return;
+                
+                // 创建模态框
+                const modal = document.createElement('div');
+                modal.id = 'mermaidPreviewModal';
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.9);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                `;
+                
+                // 创建容器
+                const container = document.createElement('div');
+                container.style.cssText = `
+                    position: relative;
+                    max-width: 95vw;
+                    max-height: 95vh;
+                    background: var(--bg-primary);
+                    border-radius: 8px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                    overflow: hidden;
+                    transform: scale(0.8);
+                    transition: transform 0.3s ease;
+                `;
+                
+                // 创建头部
+                const header = document.createElement('div');
+                header.style.cssText = `
+                    padding: 1rem;
+                    background: var(--bg-secondary);
+                    border-bottom: 1px solid var(--border-color);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                `;
+                
+                const title = document.createElement('div');
+                title.textContent = 'Mermaid 图表预览';
+                title.style.cssText = `
+                    font-weight: 600;
+                    color: var(--text-primary);
+                `;
+                
+                // 创建控制按钮组
+                const controls = document.createElement('div');
+                controls.style.cssText = `
+                    display: flex;
+                    gap: 0.5rem;
+                    align-items: center;
+                `;
+                
+                // 放大按钮
+                const zoomInBtn = createControlButton('🔍+', '放大', () => {
+                    currentZoom *= 1.2;
+                    updateSvgTransform();
+                });
+                
+                // 缩小按钮
+                const zoomOutBtn = createControlButton('🔍-', '缩小', () => {
+                    currentZoom *= 0.8;
+                    updateSvgTransform();
+                });
+                
+                // 重置按钮
+                const resetBtn = createControlButton('🔄', '重置', () => {
+                    currentZoom = 1;
+                    currentTranslate = { x: 0, y: 0 };
+                    updateSvgTransform();
+                });
+                
+                // 下载按钮
+                const downloadBtn = createControlButton('⬇️', '下载', () => {
+                    downloadMermaidImage(mermaidElement);
+                }, '#007bff');
+                
+                // 复制按钮
+                const copyBtn = createControlButton('📋', '复制', () => {
+                    copyMermaidImage(mermaidElement);
+                }, '#28a745');
+                
+                // 关闭按钮
+                const closeBtn = createControlButton('✕', '关闭', () => {
+                    closeModal();
+                }, '#dc3545');
+                
+                controls.appendChild(zoomOutBtn);
+                controls.appendChild(zoomInBtn);
+                controls.appendChild(resetBtn);
+                controls.appendChild(downloadBtn);
+                controls.appendChild(copyBtn);
+                controls.appendChild(closeBtn);
+                
+                header.appendChild(title);
+                header.appendChild(controls);
+                
+                // 创建内容区域
+                const content = document.createElement('div');
+                content.style.cssText = `
+                    padding: 1rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 400px;
+                    max-height: calc(95vh - 120px);
+                    overflow: auto;
+                    position: relative;
+                `;
+                
+                // 克隆SVG
+                const clonedSvg = svg.cloneNode(true);
+                clonedSvg.id = 'previewSvg';
+                clonedSvg.style.cssText = `
+                    max-width: 100%;
+                    max-height: 100%;
+                    transition: transform 0.2s ease;
+                    cursor: grab;
+                `;
+                
+                // 缩放和拖拽变量
+                let currentZoom = 1;
+                let currentTranslate = { x: 0, y: 0 };
+                let isDragging = false;
+                let dragStart = { x: 0, y: 0 };
+                
+                // 更新SVG变换
+                function updateSvgTransform() {
+                    clonedSvg.style.transform = `translate(${currentTranslate.x}px, ${currentTranslate.y}px) scale(${currentZoom})`;
+                    updateZoomInfo();
+                }
+                
+                // 添加拖拽功能
+                clonedSvg.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    dragStart = { x: e.clientX, y: e.clientY };
+                    clonedSvg.style.cursor = 'grabbing';
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    
+                    const deltaX = e.clientX - dragStart.x;
+                    const deltaY = e.clientY - dragStart.y;
+                    
+                    currentTranslate.x += deltaX;
+                    currentTranslate.y += deltaY;
+                    
+                    updateSvgTransform();
+                    dragStart = { x: e.clientX, y: e.clientY };
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    clonedSvg.style.cursor = 'grab';
+                });
+                
+                // 滚轮缩放
+                clonedSvg.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                    currentZoom *= delta;
+                    currentZoom = Math.max(0.1, Math.min(5, currentZoom));
+                    updateSvgTransform();
+                });
+                
+                // 缩放信息
+                const zoomInfo = document.createElement('div');
+                zoomInfo.id = 'zoomInfo';
+                zoomInfo.style.cssText = `
+                    position: absolute;
+                    bottom: 1rem;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(0, 0, 0, 0.7);
+                    color: white;
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 12px;
+                    font-size: 0.8rem;
+                    pointer-events: none;
+                `;
+                
+                function updateZoomInfo() {
+                    zoomInfo.textContent = `${Math.round(currentZoom * 100)}%`;
+                }
+                
+                updateZoomInfo();
+                
+                content.appendChild(clonedSvg);
+                content.appendChild(zoomInfo);
+                
+                container.appendChild(header);
+                container.appendChild(content);
+                modal.appendChild(container);
+                document.body.appendChild(modal);
+                
+                // 显示动画
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                    container.style.transform = 'scale(1)';
+                }, 10);
+                
+                // 关闭模态框
+                function closeModal() {
+                    modal.style.opacity = '0';
+                    container.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        if (document.body.contains(modal)) {
+                            document.body.removeChild(modal);
+                        }
+                    }, 300);
+                }
+                
+                // 点击背景关闭
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
+                
+                // ESC键关闭
+                function handleEsc(e) {
+                    if (e.key === 'Escape') {
+                        closeModal();
+                        document.removeEventListener('keydown', handleEsc);
+                    }
+                }
+                document.addEventListener('keydown', handleEsc);
+            }
+            
+            // 创建控制按钮
+            function createControlButton(text, title, onClick, bgColor = '#6c757d') {
+                const btn = document.createElement('button');
+                btn.innerHTML = text;
+                btn.title = title;
+                btn.style.cssText = `
+                    background: ${bgColor};
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    padding: 0.5rem;
+                    cursor: pointer;
+                    min-width: 36px;
+                    height: 36px;
+                    font-size: 14px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s ease;
+                `;
+                
+                btn.addEventListener('click', onClick);
+                
+                btn.addEventListener('mouseenter', () => {
+                    btn.style.opacity = '0.8';
+                    btn.style.transform = 'scale(1.05)';
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.opacity = '1';
+                    btn.style.transform = 'scale(1)';
+                });
+                
+                return btn;
+            }
+            
+            // 下载Mermaid图片
+            async function downloadMermaidImage(mermaidElement) {
+                const svg = mermaidElement.querySelector('svg');
+                if (!svg) return;
+                
+                try {
+                    // 方法1: 直接下载SVG文件
+                    const svgData = new XMLSerializer().serializeToString(svg);
+                    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                    const url = URL.createObjectURL(svgBlob);
+                    
+                    const link = document.createElement('a');
+                    link.download = `mermaid-diagram-${Date.now()}.svg`;
+                    link.href = url;
+                    link.click();
+                    
+                    URL.revokeObjectURL(url);
+                    showToast('SVG图片下载成功！');
+                    
+                    // 尝试转换为PNG（如果支持的话）
+                    setTimeout(() => {
+                        convertSvgToPng(svg, svgData).catch(() => {
+                            // PNG转换失败时的备用方案已经在convertSvgToPng中处理
+                        });
+                    }, 100);
+                    
+                } catch (error) {
+                    console.error('下载失败:', error);
+                    showToast('下载失败，请重试', 'error');
+                }
+            }
+            
+            // 转换SVG为PNG
+            async function convertSvgToPng(svg, svgData) {
+                try {
+                    // 清理SVG数据，移除可能导致安全问题的内容
+                    let cleanSvgData = svgData;
+                    
+                    // 确保SVG有正确的命名空间
+                    if (!cleanSvgData.includes('xmlns="http://www.w3.org/2000/svg"')) {
+                        cleanSvgData = cleanSvgData.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+                    
+                    // 获取SVG尺寸
+                    const svgRect = svg.getBoundingClientRect();
+                    const svgWidth = svgRect.width || 800;
+                    const svgHeight = svgRect.height || 600;
+                    
+                    // 创建canvas
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // 设置canvas尺寸
+                    canvas.width = svgWidth * 2;
+                    canvas.height = svgHeight * 2;
+                    ctx.scale(2, 2);
+                    
+                    // 创建图片
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous'; // 尝试避免跨域问题
+                    
+                    // 使用data URL而不是blob URL
+                    const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(cleanSvgData)));
+                    
+                    img.onload = () => {
+                        try {
+                            // 白色背景
+                            ctx.fillStyle = 'white';
+                            ctx.fillRect(0, 0, svgWidth, svgHeight);
+                            
+                            // 绘制SVG
+                            ctx.drawImage(img, 0, 0, svgWidth, svgHeight);
+                            
+                            // 下载PNG
+                            canvas.toBlob((blob) => {
+                                if (blob) {
+                                    const url = URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.download = `mermaid-diagram-${Date.now()}.png`;
+                                    link.href = url;
+                                    link.click();
+                                    URL.revokeObjectURL(url);
+                                    showToast('PNG图片下载成功！');
+                                } else {
+                                    showToast('PNG转换失败，已下载SVG格式', 'warning');
+                                }
+                            }, 'image/png');
+                            
+                        } catch (canvasError) {
+                            console.warn('Canvas操作失败:', canvasError);
+                            showToast('PNG转换失败，已下载SVG格式', 'warning');
+                        }
+                    };
+                    
+                    img.onerror = () => {
+                        console.warn('图片加载失败，PNG转换失败');
+                        showToast('PNG转换失败，已下载SVG格式', 'warning');
+                    };
+                    
+                    img.src = dataUrl;
+                    
+                } catch (error) {
+                    console.warn('PNG转换失败:', error);
+                    showToast('PNG转换失败，已下载SVG格式', 'warning');
+                }
+            }
+            
+            // 复制Mermaid图片
+            async function copyMermaidImage(mermaidElement) {
+                const svg = mermaidElement.querySelector('svg');
+                if (!svg) return;
+                
+                try {
+                    const svgData = new XMLSerializer().serializeToString(svg);
+                    
+                    // 方法1: 尝试复制SVG文本
+                    try {
+                        await navigator.clipboard.writeText(svgData);
+                        showToast('SVG代码已复制到剪贴板！');
+                        return;
+                    } catch (textError) {
+                        console.warn('复制SVG文本失败，尝试复制图片:', textError);
+                    }
+                    
+                    // 方法2: 尝试转换为PNG并复制
+                    await convertSvgToPngAndCopy(svg, svgData);
+                    
+                } catch (error) {
+                    console.error('复制失败:', error);
+                    showToast('复制失败，请重试', 'error');
+                }
+            }
+            
+            // 转换SVG为PNG并复制
+            async function convertSvgToPngAndCopy(svg, svgData) {
+                try {
+                    // 清理SVG数据
+                    let cleanSvgData = svgData;
+                    if (!cleanSvgData.includes('xmlns="http://www.w3.org/2000/svg"')) {
+                        cleanSvgData = cleanSvgData.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+                    
+                    // 获取SVG尺寸
+                    const svgRect = svg.getBoundingClientRect();
+                    const svgWidth = svgRect.width || 800;
+                    const svgHeight = svgRect.height || 600;
+                    
+                    // 创建canvas
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.width = svgWidth * 2;
+                    canvas.height = svgHeight * 2;
+                    ctx.scale(2, 2);
+                    
+                    // 创建图片
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    
+                    // 使用data URL
+                    const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(cleanSvgData)));
+                    
+                    img.onload = () => {
+                        try {
+                            // 白色背景
+                            ctx.fillStyle = 'white';
+                            ctx.fillRect(0, 0, svgWidth, svgHeight);
+                            
+                            // 绘制SVG
+                            ctx.drawImage(img, 0, 0, svgWidth, svgHeight);
+                            
+                            // 复制到剪贴板
+                            canvas.toBlob(async (blob) => {
+                                if (blob) {
+                                    try {
+                                        await navigator.clipboard.write([
+                                            new ClipboardItem({ 'image/png': blob })
+                                        ]);
+                                        showToast('PNG图片已复制到剪贴板！');
+                                    } catch (clipboardError) {
+                                        console.warn('复制PNG失败:', clipboardError);
+                                        showToast('图片复制失败，但SVG代码已复制', 'warning');
+                                    }
+                                } else {
+                                    showToast('图片转换失败，但SVG代码已复制', 'warning');
+                                }
+                            }, 'image/png');
+                            
+                        } catch (canvasError) {
+                            console.warn('Canvas操作失败:', canvasError);
+                            showToast('图片复制失败，但SVG代码已复制', 'warning');
+                        }
+                    };
+                    
+                    img.onerror = () => {
+                        console.warn('图片加载失败');
+                        showToast('图片复制失败，但SVG代码已复制', 'warning');
+                    };
+                    
+                    img.src = dataUrl;
+                    
+                } catch (error) {
+                    console.warn('PNG转换失败:', error);
+                    showToast('图片复制失败，但SVG代码已复制', 'warning');
+                }
+            }
+            
+            // 显示提示消息
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.textContent = message;
+                
+                let backgroundColor;
+                switch (type) {
+                    case 'success':
+                        backgroundColor = '#28a745';
+                        break;
+                    case 'error':
+                        backgroundColor = '#dc3545';
+                        break;
+                    case 'warning':
+                        backgroundColor = '#ffc107';
+                        break;
+                    default:
+                        backgroundColor = '#28a745';
+                }
+                
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${backgroundColor};
+                    color: ${type === 'warning' ? '#212529' : 'white'};
+                    padding: 0.75rem 1rem;
+                    border-radius: 6px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                    z-index: 10000;
+                    font-size: 0.9rem;
+                    animation: slideInRight 0.3s ease;
+                    max-width: 300px;
+                    word-wrap: break-word;
+                `;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => {
+                        if (document.body.contains(toast)) {
+                            document.body.removeChild(toast);
+                        }
+                    }, 300);
+                }, 3000); // 延长显示时间到3秒
+            }
+            
+            // 添加动画样式
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // 页面加载后增强Mermaid图表
+            setTimeout(() => {
+                enhanceMermaidDiagrams();
+            }, 1000);
+            
+            // 监听内容变化，自动增强新的Mermaid图表
+            const mermaidObserver = new MutationObserver((mutations) => {
+                let shouldEnhance = false;
+                mutations.forEach((mutation) => {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            if (node.classList && node.classList.contains('mermaid')) {
+                                shouldEnhance = true;
+                            } else if (node.querySelectorAll) {
+                                const mermaidElements = node.querySelectorAll('.mermaid');
+                                if (mermaidElements.length > 0) {
+                                    shouldEnhance = true;
+                                }
+                            }
+                        }
+                    });
+                });
+                
+                if (shouldEnhance) {
+                    setTimeout(() => {
+                        enhanceMermaidDiagrams();
+                    }, 100);
+                }
+            });
+            
+            mermaidObserver.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
         </script>
     </body>
 </html>
