@@ -2901,119 +2901,49 @@
                 });
             }
             
-            // 打开Mermaid预览模态框
-            function openMermaidPreview(mermaidElement) {
+            // 全局变量跟踪当前预览状态
+            let currentPreviewModal = null;
+            let isPreviewOpen = false;
+            let isPreviewOpening = false; // 防止重复点击
+            
+            // 替换预览内容（避免重新创建模态框）
+            function replacePreviewContent(mermaidElement) {
+                if (!currentPreviewModal || !isPreviewOpen) return;
+                
                 const svg = mermaidElement.querySelector('svg');
                 if (!svg) return;
                 
-                // 创建模态框
-                const modal = document.createElement('div');
-                modal.id = 'mermaidPreviewModal';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.8);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 9999;
-                    opacity: 0;
-                    transition: opacity 0.2s ease;
-                `;
+                // 找到当前预览的内容容器
+                const contentContainer = currentPreviewModal.querySelector('.content');
+                if (!contentContainer) return;
                 
-                // 创建容器
-                const container = document.createElement('div');
-                container.style.cssText = `
-                    position: relative;
-                    width: 95vw;
-                    height: 95vh;
-                    max-width: none;
-                    max-height: none;
-                    background: var(--bg-primary);
-                    border-radius: 8px;
-                    border: 1px solid var(--border-color);
-                    overflow: hidden;
-                    display: flex;
-                    flex-direction: column;
-                `;
+                // 重置缩放状态
+                window.currentZoom = 1;
+                window.currentTranslate = { x: 0, y: 0 };
                 
-                // 创建头部
-                const header = document.createElement('div');
-                header.style.cssText = `
-                    padding: 1rem;
-                    background: var(--bg-secondary);
-                    border-bottom: 1px solid var(--border-color);
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    flex-shrink: 0;
-                `;
+                // 移除旧的SVG和缩放信息
+                const oldSvg = contentContainer.querySelector('#previewSvg');
+                const oldZoomInfo = contentContainer.querySelector('#zoomInfo');
+                if (oldSvg) oldSvg.remove();
+                if (oldZoomInfo) oldZoomInfo.remove();
                 
-                const title = document.createElement('div');
-                title.textContent = 'Mermaid 图表预览';
-                title.style.cssText = `
-                    font-weight: 600;
-                    color: var(--text-primary);
-                    font-size: 1.1rem;
-                `;
+                // 创建新的SVG内容（复用原有的克隆逻辑）
+                const clonedSvg = createClonedSvg(svg);
+                const zoomInfo = createZoomInfo();
                 
-                // 创建控制按钮组
-                const controls = document.createElement('div');
-                controls.style.cssText = `
-                    display: flex;
-                    gap: 0.5rem;
-                    align-items: center;
-                `;
+                // 添加新内容
+                contentContainer.appendChild(clonedSvg);
+                contentContainer.appendChild(zoomInfo);
                 
-                // 放大按钮
-                const zoomInBtn = createControlButton('+', '放大', () => {
-                    currentZoom *= 1.2;
-                    updateSvgTransform();
-                });
+                // 重新设置事件监听器
+                setupSvgInteractions(clonedSvg);
                 
-                // 缩小按钮
-                const zoomOutBtn = createControlButton('-', '缩小', () => {
-                    currentZoom *= 0.8;
-                    updateSvgTransform();
-                });
-                
-                // 重置按钮
-                const resetBtn = createControlButton('重置', '重置缩放', () => {
-                    currentZoom = 1;
-                    currentTranslate = { x: 0, y: 0 };
-                    updateSvgTransform();
-                });
-                
-                // 关闭按钮
-                const closeBtn = createControlButton('关闭', '关闭预览', () => {
-                    closeModal();
-                }, '#dc3545');
-                
-                controls.appendChild(zoomOutBtn);
-                controls.appendChild(zoomInBtn);
-                controls.appendChild(resetBtn);
-                controls.appendChild(closeBtn);
-                
-                header.appendChild(title);
-                header.appendChild(controls);
-                
-                // 创建内容区域
-                const content = document.createElement('div');
-                content.style.cssText = `
-                    padding: 2rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex: 1;
-                    overflow: auto;
-                    position: relative;
-                    background: var(--bg-primary);
-                    min-height: 0;
-                `;
-                
+                // 更新缩放信息显示
+                updateZoomInfo();
+            }
+            
+            // 创建克隆的SVG（提取为独立函数）
+            function createClonedSvg(svg) {
                 // 克隆SVG并保持样式完全一致
                 const clonedSvg = svg.cloneNode(true);
                 clonedSvg.id = 'previewSvg';
@@ -3079,68 +3009,11 @@
                     }
                 });
                 
-                // 确保预览容器继承正确的主题样式
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                if (currentTheme) {
-                    container.setAttribute('data-theme', currentTheme);
-                    modal.setAttribute('data-theme', currentTheme);
-                }
-                
-                // 将原始SVG的父容器样式应用到预览容器
-                const originalParent = svg.closest('.mermaid');
-                if (originalParent) {
-                    const parentStyles = window.getComputedStyle(originalParent);
-                    content.style.backgroundColor = parentStyles.backgroundColor;
-                    content.style.color = parentStyles.color;
-                }
-                
-                // 缩放和拖拽变量
-                let currentZoom = 1;
-                let currentTranslate = { x: 0, y: 0 };
-                let isDragging = false;
-                let dragStart = { x: 0, y: 0 };
-                
-                // 更新SVG变换
-                function updateSvgTransform() {
-                    clonedSvg.style.transform = `translate(${currentTranslate.x}px, ${currentTranslate.y}px) scale(${currentZoom})`;
-                    updateZoomInfo();
-                }
-                
-                // 添加拖拽功能
-                clonedSvg.addEventListener('mousedown', (e) => {
-                    isDragging = true;
-                    dragStart = { x: e.clientX, y: e.clientY };
-                    clonedSvg.style.cursor = 'grabbing';
-                });
-                
-                document.addEventListener('mousemove', (e) => {
-                    if (!isDragging) return;
-                    
-                    const deltaX = e.clientX - dragStart.x;
-                    const deltaY = e.clientY - dragStart.y;
-                    
-                    currentTranslate.x += deltaX;
-                    currentTranslate.y += deltaY;
-                    
-                    updateSvgTransform();
-                    dragStart = { x: e.clientX, y: e.clientY };
-                });
-                
-                document.addEventListener('mouseup', () => {
-                    isDragging = false;
-                    clonedSvg.style.cursor = 'grab';
-                });
-                
-                // 滚轮缩放
-                clonedSvg.addEventListener('wheel', (e) => {
-                    e.preventDefault();
-                    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-                    currentZoom *= delta;
-                    currentZoom = Math.max(0.1, Math.min(5, currentZoom));
-                    updateSvgTransform();
-                });
-                
-                // 缩放信息
+                return clonedSvg;
+            }
+            
+            // 创建缩放信息显示（提取为独立函数）
+            function createZoomInfo() {
                 const zoomInfo = document.createElement('div');
                 zoomInfo.id = 'zoomInfo';
                 zoomInfo.style.cssText = `
@@ -3160,12 +3033,280 @@
                     text-align: center;
                     z-index: 10;
                 `;
+                return zoomInfo;
+            }
+            
+            // 设置SVG交互事件（提取为独立函数）
+            function setupSvgInteractions(clonedSvg) {
+                let isDragging = false;
+                let dragStart = { x: 0, y: 0 };
                 
-                function updateZoomInfo() {
-                    zoomInfo.textContent = `${Math.round(currentZoom * 100)}%`;
+                // 添加拖拽功能
+                clonedSvg.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    dragStart = { x: e.clientX, y: e.clientY };
+                    clonedSvg.style.cursor = 'grabbing';
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    
+                    const deltaX = e.clientX - dragStart.x;
+                    const deltaY = e.clientY - dragStart.y;
+                    
+                    window.currentTranslate.x += deltaX;
+                    window.currentTranslate.y += deltaY;
+                    
+                    window.updateSvgTransform();
+                    dragStart = { x: e.clientX, y: e.clientY };
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    clonedSvg.style.cursor = 'grab';
+                });
+                
+                // 滚轮缩放
+                clonedSvg.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                    window.currentZoom *= delta;
+                    window.currentZoom = Math.max(0.1, Math.min(5, window.currentZoom));
+                    window.updateSvgTransform();
+                });
+            }
+            
+            // 全局关闭预览函数
+            function closeAllMermaidPreviews() {
+                // 关闭所有可能存在的预览模态框
+                const existingModals = document.querySelectorAll('[id^="mermaidPreviewModal"]');
+                existingModals.forEach(modal => {
+                    modal.style.opacity = '0';
+                    setTimeout(() => {
+                        if (document.body.contains(modal)) {
+                            document.body.removeChild(modal);
+                        }
+                    }, 200);
+                });
+                
+                // 重置全局状态
+                currentPreviewModal = null;
+                isPreviewOpen = false;
+                isPreviewOpening = false;
+                
+                // 移除所有键盘事件监听器
+                document.removeEventListener('keydown', globalKeydownHandler);
+            }
+            
+            // 全局键盘事件处理器
+            function globalKeydownHandler(e) {
+                if (e.key === 'Escape') {
+                    closeAllMermaidPreviews();
+                } else if (isPreviewOpen && currentPreviewModal) {
+                    // 处理缩放快捷键
+                    const previewSvg = currentPreviewModal.querySelector('#previewSvg');
+                    if (previewSvg && typeof window.updateSvgTransform === 'function') {
+                        if (e.key === '+' || e.key === '=') {
+                            e.preventDefault();
+                            window.currentZoom *= 1.2;
+                            window.updateSvgTransform();
+                        } else if (e.key === '-') {
+                            e.preventDefault();
+                            window.currentZoom *= 0.8;
+                            window.updateSvgTransform();
+                        } else if (e.key === '0') {
+                            e.preventDefault();
+                            window.currentZoom = 1;
+                            window.currentTranslate = { x: 0, y: 0 };
+                            window.updateSvgTransform();
+                        }
+                    }
+                }
+            }
+            
+            // 打开Mermaid预览模态框
+            function openMermaidPreview(mermaidElement) {
+                const svg = mermaidElement.querySelector('svg');
+                if (!svg) return;
+                
+                // 防止重复点击
+                if (isPreviewOpening) {
+                    return;
                 }
                 
-                updateZoomInfo();
+                // 如果已经有预览打开，检查是否是同一个元素
+                if (isPreviewOpen && currentPreviewModal) {
+                    // 如果点击的是同一个图表，直接返回，不做任何操作
+                    const currentSvg = currentPreviewModal.querySelector('#previewSvg');
+                    if (currentSvg) {
+                        // 简单比较SVG的outerHTML来判断是否是同一个图表
+                        const currentSvgHTML = currentSvg.outerHTML;
+                        const newSvgHTML = svg.outerHTML;
+                        if (currentSvgHTML === newSvgHTML) {
+                            return;
+                        }
+                    }
+                    
+                    // 如果是不同的图表，直接替换内容而不是重新创建模态框
+                    replacePreviewContent(mermaidElement);
+                    return;
+                }
+                
+                // 设置预览状态
+                isPreviewOpening = true;
+                isPreviewOpen = true;
+                
+                // 创建模态框（使用唯一ID）
+                const modal = document.createElement('div');
+                const modalId = `mermaidPreviewModal_${Date.now()}`;
+                modal.id = modalId;
+                currentPreviewModal = modal;
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.8);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                    opacity: 0;
+                    transition: opacity 0.2s ease;
+                `;
+                
+                // 创建容器
+                const container = document.createElement('div');
+                container.style.cssText = `
+                    position: relative;
+                    width: 95vw;
+                    height: 95vh;
+                    max-width: none;
+                    max-height: none;
+                    background: var(--bg-primary);
+                    border-radius: 8px;
+                    border: 1px solid var(--border-color);
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                `;
+                
+                // 创建头部
+                const header = document.createElement('div');
+                header.style.cssText = `
+                    padding: 1rem;
+                    background: var(--bg-secondary);
+                    border-bottom: 1px solid var(--border-color);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    flex-shrink: 0;
+                `;
+                
+                const title = document.createElement('div');
+                title.textContent = 'Mermaid 图表预览';
+                title.style.cssText = `
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    font-size: 1.1rem;
+                `;
+                
+                // 创建控制按钮组
+                const controls = document.createElement('div');
+                controls.style.cssText = `
+                    display: flex;
+                    gap: 0.5rem;
+                    align-items: center;
+                `;
+                
+                // 放大按钮
+                const zoomInBtn = createControlButton('+', '放大', () => {
+                    window.currentZoom *= 1.2;
+                    window.updateSvgTransform();
+                });
+                
+                // 缩小按钮
+                const zoomOutBtn = createControlButton('-', '缩小', () => {
+                    window.currentZoom *= 0.8;
+                    window.updateSvgTransform();
+                });
+                
+                // 重置按钮
+                const resetBtn = createControlButton('重置', '重置缩放', () => {
+                    window.currentZoom = 1;
+                    window.currentTranslate = { x: 0, y: 0 };
+                    window.updateSvgTransform();
+                });
+                
+                // 关闭按钮
+                const closeBtn = createControlButton('关闭', '关闭预览', () => {
+                    closeAllMermaidPreviews();
+                }, '#dc3545');
+                
+                controls.appendChild(zoomOutBtn);
+                controls.appendChild(zoomInBtn);
+                controls.appendChild(resetBtn);
+                controls.appendChild(closeBtn);
+                
+                header.appendChild(title);
+                header.appendChild(controls);
+                
+                // 创建内容区域
+                const content = document.createElement('div');
+                content.className = 'content'; // 添加类名以便后续查找
+                content.style.cssText = `
+                    padding: 2rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex: 1;
+                    overflow: auto;
+                    position: relative;
+                    background: var(--bg-primary);
+                    min-height: 0;
+                `;
+                
+                // 确保预览容器继承正确的主题样式
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                if (currentTheme) {
+                    container.setAttribute('data-theme', currentTheme);
+                    modal.setAttribute('data-theme', currentTheme);
+                }
+                
+                // 将原始SVG的父容器样式应用到预览容器
+                const originalParent = svg.closest('.mermaid');
+                if (originalParent) {
+                    const parentStyles = window.getComputedStyle(originalParent);
+                    content.style.backgroundColor = parentStyles.backgroundColor;
+                    content.style.color = parentStyles.color;
+                }
+                
+                // 重置缩放状态
+                window.currentZoom = 1;
+                window.currentTranslate = { x: 0, y: 0 };
+                
+                // 更新SVG变换函数
+                window.updateSvgTransform = function() {
+                    const clonedSvg = currentPreviewModal?.querySelector('#previewSvg');
+                    if (clonedSvg) {
+                        clonedSvg.style.transform = `translate(${window.currentTranslate.x}px, ${window.currentTranslate.y}px) scale(${window.currentZoom})`;
+                        const zoomInfo = currentPreviewModal?.querySelector('#zoomInfo');
+                        if (zoomInfo) {
+                            zoomInfo.textContent = `${Math.round(window.currentZoom * 100)}%`;
+                        }
+                    }
+                };
+                
+                // 使用提取的函数创建SVG和缩放信息
+                const clonedSvg = createClonedSvg(svg);
+                const zoomInfo = createZoomInfo();
+                
+                // 设置SVG交互
+                setupSvgInteractions(clonedSvg);
+                
+                // 更新缩放信息显示
+                zoomInfo.textContent = `${Math.round(window.currentZoom * 100)}%`;
                 
                 content.appendChild(clonedSvg);
                 content.appendChild(zoomInfo);
@@ -3178,46 +3319,21 @@
                 // 显示动画
                 setTimeout(() => {
                     modal.style.opacity = '1';
-                }, 10);
-                
-                // 关闭模态框
-                function closeModal() {
-                    modal.style.opacity = '0';
+                    // 动画完成后重置开启状态
                     setTimeout(() => {
-                        if (document.body.contains(modal)) {
-                            document.body.removeChild(modal);
-                        }
+                        isPreviewOpening = false;
                     }, 200);
-                }
+                }, 10);
                 
                 // 点击背景关闭
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
-                        closeModal();
+                        closeAllMermaidPreviews();
                     }
                 });
                 
-                // 键盘快捷键
-                function handleKeydown(e) {
-                    if (e.key === 'Escape') {
-                        closeModal();
-                        document.removeEventListener('keydown', handleKeydown);
-                    } else if (e.key === '+' || e.key === '=') {
-                        e.preventDefault();
-                        currentZoom *= 1.2;
-                        updateSvgTransform();
-                    } else if (e.key === '-') {
-                        e.preventDefault();
-                        currentZoom *= 0.8;
-                        updateSvgTransform();
-                    } else if (e.key === '0') {
-                        e.preventDefault();
-                        currentZoom = 1;
-                        currentTranslate = { x: 0, y: 0 };
-                        updateSvgTransform();
-                    }
-                }
-                document.addEventListener('keydown', handleKeydown);
+                // 添加全局键盘事件监听器
+                document.addEventListener('keydown', globalKeydownHandler);
             }
             
             // 创建控制按钮
