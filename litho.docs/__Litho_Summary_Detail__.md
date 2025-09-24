@@ -1,31 +1,31 @@
 # 项目分析总结报告（完整版）
 
-生成时间: 2025-09-23 05:50:54 UTC
+生成时间: 2025-09-24 01:38:54 UTC
 
 ## 执行耗时统计
 
-- **总执行时间**: 594.88 秒
-- **预处理阶段**: 0.07 秒 (0.0%)
-- **研究阶段**: 41.43 秒 (7.0%)
-- **文档生成阶段**: 553.38 秒 (93.0%)
+- **总执行时间**: 175.46 秒
+- **预处理阶段**: 0.24 秒 (0.1%)
+- **研究阶段**: 18.30 秒 (10.4%)
+- **文档生成阶段**: 156.92 秒 (89.4%)
 - **输出阶段**: 0.00 秒 (0.0%)
-- **Summary生成时间**: 0.000 秒
+- **Summary生成时间**: 0.001 秒
 
 ## 缓存性能统计与节约效果
 
 ### 性能指标
-- **缓存命中率**: 94.1%
-- **总操作次数**: 17
-- **缓存命中**: 16 次
-- **缓存未命中**: 1 次
-- **缓存写入**: 2 次
+- **缓存命中率**: 84.6%
+- **总操作次数**: 13
+- **缓存命中**: 11 次
+- **缓存未命中**: 2 次
+- **缓存写入**: 3 次
 
 ### 节约效果
-- **节省推理时间**: 91.8 秒
-- **节省Token数量**: 22729 输入 + 15340 输出 = 38069 总计
-- **估算节省成本**: $0.0290
-- **性能提升**: 94.1%
-- **效率提升比**: 0.2x（节省时间 / 实际执行时间）
+- **节省推理时间**: 66.3 秒
+- **节省Token数量**: 20448 输入 + 10906 输出 = 31354 总计
+- **估算节省成本**: $0.0220
+- **性能提升**: 84.6%
+- **效率提升比**: 0.4x（节省时间 / 实际执行时间）
 
 ## 核心调研数据汇总
 
@@ -36,78 +36,50 @@
 
 ```json
 {
-  "business_value": "为技术文档作者、开发者和知识管理者提供一种无需上传至云端、无需复杂配置的本地化 Markdown 文档浏览解决方案，提升文档阅读的隐私性、响应速度与离线可用性，替代传统文件管理器或静态网站生成器的低效体验。",
+  "business_value": "为用户提供一个轻量级、无依赖、离线可用的本地文档搜索引擎和阅读器，提升知识管理效率，避免在多个文件夹中手动查找 Markdown 文档的繁琐操作，支持快速导航、全文检索和结构化浏览。",
   "confidence_score": 0.95,
-  "external_systems": [
-    {
-      "description": "用于读取用户指定目录下的 Markdown 文件，获取文件元数据（大小、修改时间）",
-      "interaction_type": "Read",
-      "name": "操作系统文件系统"
-    },
-    {
-      "description": "在启动服务后自动打开，用于展示 Web 界面",
-      "interaction_type": "Launch",
-      "name": "操作系统默认浏览器"
-    },
-    {
-      "description": "绑定本地或指定主机的 TCP 端口，提供 HTTP 服务供浏览器访问",
-      "interaction_type": "Listen",
-      "name": "网络接口（TCP）"
-    }
-  ],
-  "project_description": "Litho Book 是一个命令行工具驱动的本地 Markdown 文档阅读器，通过启动本地 Web 服务，将用户指定目录中的 Markdown 文件组织为结构化文档树，并提供浏览器端交互式浏览、搜索与元数据查看功能。它集成了 CLI 参数解析、文件系统扫描、文档树构建、HTTP 服务与前端模板渲染，实现零依赖、离线优先的本地文档阅读体验。",
+  "external_systems": [],
+  "project_description": "Litho Book 是一个本地文档目录的静态文档服务器，能够递归扫描指定目录中的 Markdown 文件，构建树形文档结构，提供全文搜索功能，并通过 Web 界面展示文档内容。它无需数据库，完全基于文件系统，适合开发者或知识工作者用于本地知识库的快速浏览与检索。",
   "project_name": "litho-book",
-  "project_type": "FullStackApp",
+  "project_type": "BackendService",
   "system_boundary": {
     "excluded_components": [
-      "文档编辑器",
-      "Git 版本控制集成",
-      "用户账户与权限系统",
-      "云存储同步（如 Dropbox、OneDrive）",
+      "用户登录与权限系统",
       "数据库（如 SQLite、PostgreSQL）",
-      "实时协作功能",
-      "移动 App 或桌面打包版本",
-      "插件系统或扩展机制"
+      "远程同步功能（如 Git 或云存储）",
+      "Markdown 编辑器功能",
+      "多用户协作功能",
+      "插件或扩展机制",
+      "外部 API 调用（如搜索引擎 API）"
     ],
     "included_components": [
-      "CLI 参数解析器",
-      "文件系统扫描与文档树构建",
-      "Markdown 文件内容读取与元数据提取",
-      "Axum HTTP 服务与 REST API",
-      "HTML 模板渲染与前端交互",
-      "错误统一处理与日志系统"
+      "命令行参数解析 (cli.rs)",
+      "文件系统扫描与文档树构建 (filesystem.rs)",
+      "HTTP 服务与 API 实现 (server.rs)",
+      "错误处理与状态管理 (error.rs)",
+      "主程序协调器 (main.rs)"
     ],
-    "scope": "Litho Book 是一个单机本地应用，仅负责将本地 Markdown 文件转化为可浏览的 Web 服务。不包含文档编辑、版本控制、用户认证、远程同步、数据库存储或云端协作功能。"
+    "scope": "Litho Book 是一个单机命令行启动的 Web 服务，仅负责扫描本地文件系统中的 Markdown 文档，构建内存文档树，并提供 HTTP 接口供浏览器访问。不涉及用户认证、权限管理、远程同步、数据库存储或外部 API 调用。"
   },
   "target_users": [
     {
-      "description": "需要快速浏览本地项目文档、README 或技术笔记的工程师",
+      "description": "使用 Markdown 编写技术文档、笔记或项目手册的开发者",
       "name": "开发者",
       "needs": [
-        "无需上传到网络即可查看 Markdown 文档",
-        "支持全文搜索和目录导航",
-        "轻量级、无依赖、启动快速",
-        "离线使用，保障隐私"
+        "快速浏览本地文档目录结构",
+        "通过关键词搜索文档内容",
+        "无需部署复杂系统即可本地访问文档",
+        "支持离线使用"
       ]
     },
     {
-      "description": "编写和维护本地技术文档的撰写者或技术作家",
-      "name": "技术文档作者",
+      "description": "需要管理个人知识库、读书笔记或项目文档的非技术用户",
+      "name": "知识工作者",
       "needs": [
-        "实时预览文档结构和内容",
-        "快速跳转和搜索文档",
-        "避免使用复杂静态站点生成器",
-        "在本地环境中测试文档组织结构"
-      ]
-    },
-    {
-      "description": "管理内部知识库、个人笔记或团队文档的用户",
-      "name": "知识管理者",
-      "needs": [
-        "集中管理分散的 Markdown 文件",
-        "可视化文档树结构",
-        "安全本地存储，避免云服务依赖",
-        "简单命令行启动，集成到工作流"
+        "以树形结构组织和导航文档",
+        "支持 Markdown 渲染的可视化阅读",
+        "简单启动、无需配置",
+        "轻量级、跨平台运行"
       ]
     }
   ]
@@ -119,94 +91,78 @@
 
 ```json
 {
-  "architecture_summary": "Litho Book 是一个单机本地化 Markdown 文档浏览系统，采用命令行启动、Web 服务渲染的全栈架构。系统以 Rust 语言构建，核心依赖 Axum 框架提供 HTTP 服务，Clap 实现 CLI 解析，thiserror 统一错误处理，Serde 和 Tracing 支持数据序列化与日志追踪。整体架构遵循清晰的分层原则：CLI 作为入口触发流程，文件系统模块负责数据采集与结构化，服务器模块提供 API 与前端交互，错误模块贯穿全链路保障稳定性。系统无外部数据库或云依赖，完全基于本地文件系统运行，体现了轻量、离线优先、隐私安全的设计哲学。",
+  "architecture_summary": "Litho Book 采用轻量级单体架构，以文件系统为唯一数据源，通过命令行启动后构建内存文档树，提供基于 Axum 的 HTTP 服务。系统无数据库、无外部依赖，核心价值在于将本地 Markdown 文档转化为可搜索、可浏览的 Web 应用。技术栈聚焦于 Rust 生态（tokio、axum、clap、serde），实现高并发、低延迟的本地文档服务，符合嵌入式知识管理场景的离线、快速、无依赖需求。",
   "business_flows": [
     {
-      "description": "用户通过命令行启动程序，指定文档目录和端口，系统解析参数、验证路径、构建文档树并启动 Web 服务，最终打开浏览器展示文档界面。该流程是系统的核心使用路径，连接用户意图与功能交付。",
-      "entry_point": "命令行执行 `litho-book <path> --port <port>`",
+      "description": "用户通过命令行启动程序后，系统解析参数、初始化日志、扫描文档目录、构建文档树，并启动 HTTP 服务器，最终打开浏览器访问服务。该流程是系统的核心启动路径，决定用户能否成功访问文档服务。",
+      "entry_point": "命令行执行 `litho-book <directory>`",
       "importance": 10.0,
       "involved_domains_count": 4,
-      "name": "文档浏览启动流程",
+      "name": "文档服务启动与初始化流程",
       "steps": [
         {
-          "code_entry_point": "src/cli.rs:parse_args()",
-          "domain_module": "命令行接口域",
-          "operation": "解析用户输入的文档路径、端口、主机地址等参数",
+          "code_entry_point": "src/cli.rs::Args::parse()",
+          "domain_module": "命令行解析域",
+          "operation": "解析命令行参数，获取文档目录路径、绑定地址和端口",
           "step": 1,
           "sub_module": null
         },
         {
-          "code_entry_point": "src/filesystem.rs:DocumentTree::from_path()",
-          "domain_module": "文件系统域",
-          "operation": "扫描指定目录，递归构建DocumentTree结构，过滤隐藏文件与非Markdown文件",
+          "code_entry_point": "src/error.rs::LithoBookError::new()",
+          "domain_module": "错误处理域",
+          "operation": "验证参数有效性，初始化统一错误类型与日志系统",
           "step": 2,
           "sub_module": null
         },
         {
-          "code_entry_point": "src/server.rs:create_app() & serve()",
-          "domain_module": "服务器域",
-          "operation": "初始化Axum应用，绑定路由处理器，创建共享AppState，启动TCP监听服务",
+          "code_entry_point": "src/filesystem.rs::DocumentTree::from_path()",
+          "domain_module": "文件系统域",
+          "operation": "递归扫描文档目录，构建内存中的文档树结构与全文索引",
           "step": 3,
           "sub_module": null
         },
         {
-          "code_entry_point": "src/cli.rs:open_browser()",
-          "domain_module": "命令行接口域",
-          "operation": "根据配置自动打开默认浏览器访问服务地址",
+          "code_entry_point": "src/server.rs::create_router() & axum::Server::bind()",
+          "domain_module": "HTTP服务域",
+          "operation": "创建 Axum 路由器，绑定 AppState，启动 HTTP 服务器监听",
           "step": 4,
           "sub_module": null
+        },
+        {
+          "code_entry_point": "src/main.rs::open_browser_if_enabled()",
+          "domain_module": "命令行解析域",
+          "operation": "根据参数决定是否自动打开浏览器，输出启动成功信息",
+          "step": 5,
+          "sub_module": null
         }
       ]
     },
     {
-      "description": "用户在浏览器中点击文档或执行搜索，系统通过HTTP请求获取指定文件内容、元数据或全文搜索结果，返回结构化JSON或HTML响应。该流程是系统核心交互场景，体现Web服务的动态服务能力。",
-      "entry_point": "浏览器访问 /file/<path>、/search?q=... 或 /tree",
+      "description": "用户通过 Web 界面访问文档内容、导航目录结构或执行关键词搜索，系统响应请求并返回渲染后的 Markdown 内容或搜索结果。该流程是系统的核心交互路径，直接体现产品价值。",
+      "entry_point": "浏览器访问 http://localhost:<port> 或 /search?q=keyword",
       "importance": 9.0,
       "involved_domains_count": 3,
-      "name": "文档内容查询流程",
+      "name": "文档浏览与搜索流程",
       "steps": [
         {
-          "code_entry_point": "src/server.rs:get_file_handler()",
-          "domain_module": "服务器域",
-          "operation": "接收HTTP请求，匹配路由（如get_file_handler、search_handler）",
+          "code_entry_point": "src/server.rs::routes::root() & routes::search()",
+          "domain_module": "HTTP服务域",
+          "operation": "接收 HTTP 请求，解析路径或查询参数，提取请求上下文",
           "step": 1,
           "sub_module": null
         },
         {
-          "code_entry_point": "src/filesystem.rs:read_file_content() & get_metadata()",
+          "code_entry_point": "src/filesystem.rs::DocumentTree::find_by_path() & DocumentTree::search()",
           "domain_module": "文件系统域",
-          "operation": "根据路径映射查找文件，读取内容并渲染Markdown，提取元数据（大小、修改时间）",
+          "operation": "根据路径查询文档树结构，或根据关键词执行全文搜索，返回匹配文件列表",
           "step": 2,
           "sub_module": null
         },
         {
-          "code_entry_point": "src/server.rs:serialize_response()",
-          "domain_module": "服务器域",
-          "operation": "使用Serde序列化结果，通过HTTP响应返回JSON或HTML模板",
+          "code_entry_point": "src/server.rs::render_markdown() & axum::response::Html()",
+          "domain_module": "HTTP服务域",
+          "operation": "将 Markdown 内容渲染为 HTML，注入模板，序列化为响应体返回",
           "step": 3,
-          "sub_module": null
-        }
-      ]
-    },
-    {
-      "description": "当文件读取失败、路径无效或服务异常时，系统统一捕获错误并转换为标准HTTP响应码与用户友好信息，保障前端体验一致性。",
-      "entry_point": "任意模块抛出LithoBookError",
-      "importance": 8.0,
-      "involved_domains_count": 2,
-      "name": "系统错误处理流程",
-      "steps": [
-        {
-          "code_entry_point": "src/error.rs:LithoBookError",
-          "domain_module": "通用错误域",
-          "operation": "通过thiserror宏定义并封装IO、JSON、路径无效等错误类型",
-          "step": 1,
-          "sub_module": null
-        },
-        {
-          "code_entry_point": "src/server.rs:handle_error()",
-          "domain_module": "服务器域",
-          "operation": "实现From trait将LithoBookError映射为HTTP状态码（如404、500），返回标准化错误响应",
-          "step": 2,
           "sub_module": null
         }
       ]
@@ -219,35 +175,24 @@
         "src/cli.rs"
       ],
       "complexity": 5.0,
-      "description": "负责接收和验证用户通过命令行输入的启动参数，是系统与用户的首要交互入口。其核心价值在于降低使用门槛，使非技术用户也能通过简单命令启动文档服务。",
-      "domain_type": "用户交互域",
+      "description": "负责接收和解析用户通过命令行输入的配置参数，包括文档目录路径、服务端口、主机地址等。该领域是系统与用户的初始交互接口，确保参数合法并传递给后续模块。",
+      "domain_type": "工具支撑域",
       "importance": 8.0,
-      "name": "命令行接口域",
+      "name": "命令行解析域",
       "sub_modules": [
         {
           "code_paths": [
             "src/cli.rs"
           ],
-          "description": "使用Clap库解析文档路径、端口、主机、日志级别等参数",
-          "importance": 9.0,
-          "key_functions": [
-            "parse_args()",
-            "validate_path()",
-            "generate_server_url()"
-          ],
-          "name": "参数解析器"
-        },
-        {
-          "code_paths": [
-            "src/cli.rs"
-          ],
-          "description": "协调参数验证与服务启动流程，决定是否自动打开浏览器",
+          "description": "使用 clap 定义命令行参数结构，实现参数校验、默认值设置和辅助方法。",
           "importance": 7.0,
           "key_functions": [
-            "main()",
-            "open_browser()"
+            "定义 Args 结构体",
+            "验证目录是否存在",
+            "检查端口有效性",
+            "检测特权状态"
           ],
-          "name": "启动控制器"
+          "name": "参数定义与验证模块"
         }
       ]
     },
@@ -255,49 +200,50 @@
       "code_paths": [
         "src/filesystem.rs"
       ],
-      "complexity": 8.0,
-      "description": "负责从本地文件系统采集、组织和抽象Markdown文档数据，构建可查询的文档树结构。其核心价值在于将杂乱的文件目录转化为结构化、可导航的文档知识图谱。",
-      "domain_type": "数据处理域",
-      "importance": 9.0,
+      "complexity": 9.0,
+      "description": "核心业务领域，负责递归扫描本地文档目录，构建内存文档树结构，建立全文搜索索引，并支持 Markdown 文件的渲染。该领域是系统数据模型与搜索引擎的实现核心，直接决定文档的可发现性与访问效率。",
+      "domain_type": "核心业务域",
+      "importance": 10.0,
       "name": "文件系统域",
       "sub_modules": [
         {
           "code_paths": [
             "src/filesystem.rs"
           ],
-          "description": "递归扫描目录，过滤非Markdown文件，按目录优先、名称排序构建DocumentTree结构",
+          "description": "递归遍历目录，仅保留 .md 文件，构建树形结构与路径映射。",
           "importance": 10.0,
           "key_functions": [
+            "FileNode::new()",
             "DocumentTree::from_path()",
-            "DocumentTree::filter_files()",
-            "DocumentTree::sort_nodes()"
+            "build_file_tree()"
           ],
-          "name": "文档树构建器"
+          "name": "文档树构建模块"
         },
         {
           "code_paths": [
             "src/filesystem.rs"
           ],
-          "description": "读取文件内容、提取元数据、渲染Markdown为HTML，支持全文搜索",
+          "description": "基于关键词在文件名、标题、内容中进行模糊匹配，计算相关性评分，返回排序结果。",
+          "importance": 9.0,
+          "key_functions": [
+            "DocumentTree::search()",
+            "match_title()",
+            "extract_context()",
+            "compute_relevance_score()"
+          ],
+          "name": "全文搜索模块"
+        },
+        {
+          "code_paths": [
+            "src/filesystem.rs"
+          ],
+          "description": "将 Markdown 文件内容转换为 HTML，支持标题、代码块、链接等语法渲染。",
           "importance": 8.0,
           "key_functions": [
-            "read_file_content()",
-            "get_metadata()",
-            "search_in_files()"
+            "render_markdown_to_html()",
+            "extract_frontmatter()"
           ],
-          "name": "文件内容管理器"
-        },
-        {
-          "code_paths": [
-            "src/filesystem.rs"
-          ],
-          "description": "维护相对路径与实际文件路径的双向映射，支持快速查找与路由解析",
-          "importance": 7.0,
-          "key_functions": [
-            "path_map.get()",
-            "path_map.insert()"
-          ],
-          "name": "路径映射器"
+          "name": "Markdown 渲染模块"
         }
       ]
     },
@@ -305,50 +251,50 @@
       "code_paths": [
         "src/server.rs"
       ],
-      "complexity": 7.0,
-      "description": "提供基于Axum的HTTP服务，暴露RESTful API供前端交互，处理所有用户请求并返回响应。其核心价值在于将本地文档数据转化为可浏览器访问的动态Web体验。",
-      "domain_type": "后端服务域",
+      "complexity": 8.0,
+      "description": "提供 RESTful API 接口，处理前端请求，协调文档树数据的访问与响应。该领域作为前端与后端数据的桥梁，实现 HTML 渲染、JSON 返回、状态管理与路由分发。",
+      "domain_type": "核心业务域",
       "importance": 9.0,
-      "name": "服务器域",
+      "name": "HTTP服务域",
       "sub_modules": [
         {
           "code_paths": [
             "src/server.rs"
           ],
-          "description": "定义并实现index、get_file、get_tree、search、stats、health等路由处理器",
+          "description": "定义 /、/search、/file、/stats、/health 等路由，分发请求至对应处理逻辑。",
           "importance": 9.0,
           "key_functions": [
-            "index_handler()",
-            "get_file_handler()",
-            "search_handler()",
-            "health_handler()"
+            "create_router()",
+            "routes::root()",
+            "routes::search()",
+            "routes::get_file()"
           ],
-          "name": "路由处理器"
+          "name": "路由与控制器模块"
         },
         {
           "code_paths": [
             "src/server.rs"
           ],
-          "description": "通过AppState共享文档树与路径映射，确保多请求间状态一致性",
+          "description": "将 Markdown 内容渲染为 HTML，格式化字节大小，注入模板，返回结构化响应。",
           "importance": 8.0,
           "key_functions": [
-            "AppState::new()",
-            "AppState::get_tree()"
+            "render_markdown()",
+            "format_bytes()",
+            "inject_template()"
           ],
-          "name": "应用状态管理器"
+          "name": "响应渲染模块"
         },
         {
           "code_paths": [
             "src/server.rs"
           ],
-          "description": "使用Serde序列化数据，使用模板引擎渲染HTML，处理CORS与日志",
+          "description": "封装 DocumentTree 与文件路径信息，通过 AppState 在请求间共享上下文。",
           "importance": 7.0,
           "key_functions": [
-            "serialize_to_json()",
-            "render_template()",
-            "apply_cors()"
+            "AppState::new()",
+            "extract_state()"
           ],
-          "name": "响应序列化器"
+          "name": "状态管理模块"
         }
       ]
     },
@@ -357,79 +303,84 @@
         "src/error.rs"
       ],
       "complexity": 6.0,
-      "description": "统一定义和管理应用程序中所有可能发生的错误类型，实现错误的标准化封装、转换与响应。其核心价值在于提升系统健壮性与用户体验一致性，避免散乱的错误提示。",
-      "domain_type": "支撑服务域",
-      "importance": 7.0,
-      "name": "通用错误域",
+      "description": "统一管理应用中所有可能发生的错误类型，提供可序列化、可转换的错误枚举，支持从底层错误（如 IO、JSON）转换为统一的 LithoBookError，并映射为 HTTP 状态码，提升系统健壮性与可观测性。",
+      "domain_type": "基础设施域",
+      "importance": 8.0,
+      "name": "错误处理域",
       "sub_modules": [
         {
           "code_paths": [
             "src/error.rs"
           ],
-          "description": "定义LithoBookError枚举，封装IO、JSON、路径无效、目录扫描失败等错误变体",
-          "importance": 9.0,
-          "key_functions": [
-            "LithoBookError::from_io_error()",
-            "LithoBookError::from_invalid_path()"
-          ],
-          "name": "错误枚举定义"
-        },
-        {
-          "code_paths": [
-            "src/error.rs"
-          ],
-          "description": "实现From trait，将业务错误映射为HTTP状态码，便于服务器模块统一处理",
+          "description": "定义 LithoBookError 枚举，集成 thiserror 与 serde_json，实现 From 转换为 axum::http::StatusCode。",
           "importance": 8.0,
           "key_functions": [
-            "From<LithoBookError> for StatusCode"
+            "LithoBookError::Io",
+            "LithoBookError::Json",
+            "From<LithoBookError> for StatusCode",
+            "type Result<T> = std::result::Result<T, LithoBookError>"
           ],
-          "name": "错误转换器"
+          "name": "错误枚举与转换模块"
         }
       ]
     }
   ],
   "domain_relations": [
     {
-      "description": "CLI模块在参数验证通过后，调用文件系统模块的DocumentTree::from_path()方法构建文档树，是启动流程的关键依赖。",
-      "from_domain": "命令行接口域",
+      "description": "命令行解析模块在参数校验失败时，会构造 LithoBookError 错误并返回，依赖错误模块的统一错误类型。",
+      "from_domain": "命令行解析域",
+      "relation_type": "数据依赖",
+      "strength": 7.0,
+      "to_domain": "错误处理域"
+    },
+    {
+      "description": "命令行解析模块将用户指定的文档目录路径传递给文件系统模块，触发文档树构建。",
+      "from_domain": "命令行解析域",
+      "relation_type": "服务调用",
+      "strength": 9.0,
+      "to_domain": "文件系统域"
+    },
+    {
+      "description": "HTTP 服务模块依赖文件系统模块构建的 DocumentTree 实例，用于处理所有文件查询与搜索请求。",
+      "from_domain": "文件系统域",
+      "relation_type": "数据依赖",
+      "strength": 10.0,
+      "to_domain": "HTTP服务域"
+    },
+    {
+      "description": "HTTP 服务在处理请求过程中发生错误时，会转换为 LithoBookError 并映射为 HTTP 状态码返回。",
+      "from_domain": "HTTP服务域",
       "relation_type": "服务调用",
       "strength": 8.0,
+      "to_domain": "错误处理域"
+    },
+    {
+      "description": "main.rs 作为入口，调用 cli 模块解析参数，是流程的起点。",
+      "from_domain": "主程序协调器",
+      "relation_type": "服务调用",
+      "strength": 9.0,
+      "to_domain": "命令行解析域"
+    },
+    {
+      "description": "main.rs 在参数验证后调用 filesystem 模块构建文档树。",
+      "from_domain": "主程序协调器",
+      "relation_type": "服务调用",
+      "strength": 9.0,
       "to_domain": "文件系统域"
     },
     {
-      "description": "CLI模块启动后，调用服务器模块的create_app()和serve()函数启动HTTP服务，是服务生命周期的触发点。",
-      "from_domain": "命令行接口域",
+      "description": "main.rs 调用 server 模块创建路由器并启动 HTTP 服务。",
+      "from_domain": "主程序协调器",
       "relation_type": "服务调用",
       "strength": 9.0,
-      "to_domain": "服务器域"
+      "to_domain": "HTTP服务域"
     },
     {
-      "description": "服务器的所有路由处理器（如get_file_handler、get_tree_handler）均依赖文件系统域提供的DocumentTree和文件读取能力，是核心数据源。",
-      "from_domain": "服务器域",
-      "relation_type": "数据依赖",
-      "strength": 9.0,
-      "to_domain": "文件系统域"
-    },
-    {
-      "description": "服务器模块在处理请求过程中抛出的任何错误均通过LithoBookError封装，并通过From trait转换为HTTP响应码，实现统一错误处理。",
-      "from_domain": "服务器域",
+      "description": "main.rs 使用错误模块统一处理各阶段的错误退出。",
+      "from_domain": "主程序协调器",
       "relation_type": "服务调用",
-      "strength": 9.0,
-      "to_domain": "通用错误域"
-    },
-    {
-      "description": "文件系统模块在读取文件或扫描目录时，直接使用LithoBookError作为返回错误类型，通过#[from]宏继承IO、JSON等底层错误，形成错误传递链。",
-      "from_domain": "文件系统域",
-      "relation_type": "继承依赖",
-      "strength": 7.0,
-      "to_domain": "通用错误域"
-    },
-    {
-      "description": "CLI模块在参数验证失败时，会抛出LithoBookError并由顶层main函数统一捕获，确保错误信息标准化输出。",
-      "from_domain": "命令行接口域",
-      "relation_type": "服务调用",
-      "strength": 6.0,
-      "to_domain": "通用错误域"
+      "strength": 8.0,
+      "to_domain": "错误处理域"
     }
   ]
 }
@@ -441,20 +392,15 @@
 ```json
 {
   "main_workflow": {
-    "description": "用户通过命令行启动Litho Book，系统解析参数、扫描文档目录构建文档树、启动Web服务并自动打开浏览器，实现从本地文件到可交互Web界面的转化。该流程是系统的核心主干，串联CLI入口、文件系统处理与服务器启动三大模块，完成应用的初始化与服务暴露。",
-    "flowchart_mermaid": "graph TD\n    A[用户执行命令: litho-book <path> --port <port>] --> B[CLI解析参数并验证路径]\n    B --> C[文件系统模块扫描目录]\n    C --> D[递归构建DocumentTree结构]\n    D --> E[服务器模块创建Axum应用]\n    E --> F[绑定路由处理器与共享状态]\n    F --> G[启动TCP监听服务]\n    G --> H[自动打开默认浏览器访问界面]\n    H --> I[用户在浏览器中查看文档]",
-    "name": "文档浏览启动流程"
+    "description": "用户通过命令行启动程序后，系统解析参数、初始化日志、扫描文档目录、构建内存文档树，并启动 HTTP 服务器，最终打开浏览器访问服务。该流程是系统的核心启动路径，决定用户能否成功访问文档服务。",
+    "flowchart_mermaid": "sequenceDiagram\n    participant User\n    participant CLI\n    participant Error\n    participant Filesystem\n    participant Server\n    participant Browser\n\n    User->>CLI: 执行 `litho-book <directory>`\n    CLI->>Error: 解析并验证参数（路径、端口等）\n    Error-->>CLI: 返回校验结果或错误\n    CLI->>Filesystem: 传递文档目录路径\n    Filesystem->>Filesystem: 递归扫描 .md 文件，构建 DocumentTree 树形结构与全文索引\n    Filesystem-->>Server: 返回 DocumentTree 实例\n    Server->>Server: 创建 Axum 路由器，绑定 AppState\n    Server->>Server: 绑定 TCP 监听器，启动 HTTP 服务\n    Server-->>CLI: 服务启动成功\n    CLI->>Browser: 自动打开浏览器（若启用）\n    Browser->>Server: 请求 http://localhost:<port>\n    Server-->>Browser: 返回首页 HTML",
+    "name": "文档服务启动与初始化流程"
   },
   "other_important_workflows": [
     {
-      "description": "用户在浏览器中点击文档或执行搜索，前端发起HTTP请求至服务器，路由处理器调用文件系统模块读取对应Markdown内容并渲染为HTML或JSON响应，实现动态内容获取与展示。此流程体现了系统的交互能力和服务响应机制。",
-      "flowchart_mermaid": "graph TD\n    A[用户在浏览器访问 /file/<path> 或 /search?q=... ] --> B[服务器接收HTTP请求并匹配路由]\n    B --> C[调用get_file_handler或search_handler]\n    C --> D[文件系统模块根据路径查找文件]\n    D --> E[读取Markdown内容并提取元数据]\n    E --> F[渲染Markdown为HTML或序列化为JSON]\n    F --> G[返回HTTP响应给浏览器]\n    G --> H[前端展示文档内容或搜索结果]",
-      "name": "文档内容查询流程"
-    },
-    {
-      "description": "当任意模块发生异常（如文件不存在、路径无效、IO错误），统一抛出LithoBookError，由错误处理机制捕获并将不同错误类型映射为标准HTTP状态码（如404、500），返回用户友好的错误信息，保障系统健壮性与用户体验一致性。",
-      "flowchart_mermaid": "graph TD\n    A[任意模块出现错误：文件未找到、IO失败等] --> B[抛出LithoBookError]\n    B --> C[通过thiserror宏封装底层错误]\n    C --> D[服务器模块实现From<LithoBookError> for StatusCode]\n    D --> E[转换为对应HTTP状态码（404, 500等）]\n    E --> F[生成标准化错误响应]\n    F --> G[返回用户可读的错误页面或JSON]",
-      "name": "系统错误处理流程"
+      "description": "用户通过 Web 界面访问文档内容、导航目录结构或执行关键词搜索，系统响应请求并返回渲染后的 Markdown 内容或搜索结果。该流程是系统的核心交互路径，直接体现产品价值。",
+      "flowchart_mermaid": "sequenceDiagram\n    participant Browser\n    participant Server\n    participant Filesystem\n\n    Browser->>Server: 请求 / 或 /file/{path} 或 /search?q=keyword\n    Server->>Filesystem: 查询 DocumentTree 获取文件内容或搜索结果\n    Filesystem-->>Server: 返回匹配的文件元数据或内容\n    Server->>Server: 渲染 Markdown 为 HTML（如需）\n    Server->>Server: 注入模板，格式化响应（JSON 或 HTML）\n    Server-->>Browser: 返回渲染后的内容或搜索结果列表",
+      "name": "文档浏览与搜索流程"
     }
   ]
 }
@@ -468,19 +414,8 @@
   {
     "code_dossier": {
       "code_purpose": "entry",
-      "dependencies": [
-        "clap::Parser",
-        "tracing::{error, info, warn}",
-        "tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt}",
-        "tokio::main",
-        "anyhow::Result",
-        "cli::Args",
-        "filesystem::DocumentTree",
-        "server::create_router",
-        "axum::serve"
-      ],
-      "description": "Litho Book 文档阅读器的主入口点，负责解析命令行参数、初始化日志、扫描文档目录、构建文件树、启动HTTP服务器并自动打开浏览器。",
-      "file_path": "src/main.rs",
+      "description": null,
+      "file_path": "src\\main.rs",
       "functions": [
         "main",
         "init_logging",
@@ -489,18 +424,12 @@
         "format_bytes"
       ],
       "importance_score": 1.0,
-      "interfaces": [
-        "main",
-        "init_logging",
-        "print_banner",
-        "open_browser",
-        "format_bytes"
-      ],
+      "interfaces": [],
       "name": "main.rs"
     },
     "complexity_metrics": {
-      "cohesion_score": 0.85,
-      "coupling_factor": 0.4667,
+      "cohesion_score": 0.92,
+      "coupling_factor": 0.8,
       "cyclomatic_complexity": 15.0,
       "depth_of_inheritance": 0,
       "lines_of_code": 187,
@@ -509,259 +438,475 @@
     },
     "dependencies": [
       {
-        "dependency_type": "crate",
+        "dependency_type": "internal_module",
+        "is_external": false,
+        "line_number": 10,
+        "name": "cli",
+        "path": "src/cli.rs",
+        "version": null
+      },
+      {
+        "dependency_type": "internal_module",
+        "is_external": false,
+        "line_number": 11,
+        "name": "error",
+        "path": "src/error.rs",
+        "version": null
+      },
+      {
+        "dependency_type": "internal_module",
+        "is_external": false,
+        "line_number": 12,
+        "name": "filesystem",
+        "path": "src/filesystem.rs",
+        "version": null
+      },
+      {
+        "dependency_type": "internal_module",
+        "is_external": false,
+        "line_number": 13,
+        "name": "server",
+        "path": "src/server.rs",
+        "version": null
+      },
+      {
+        "dependency_type": "external_crate",
         "is_external": true,
-        "line_number": 7,
-        "name": "clap::Parser",
+        "line_number": 15,
+        "name": "clap",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "crate",
+        "dependency_type": "external_crate",
         "is_external": true,
-        "line_number": 8,
+        "line_number": 16,
         "name": "tracing",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "crate",
+        "dependency_type": "external_crate",
         "is_external": true,
-        "line_number": 9,
+        "line_number": 17,
         "name": "tracing_subscriber",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "crate",
+        "dependency_type": "external_crate",
         "is_external": true,
-        "line_number": 11,
-        "name": "tokio::main",
+        "line_number": 19,
+        "name": "tokio",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "crate",
+        "dependency_type": "external_crate",
         "is_external": true,
-        "line_number": 11,
-        "name": "anyhow::Result",
+        "line_number": 19,
+        "name": "anyhow",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "module",
-        "is_external": false,
-        "line_number": 15,
-        "name": "cli::Args",
-        "path": "./src/cli.rs",
-        "version": null
-      },
-      {
-        "dependency_type": "module",
-        "is_external": false,
-        "line_number": 38,
-        "name": "filesystem::DocumentTree",
-        "path": "./src/filesystem.rs",
-        "version": null
-      },
-      {
-        "dependency_type": "module",
-        "is_external": false,
-        "line_number": 69,
-        "name": "server::create_router",
-        "path": "./src/server.rs",
-        "version": null
-      },
-      {
-        "dependency_type": "crate",
+        "dependency_type": "external_std",
         "is_external": true,
-        "line_number": 102,
-        "name": "axum::serve",
+        "line_number": 27,
+        "name": "std::process",
+        "path": null,
+        "version": null
+      },
+      {
+        "dependency_type": "external_crate",
+        "is_external": true,
+        "line_number": 83,
+        "name": "axum",
+        "path": null,
+        "version": null
+      },
+      {
+        "dependency_type": "external_std",
+        "is_external": true,
+        "line_number": 68,
+        "name": "tokio::net::TcpListener",
+        "path": null,
+        "version": null
+      },
+      {
+        "dependency_type": "external_crate",
+        "is_external": true,
+        "line_number": 90,
+        "name": "open",
         "path": null,
         "version": null
       }
     ],
-    "detailed_description": "该组件是 Litho Book 文档阅读器的核心执行入口。它通过集成 CLI 参数解析、文件系统扫描、Web 服务启动和用户交互功能，实现了从命令行启动到 Web 界面展示的完整流程。程序首先解析用户输入的参数（如文档目录、端口、主机地址等），验证其有效性后初始化日志系统。随后扫描指定的 Markdown 文档目录，构建结构化的文档树，并统计文件数量与大小。接着创建基于 Axum 框架的路由服务，绑定 TCP 监听器并在指定地址启动 HTTP 服务器。最后可选择性地自动打开默认浏览器访问服务页面，提供友好的用户体验。",
-    "interfaces": [
+    "detailed_description": "main.rs 是 Litho Book 项目的执行入口，负责初始化应用程序、解析命令行参数、设置日志系统、构建文档树结构、启动 Web 服务器并自动打开浏览器。它协调多个模块（cli、error、filesystem、server）的工作流程，处理错误退出逻辑，并提供用户友好的启动信息。核心流程包括：解析用户输入参数 → 初始化日志 → 打印启动横幅 → 验证参数有效性 → 扫描文档目录生成文档树 → 创建 Axum 路由器 → 绑定 TCP 监听器 → 启动 HTTP 服务器 → 自动打开浏览器（可选）→ 处理服务器运行错误。该文件是整个应用的控制中心，不包含业务逻辑实现，仅作为协调者和流程控制器。",
+    "interfaces": [],
+    "responsibilities": [
+      "解析和验证命令行参数",
+      "初始化日志系统并配置日志级别",
+      "扫描文档目录并构建文档树结构",
+      "创建并启动 Axum HTTP 服务器",
+      "处理启动流程中的错误和异常退出"
+    ]
+  },
+  {
+    "code_dossier": {
+      "code_purpose": "entry",
+      "description": "CLI参数解析和验证模块，负责解析命令行参数并进行基本验证。",
+      "file_path": "src\\cli.rs",
+      "functions": [
+        "validate",
+        "server_url",
+        "bind_address",
+        "is_privileged"
+      ],
+      "importance_score": 0.8,
+      "interfaces": [
+        "Args",
+        "Args::validate",
+        "Args::server_url",
+        "Args::bind_address",
+        "is_privileged"
+      ],
+      "name": "cli.rs"
+    },
+    "complexity_metrics": {
+      "cohesion_score": 0.85,
+      "coupling_factor": 0.3,
+      "cyclomatic_complexity": 9.0,
+      "depth_of_inheritance": 0,
+      "lines_of_code": 87,
+      "number_of_classes": 1,
+      "number_of_functions": 4
+    },
+    "dependencies": [
       {
-        "description": "异步主函数，使用 tokio 运行为入口点，返回 Result 包装的空类型",
-        "interface_type": "function",
-        "name": "main",
-        "parameters": [],
-        "return_type": "anyhow::Result<()>",
-        "visibility": "public"
+        "dependency_type": "library",
+        "is_external": true,
+        "line_number": 1,
+        "name": "clap",
+        "path": null,
+        "version": null
       },
       {
-        "description": "根据是否开启详细日志模式初始化 tracing 日志订阅者",
-        "interface_type": "function",
-        "name": "init_logging",
+        "dependency_type": "library",
+        "is_external": true,
+        "line_number": 2,
+        "name": "anyhow",
+        "path": null,
+        "version": null
+      }
+    ],
+    "detailed_description": "该组件是项目的命令行接口入口，使用clap库解析命令行参数。主要功能包括：\n1. 定义并解析命令行参数\n2. 验证参数有效性\n3. 提供服务器URL和绑定地址\n4. 检查当前进程的特权状态\n\n组件通过Args结构体定义了所有命令行参数，包括文档目录路径、服务端口、主机地址等，并提供了相应的验证和辅助方法。",
+    "interfaces": [
+      {
+        "description": "命令行参数结构体",
+        "interface_type": "struct",
+        "name": "Args",
         "parameters": [
           {
-            "description": null,
+            "description": "文档目录路径",
             "is_optional": false,
+            "name": "docs_dir",
+            "param_type": "PathBuf"
+          },
+          {
+            "description": "服务端口",
+            "is_optional": true,
+            "name": "port",
+            "param_type": "u16"
+          },
+          {
+            "description": "服务主机地址",
+            "is_optional": true,
+            "name": "host",
+            "param_type": "String"
+          },
+          {
+            "description": "是否自动打开浏览器",
+            "is_optional": true,
+            "name": "open",
+            "param_type": "bool"
+          },
+          {
+            "description": "是否启用详细日志",
+            "is_optional": true,
             "name": "verbose",
             "param_type": "bool"
           }
         ],
         "return_type": null,
-        "visibility": "private"
+        "visibility": "public"
       },
       {
-        "description": "打印应用标题横幅信息，包含版本号和项目描述",
-        "interface_type": "function",
-        "name": "print_banner",
+        "description": "验证命令行参数",
+        "interface_type": "method",
+        "name": "validate",
         "parameters": [],
-        "return_type": null,
-        "visibility": "private"
-      },
-      {
-        "description": "跨平台打开默认浏览器访问指定 URL",
-        "interface_type": "function",
-        "name": "open_browser",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "url",
-            "param_type": "&str"
-          }
-        ],
         "return_type": "anyhow::Result<()>",
-        "visibility": "private"
+        "visibility": "public"
       },
       {
-        "description": "将字节数格式化为人类可读的字符串（如 KB, MB）",
-        "interface_type": "function",
-        "name": "format_bytes",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "bytes",
-            "param_type": "u64"
-          }
-        ],
+        "description": "生成服务器URL",
+        "interface_type": "method",
+        "name": "server_url",
+        "parameters": [],
         "return_type": "String",
-        "visibility": "private"
+        "visibility": "public"
+      },
+      {
+        "description": "生成绑定地址",
+        "interface_type": "method",
+        "name": "bind_address",
+        "parameters": [],
+        "return_type": "String",
+        "visibility": "public"
+      },
+      {
+        "description": "检查当前进程是否有特权",
+        "interface_type": "function",
+        "name": "is_privileged",
+        "parameters": [],
+        "return_type": "bool",
+        "visibility": "public"
       }
     ],
     "responsibilities": [
-      "作为应用程序的主执行入口点，协调各模块启动流程",
-      "解析和验证命令行参数，确保运行时配置正确",
-      "初始化日志系统，根据 verbosity 级别设置日志输出级别",
-      "协调文档目录扫描、服务器创建与启动、浏览器自动打开等核心流程",
-      "处理启动阶段的错误并进行适当的退出或提示"
+      "解析命令行参数",
+      "验证参数有效性",
+      "生成服务器URL和绑定地址",
+      "检查进程特权状态",
+      "提供命令行接口"
     ]
   },
   {
     "code_dossier": {
       "code_purpose": "model",
-      "dependencies": [
-        "serde",
-        "std::collections::HashMap",
-        "std::path::{Path, PathBuf}",
-        "tracing",
-        "anyhow",
-        "chrono",
-        "pulldown_cmark"
+      "description": "This Rust module defines a comprehensive error handling system for the LithoBook application. It uses the thiserror crate to create a custom error type that can be easily converted from various underlying error types. The module also provides a type alias for Result that uses this custom error type.",
+      "file_path": "src\\error.rs",
+      "functions": [
+        "LithoBookError",
+        "Result",
+        "From<LithoBookError> for axum::http::StatusCode"
       ],
-      "description": "文件系统模型组件，用于构建文档目录树、管理文件映射和提供文档操作功能。",
-      "file_path": "src/filesystem.rs",
+      "importance_score": 0.8,
+      "interfaces": [
+        "LithoBookError",
+        "Result",
+        "From<LithoBookError> for axum::http::StatusCode"
+      ],
+      "name": "error.rs"
+    },
+    "complexity_metrics": {
+      "cohesion_score": 0.9,
+      "coupling_factor": 0.3,
+      "cyclomatic_complexity": 3.0,
+      "depth_of_inheritance": 0,
+      "lines_of_code": 42,
+      "number_of_classes": 1,
+      "number_of_functions": 3
+    },
+    "dependencies": [
+      {
+        "dependency_type": "library",
+        "is_external": true,
+        "line_number": null,
+        "name": "thiserror",
+        "path": null,
+        "version": null
+      },
+      {
+        "dependency_type": "library",
+        "is_external": true,
+        "line_number": null,
+        "name": "std::io",
+        "path": null,
+        "version": null
+      },
+      {
+        "dependency_type": "library",
+        "is_external": true,
+        "line_number": null,
+        "name": "serde_json",
+        "path": null,
+        "version": null
+      },
+      {
+        "dependency_type": "library",
+        "is_external": true,
+        "line_number": null,
+        "name": "axum::http",
+        "path": null,
+        "version": null
+      }
+    ],
+    "detailed_description": "The error.rs module in the LithoBook application provides a centralized error handling mechanism. It defines a custom error enum LithoBookError that can represent various types of errors that might occur in the application. The module uses the thiserror crate to easily convert from underlying error types to the custom error type. It also provides a type alias Result for convenience. The module implements the From trait to convert LithoBookError to axum::http::StatusCode, which is useful for web applications. The error types include IO errors, JSON serialization errors, file not found errors, invalid path errors, directory scan errors, server errors, and configuration errors.",
+    "interfaces": [
+      {
+        "description": null,
+        "interface_type": "enum",
+        "name": "LithoBookError",
+        "parameters": [
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "Io",
+            "param_type": "std::io::Error"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "Json",
+            "param_type": "serde_json::Error"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "FileNotFound",
+            "param_type": "path: String"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "InvalidPath",
+            "param_type": "path: String"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "DirectoryScan",
+            "param_type": "String"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "Server",
+            "param_type": "String"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "Config",
+            "param_type": "String"
+          }
+        ],
+        "return_type": null,
+        "visibility": "public"
+      },
+      {
+        "description": null,
+        "interface_type": "type alias",
+        "name": "Result",
+        "parameters": [],
+        "return_type": "std::result::Result<T, LithoBookError>",
+        "visibility": "public"
+      },
+      {
+        "description": null,
+        "interface_type": "trait implementation",
+        "name": "From<LithoBookError> for axum::http::StatusCode",
+        "parameters": [
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "err",
+            "param_type": "LithoBookError"
+          }
+        ],
+        "return_type": "axum::http::StatusCode",
+        "visibility": "public"
+      }
+    ],
+    "responsibilities": [
+      "Define a comprehensive set of application-specific error types.",
+      "Provide easy conversion from underlying error types to custom error types.",
+      "Map custom error types to appropriate HTTP status codes.",
+      "Offer a convenient Result type alias for the application."
+    ]
+  },
+  {
+    "code_dossier": {
+      "code_purpose": "model",
+      "description": null,
+      "file_path": "src\\filesystem.rs",
       "functions": [
         "new",
         "build_tree",
         "get_file_content",
         "render_markdown",
         "get_stats",
+        "search_content",
+        "highlight_matches",
         "search_files"
       ],
       "importance_score": 0.8,
       "interfaces": [
         "FileNode",
+        "SearchResult",
+        "SearchMatch",
         "DocumentTree",
         "TreeStats"
       ],
       "name": "filesystem.rs"
     },
     "complexity_metrics": {
-      "cohesion_score": 0.85,
+      "cohesion_score": 0.92,
       "coupling_factor": 0.75,
-      "cyclomatic_complexity": 18.0,
+      "cyclomatic_complexity": 36.0,
       "depth_of_inheritance": 0,
-      "lines_of_code": 265,
-      "number_of_classes": 3,
-      "number_of_functions": 6
+      "lines_of_code": 401,
+      "number_of_classes": 5,
+      "number_of_functions": 8
     },
     "dependencies": [
       {
-        "dependency_type": "serialization",
+        "dependency_type": "crate",
         "is_external": true,
-        "line_number": 1,
+        "line_number": null,
         "name": "serde",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "standard_library",
+        "dependency_type": "std",
         "is_external": false,
-        "line_number": 2,
+        "line_number": null,
         "name": "std::collections::HashMap",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "standard_library",
+        "dependency_type": "std",
         "is_external": false,
-        "line_number": 2,
-        "name": "std::path::Path",
+        "line_number": null,
+        "name": "std::path::{Path, PathBuf}",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "standard_library",
-        "is_external": false,
-        "line_number": 2,
-        "name": "std::path::PathBuf",
-        "path": null,
-        "version": null
-      },
-      {
-        "dependency_type": "logging",
+        "dependency_type": "crate",
         "is_external": true,
-        "line_number": 3,
+        "line_number": null,
         "name": "tracing",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "error_handling",
+        "dependency_type": "crate",
         "is_external": true,
         "line_number": null,
         "name": "anyhow",
         "path": null,
         "version": null
-      },
-      {
-        "dependency_type": "datetime",
-        "is_external": true,
-        "line_number": null,
-        "name": "chrono",
-        "path": null,
-        "version": null
-      },
-      {
-        "dependency_type": "markdown_parsing",
-        "is_external": true,
-        "line_number": null,
-        "name": "pulldown_cmark",
-        "path": null,
-        "version": null
       }
     ],
-    "detailed_description": "该组件定义了文件系统的数据结构和操作逻辑，核心是DocumentTree结构体，用于表示一个文档目录树。它能够从指定的根目录递归构建文件树，过滤隐藏文件和非Markdown文件，并维护文件路径映射。组件提供了文件内容读取、Markdown渲染、全文搜索和统计信息查询等功能。树结构按目录优先、名称排序的方式组织，支持虚拟根节点。文件元数据如大小和修改时间被收集并序列化。组件使用HashMap建立相对路径到实际路径的映射，便于快速查找。整个设计体现了树形数据结构与文件系统抽象的结合，为上层应用提供统一的文档访问接口。",
+    "detailed_description": "filesystem.rs 是一个用于构建、管理和搜索文档目录结构的模型组件。它定义了文件树的数据结构（FileNode、DocumentTree）并实现了递归遍历目录、构建树形结构、索引 Markdown 文件内容、执行全文搜索和渲染 Markdown 为 HTML 的核心功能。该组件以文档根目录为起点，递归扫描所有文件和子目录（仅保留 .md 文件和目录），构建一个内存中的树形结构，同时建立文件路径映射和全文搜索索引。它支持基于关键词的高级搜索，包括标题匹配、文件名匹配、上下文提取和相关性评分，并提供 Markdown 渲染能力，是文档管理系统的核心数据模型与搜索引擎。",
     "interfaces": [
       {
-        "description": "表示文件系统中的一个节点，可以是文件或目录。包含名称、路径、类型、子节点及可选的大小和修改时间。",
+        "description": "表示文件系统中单个节点（文件或目录）的结构，支持序列化，用于传输和持久化树形结构。",
         "interface_type": "struct",
         "name": "FileNode",
         "parameters": [
@@ -806,7 +951,85 @@
         "visibility": "pub"
       },
       {
-        "description": "文档树的根结构，包含根节点、文件路径映射和统计信息。",
+        "description": "表示一次搜索结果，包含匹配的文件路径、文件名、标题、匹配行列表和相关性分数。",
+        "interface_type": "struct",
+        "name": "SearchResult",
+        "parameters": [
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "file_path",
+            "param_type": "String"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "file_name",
+            "param_type": "String"
+          },
+          {
+            "description": null,
+            "is_optional": true,
+            "name": "title",
+            "param_type": "Option<String>"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "matches",
+            "param_type": "Vec<SearchMatch>"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "relevance_score",
+            "param_type": "f32"
+          }
+        ],
+        "return_type": null,
+        "visibility": "pub"
+      },
+      {
+        "description": "表示文件中的一次匹配项，包含行号、原始内容、高亮内容和上下文。",
+        "interface_type": "struct",
+        "name": "SearchMatch",
+        "parameters": [
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "line_number",
+            "param_type": "usize"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "content",
+            "param_type": "String"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "highlighted_content",
+            "param_type": "String"
+          },
+          {
+            "description": null,
+            "is_optional": true,
+            "name": "context_before",
+            "param_type": "Option<String>"
+          },
+          {
+            "description": null,
+            "is_optional": true,
+            "name": "context_after",
+            "param_type": "Option<String>"
+          }
+        ],
+        "return_type": null,
+        "visibility": "pub"
+      },
+      {
+        "description": "整个文档树的根结构，封装了文件树、路径映射、统计信息和搜索索引，是对外暴露的主要接口。",
         "interface_type": "struct",
         "name": "DocumentTree",
         "parameters": [
@@ -827,13 +1050,19 @@
             "is_optional": false,
             "name": "stats",
             "param_type": "TreeStats"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "search_index",
+            "param_type": "HashMap<String, Vec<String>>"
           }
         ],
         "return_type": null,
         "visibility": "pub"
       },
       {
-        "description": "记录文档树的统计信息，包括文件数量、目录数量和总大小。",
+        "description": "存储文档树的统计信息，包括文件数、目录数和总大小。",
         "interface_type": "struct",
         "name": "TreeStats",
         "parameters": [
@@ -858,240 +1087,21 @@
         ],
         "return_type": null,
         "visibility": "pub"
-      },
-      {
-        "description": "从指定目录创建新的文档树实例。递归扫描目录，构建树形结构并初始化文件映射和统计信息。",
-        "interface_type": "function",
-        "name": "new",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "docs_dir",
-            "param_type": "&Path"
-          }
-        ],
-        "return_type": "anyhow::Result<Self>",
-        "visibility": "pub"
-      },
-      {
-        "description": "递归构建文件树的内部方法。处理单个路径，创建对应的FileNode，并更新文件映射和统计信息。",
-        "interface_type": "function",
-        "name": "build_tree",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "current_path",
-            "param_type": "&Path"
-          },
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "base_path",
-            "param_type": "&Path"
-          },
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "file_map",
-            "param_type": "&mut HashMap<String, PathBuf>"
-          },
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "stats",
-            "param_type": "&mut TreeStats"
-          }
-        ],
-        "return_type": "anyhow::Result<FileNode>",
-        "visibility": "private"
-      },
-      {
-        "description": "根据相对路径获取文件内容。通过file_map查找实际路径并读取文件。",
-        "interface_type": "function",
-        "name": "get_file_content",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "file_path",
-            "param_type": "&str"
-          }
-        ],
-        "return_type": "anyhow::Result<String>",
-        "visibility": "pub"
-      },
-      {
-        "description": "将Markdown内容渲染为HTML。使用pulldown_cmark库并启用多种扩展功能。",
-        "interface_type": "function",
-        "name": "render_markdown",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "content",
-            "param_type": "&str"
-          }
-        ],
-        "return_type": "String",
-        "visibility": "pub"
-      },
-      {
-        "description": "获取文档树的统计信息。",
-        "interface_type": "function",
-        "name": "get_stats",
-        "parameters": [],
-        "return_type": "&TreeStats",
-        "visibility": "pub"
-      },
-      {
-        "description": "在文件路径中搜索匹配查询字符串的文件。支持路径部分匹配和不区分大小写的搜索。",
-        "interface_type": "function",
-        "name": "search_files",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "query",
-            "param_type": "&str"
-          }
-        ],
-        "return_type": "Vec<&String>",
-        "visibility": "pub"
       }
     ],
     "responsibilities": [
-      "构建和维护文档目录的树形结构",
-      "管理文件路径映射以支持快速查找",
-      "提供文件内容读取和Markdown渲染功能",
-      "维护文档树的统计信息（文件数、目录数、总大小）",
-      "支持基于路径的文件搜索功能"
-    ]
-  },
-  {
-    "code_dossier": {
-      "code_purpose": "model",
-      "dependencies": [
-        "thiserror",
-        "serde_json",
-        "std::io::Error",
-        "axum::http::StatusCode"
-      ],
-      "description": "定义了应用程序的统一错误类型 LithoBookError，支持从多种底层错误（如IO、JSON）转换，并实现到HTTP状态码的映射。",
-      "file_path": "src/error.rs",
-      "functions": [],
-      "importance_score": 0.8,
-      "interfaces": [
-        "From<LithoBookError> for axum::http::StatusCode",
-        "impl Result<T>",
-        "LithoBookError enum"
-      ],
-      "name": "error.rs"
-    },
-    "complexity_metrics": {
-      "cohesion_score": 0.92,
-      "coupling_factor": 0.15,
-      "cyclomatic_complexity": 3.0,
-      "depth_of_inheritance": 0,
-      "lines_of_code": 42,
-      "number_of_classes": 0,
-      "number_of_functions": 1
-    },
-    "dependencies": [
-      {
-        "dependency_type": "crate",
-        "is_external": true,
-        "line_number": 1,
-        "name": "thiserror",
-        "path": null,
-        "version": null
-      },
-      {
-        "dependency_type": "struct",
-        "is_external": true,
-        "line_number": 6,
-        "name": "serde_json::Error",
-        "path": null,
-        "version": null
-      },
-      {
-        "dependency_type": "struct",
-        "is_external": true,
-        "line_number": 5,
-        "name": "std::io::Error",
-        "path": null,
-        "version": null
-      },
-      {
-        "dependency_type": "struct",
-        "is_external": true,
-        "line_number": 32,
-        "name": "axum::http::StatusCode",
-        "path": null,
-        "version": null
-      }
-    ],
-    "detailed_description": "该组件定义了一个中心化的错误枚举 LithoBookError，用于在整个应用程序中统一表示和处理各种运行时错误。它利用 thiserror 库自动生成错误消息和来源转换（通过 #[from]），涵盖 IO 错误、JSON 序序列化错误、文件未找到、无效路径、目录扫描失败、服务器内部错误以及配置错误等场景。此外，通过实现 From trait，将不同类型的 LithoBookError 映射为相应的 HTTP 状态码（如 NOT_FOUND、BAD_REQUEST、INTERNAL_SERVER_ERROR），便于在 Web API 中返回合适的响应。同时导出了一个类型别名 Result<T>，简化了函数签名中对错误类型的引用。",
-    "interfaces": [
-      {
-        "description": "核心错误枚举，包含多个变体对应不同错误场景",
-        "interface_type": "enum",
-        "name": "LithoBookError",
-        "parameters": [],
-        "return_type": null,
-        "visibility": "pub"
-      },
-      {
-        "description": "统一的结果类型别名，用于所有可能出错的操作",
-        "interface_type": "type_alias",
-        "name": "Result<T>",
-        "parameters": [
-          {
-            "description": "成功时返回的值类型",
-            "is_optional": false,
-            "name": "T",
-            "param_type": "generic"
-          }
-        ],
-        "return_type": "std::result::Result<T, LithoBookError>",
-        "visibility": "pub"
-      },
-      {
-        "description": "将LithoBookError映射为对应的HTTP状态码",
-        "interface_type": "impl",
-        "name": "From<LithoBookError> for axum::http::StatusCode",
-        "parameters": [
-          {
-            "description": "要转换的错误实例",
-            "is_optional": false,
-            "name": "err",
-            "param_type": "LithoBookError"
-          }
-        ],
-        "return_type": "axum::http::StatusCode",
-        "visibility": "impl"
-      }
-    ],
-    "responsibilities": [
-      "定义应用程序级别的统一错误类型",
-      "封装多种底层错误并提供语义化错误信息",
-      "实现错误到HTTP状态码的转换逻辑",
-      "提供Result类型别名以简化错误处理代码",
-      "支持错误溯源与链式传播"
+      "递归构建文档目录的树形结构（FileNode）",
+      "维护文件路径到物理路径的映射（file_map）",
+      "为 Markdown 文件建立全文搜索索引（search_index）",
+      "实现基于关键词的高级全文搜索与相关性排序",
+      "提供 Markdown 内容渲染为 HTML 的功能"
     ]
   },
   {
     "code_dossier": {
       "code_purpose": "controller",
-      "dependencies": [
-        "axum",
-        "serde",
-        "tower_http",
-        "tracing"
-      ],
-      "description": "Axum框架构建的Web服务器模块，提供文档树浏览、文件内容获取、搜索和统计等REST API接口。",
-      "file_path": "src/server.rs",
+      "description": null,
+      "file_path": "src\\server.rs",
       "functions": [
         "create_router",
         "index_handler",
@@ -1105,72 +1115,64 @@
       ],
       "importance_score": 0.8,
       "interfaces": [
-        "/",
-        "/api/file",
-        "/api/tree",
-        "/api/search",
-        "/api/stats",
-        "/health"
+        "AppState",
+        "FileQuery",
+        "SearchQuery",
+        "FileResponse",
+        "SearchResponse",
+        "StatsResponse"
       ],
       "name": "server.rs"
     },
     "complexity_metrics": {
-      "cohesion_score": 0.82,
-      "coupling_factor": 0.36,
+      "cohesion_score": 0.92,
+      "coupling_factor": 0.4,
       "cyclomatic_complexity": 7.0,
       "depth_of_inheritance": 0,
       "lines_of_code": 226,
-      "number_of_classes": 5,
+      "number_of_classes": 6,
       "number_of_functions": 9
     },
     "dependencies": [
       {
-        "dependency_type": "framework",
+        "dependency_type": "crate",
         "is_external": true,
-        "line_number": 1,
+        "line_number": null,
         "name": "axum",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "serialization",
+        "dependency_type": "crate",
         "is_external": true,
-        "line_number": 7,
+        "line_number": null,
         "name": "serde",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "middleware",
+        "dependency_type": "crate",
         "is_external": true,
-        "line_number": 8,
+        "line_number": null,
         "name": "tower_http",
         "path": null,
         "version": null
       },
       {
-        "dependency_type": "logging",
+        "dependency_type": "crate",
         "is_external": true,
-        "line_number": 9,
+        "line_number": null,
         "name": "tracing",
         "path": null,
         "version": null
-      },
-      {
-        "dependency_type": "internal_module",
-        "is_external": false,
-        "line_number": 11,
-        "name": "crate::filesystem::DocumentTree",
-        "path": "src/filesystem.rs",
-        "version": null
       }
     ],
-    "detailed_description": "该组件是基于Axum框架构建的Web服务器核心模块，负责处理所有HTTP请求并提供文档系统的RESTful API接口。它通过AppState结构体管理共享状态（文档树和文档路径），并定义了多个路由处理器来实现不同的功能：index_handler返回主页面HTML，get_file_handler获取指定文件的内容和元数据，get_tree_handler返回文档树结构，search_handler支持文件名搜索，stats_handler提供系统统计信息，health_handler用于健康检查。组件使用Serde进行序列化/反序列化，Tower Http处理CORS，Tracing进行日志记录，并通过模板替换生成动态HTML页面。",
+    "detailed_description": "该组件是基于Axum框架构建的后端HTTP控制器，负责处理所有前端请求并协调文档树的访问与操作。它定义了多个RESTful API端点，包括首页渲染、文件内容获取、文档树结构查询、全文搜索、系统统计和健康检查。核心逻辑围绕DocumentTree进行，通过异步处理HTTP请求，序列化数据为JSON或HTML响应，并使用状态管理（AppState）封装文档树和文件路径信息。同时，组件实现了文件元数据读取、Markdown渲染、字节格式化、HTML模板注入等辅助功能，构建了一个完整的文档服务API。",
     "interfaces": [
       {
-        "description": "创建并配置应用程序路由器",
-        "interface_type": "function",
-        "name": "create_router",
+        "description": null,
+        "interface_type": "struct",
+        "name": "AppState",
         "parameters": [
           {
             "description": null,
@@ -1185,277 +1187,145 @@
             "param_type": "String"
           }
         ],
-        "return_type": "Router",
-        "visibility": "public"
+        "return_type": null,
+        "visibility": "pub"
       },
       {
-        "description": "处理根路径请求，返回主页面HTML",
-        "interface_type": "function",
-        "name": "index_handler",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "State(state)",
-            "param_type": "State<AppState>"
-          }
-        ],
-        "return_type": "Result<Html<String>, StatusCode>",
-        "visibility": "private"
-      },
-      {
-        "description": "获取指定文件的内容和元数据",
-        "interface_type": "function",
-        "name": "get_file_handler",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "Query(params)",
-            "param_type": "Query<FileQuery>"
-          },
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "State(state)",
-            "param_type": "State<AppState>"
-          }
-        ],
-        "return_type": "Result<Json<FileResponse>, StatusCode>",
-        "visibility": "private"
-      },
-      {
-        "description": "返回文档树结构",
-        "interface_type": "function",
-        "name": "get_tree_handler",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "State(state)",
-            "param_type": "State<AppState>"
-          }
-        ],
-        "return_type": "Json<serde_json::Value>",
-        "visibility": "private"
-      },
-      {
-        "description": "搜索匹配查询条件的文件",
-        "interface_type": "function",
-        "name": "search_handler",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "Query(params)",
-            "param_type": "Query<SearchQuery>"
-          },
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "State(state)",
-            "param_type": "State<AppState>"
-          }
-        ],
-        "return_type": "Result<Json<SearchResponse>, StatusCode>",
-        "visibility": "private"
-      },
-      {
-        "description": "返回文档系统的统计信息",
-        "interface_type": "function",
-        "name": "stats_handler",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "State(state)",
-            "param_type": "State<AppState>"
-          }
-        ],
-        "return_type": "Json<StatsResponse>",
-        "visibility": "private"
-      },
-      {
-        "description": "健康检查端点",
-        "interface_type": "function",
-        "name": "health_handler",
-        "parameters": [],
-        "return_type": "Json<serde_json::Value>",
-        "visibility": "private"
-      },
-      {
-        "description": "将字节数格式化为人类可读的字符串",
-        "interface_type": "function",
-        "name": "format_bytes",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "bytes",
-            "param_type": "u64"
-          }
-        ],
-        "return_type": "String",
-        "visibility": "private"
-      },
-      {
-        "description": "根据模板生成主页面HTML",
-        "interface_type": "function",
-        "name": "generate_index_html",
-        "parameters": [
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "tree_json",
-            "param_type": "&str"
-          },
-          {
-            "description": null,
-            "is_optional": false,
-            "name": "docs_path",
-            "param_type": "&str"
-          }
-        ],
-        "return_type": "String",
-        "visibility": "private"
-      }
-    ],
-    "responsibilities": [
-      "管理Web应用路由和请求处理",
-      "提供文档内容读取与HTML渲染服务",
-      "实现文件搜索功能",
-      "暴露系统健康检查和统计信息接口",
-      "维护共享的应用程序状态"
-    ]
-  },
-  {
-    "code_dossier": {
-      "code_purpose": "entry",
-      "dependencies": [
-        "clap",
-        "std::path::PathBuf"
-      ],
-      "description": "命令行参数解析器，用于配置文档阅读器的启动选项",
-      "file_path": "src/cli.rs",
-      "functions": [
-        "is_privileged",
-        "validate",
-        "server_url",
-        "bind_address"
-      ],
-      "importance_score": 0.8,
-      "interfaces": [
-        "Args"
-      ],
-      "name": "cli.rs"
-    },
-    "complexity_metrics": {
-      "cohesion_score": 0.85,
-      "coupling_factor": 0.25,
-      "cyclomatic_complexity": 9.0,
-      "depth_of_inheritance": 0,
-      "lines_of_code": 87,
-      "number_of_classes": 1,
-      "number_of_functions": 4
-    },
-    "dependencies": [
-      {
-        "dependency_type": "library",
-        "is_external": true,
-        "line_number": 1,
-        "name": "clap",
-        "path": null,
-        "version": null
-      },
-      {
-        "dependency_type": "standard_library",
-        "is_external": false,
-        "line_number": 2,
-        "name": "std::path::PathBuf",
-        "path": null,
-        "version": null
-      }
-    ],
-    "detailed_description": "该组件定义了命令行接口（CLI）的参数结构和验证逻辑，使用Clap库解析用户输入。主要功能包括：解析文档目录路径、服务端口、绑定主机、浏览器自动打开和详细日志等参数；验证输入参数的有效性（如目录存在性、权限要求）；提供辅助方法生成服务器URL和绑定地址。作为项目入口，它初始化应用配置并确保运行前提条件满足。",
-    "interfaces": [
-      {
-        "description": "命令行参数数据结构",
+        "description": null,
         "interface_type": "struct",
-        "name": "Args",
+        "name": "FileQuery",
         "parameters": [
           {
-            "description": "Markdown文档目录路径",
+            "description": null,
             "is_optional": false,
-            "name": "docs_dir",
-            "param_type": "PathBuf"
-          },
-          {
-            "description": "Web服务端口，默认3000",
-            "is_optional": false,
-            "name": "port",
-            "param_type": "u16"
-          },
-          {
-            "description": "服务器绑定主机，默认127.0.0.1",
-            "is_optional": false,
-            "name": "host",
-            "param_type": "String"
-          },
-          {
-            "description": "是否自动打开浏览器",
-            "is_optional": false,
-            "name": "open",
-            "param_type": "bool"
-          },
-          {
-            "description": "是否启用详细日志",
-            "is_optional": false,
-            "name": "verbose",
-            "param_type": "bool"
+            "name": "file",
+            "param_type": "Option<String>"
           }
         ],
         "return_type": null,
         "visibility": "pub"
       },
       {
-        "description": "验证参数有效性，检查目录存在性和端口权限",
-        "interface_type": "method",
-        "name": "validate",
-        "parameters": [],
-        "return_type": "anyhow::Result<()>",
+        "description": null,
+        "interface_type": "struct",
+        "name": "SearchQuery",
+        "parameters": [
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "q",
+            "param_type": "Option<String>"
+          }
+        ],
+        "return_type": null,
         "visibility": "pub"
       },
       {
-        "description": "获取服务器访问URL",
-        "interface_type": "method",
-        "name": "server_url",
-        "parameters": [],
-        "return_type": "String",
+        "description": null,
+        "interface_type": "struct",
+        "name": "FileResponse",
+        "parameters": [
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "content",
+            "param_type": "String"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "html",
+            "param_type": "String"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "path",
+            "param_type": "String"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "size",
+            "param_type": "Option<u64>"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "modified",
+            "param_type": "Option<String>"
+          }
+        ],
+        "return_type": null,
         "visibility": "pub"
       },
       {
-        "description": "获取服务器绑定地址",
-        "interface_type": "method",
-        "name": "bind_address",
-        "parameters": [],
-        "return_type": "String",
+        "description": null,
+        "interface_type": "struct",
+        "name": "SearchResponse",
+        "parameters": [
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "results",
+            "param_type": "Vec<SearchResult>"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "total",
+            "param_type": "usize"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "query",
+            "param_type": "String"
+          }
+        ],
+        "return_type": null,
         "visibility": "pub"
       },
       {
-        "description": "检查当前进程是否具有管理员权限",
-        "interface_type": "function",
-        "name": "is_privileged",
-        "parameters": [],
-        "return_type": "bool",
-        "visibility": "private"
+        "description": null,
+        "interface_type": "struct",
+        "name": "StatsResponse",
+        "parameters": [
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "total_files",
+            "param_type": "usize"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "total_dirs",
+            "param_type": "usize"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "total_size",
+            "param_type": "u64"
+          },
+          {
+            "description": null,
+            "is_optional": false,
+            "name": "formatted_size",
+            "param_type": "String"
+          }
+        ],
+        "return_type": null,
+        "visibility": "pub"
       }
     ],
     "responsibilities": [
-      "解析和验证命令行参数",
-      "确保文档目录路径的有效性",
-      "验证端口权限要求",
-      "生成服务器连接信息",
-      "提供跨平台特权检查"
+      "提供RESTful API接口处理前端请求",
+      "管理并暴露文档树结构与内容",
+      "执行全文搜索与内容检索",
+      "渲染Markdown为HTML并返回响应",
+      "提供系统健康检查与统计信息"
     ]
   }
 ]
@@ -1463,21 +1333,21 @@
 
 ## Memory存储统计
 
-**总存储大小**: 113611 bytes
+**总存储大小**: 179189 bytes
 
-- **documentation**: 54652 bytes (48.1%)
-- **studies_research**: 29910 bytes (26.3%)
-- **preprocess**: 29014 bytes (25.5%)
-- **timing**: 35 bytes (0.0%)
+- **timing**: 30 bytes (0.0%)
+- **preprocess**: 27035 bytes (15.1%)
+- **documentation**: 118726 bytes (66.3%)
+- **studies_research**: 33398 bytes (18.6%)
 
 ## 生成文档统计
 
 生成文档数量: 7 个
 
 - 项目概述
-- 核心模块与组件调研报告_通用错误域
-- 核心模块与组件调研报告_文件系统域
-- 核心模块与组件调研报告_命令行接口域
-- 核心模块与组件调研报告_服务器域
+- 核心模块与组件调研报告_命令行解析域
 - 核心流程
 - 架构说明
+- 核心模块与组件调研报告_文件系统域
+- 核心模块与组件调研报告_错误处理域
+- 核心模块与组件调研报告_HTTP服务域
