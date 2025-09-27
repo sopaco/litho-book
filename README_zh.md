@@ -1,5 +1,5 @@
 <p align="center">
-  <img height="120" src="https://raw.githubusercontent.com/sopaco/deepwiki-rs/main/assets/banner_litho.jpg">
+  <img height="320" src="./assets/banner_litho_book.webp">
 </p>
 <h3 align="center">Litho Book</h3>
 
@@ -9,7 +9,7 @@
     <a href="./README_zh.md">中文</a>
 </p>
 
-<p align="center">🛠️ 基于 <strong>Rust</strong> 和 <strong>Axum</strong> 构建的高性能文档阅读器</p>
+<p align="center">🛠️ 基于 <strong>Rust</strong> 和 <strong>Axum</strong> 构建的高性能Markdown阅读器，内置Mermaid图表渲染引擎</p>
 <p align="center">📚 为 <strong><a href="https://github.com/sopaco/deepwiki-rs">Litho (deepwiki-rs)</a></strong> 生成的文档提供现代化Web阅读体验</p>
 <p align="center">
   <img src="https://img.shields.io/badge/built_with-Rust-dca282.svg?logo=rust" />
