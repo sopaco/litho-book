@@ -1,5 +1,5 @@
 <p align="center">
-  <img height="120" src="https://raw.githubusercontent.com/sopaco/deepwiki-rs/main/assets/banner_litho.jpg">
+  <img height="320" src="./assets/banner_litho_book.webp">
 </p>
 <h3 align="center">Litho Book</h3>
 
