@@ -29,7 +29,7 @@
 ❤️ Like **Litho Book**? Star it 🌟 and learn more about the [**Litho project**](https://github.com/sopaco/deepwiki-rs)! ❤️
 
 
-# 🌠 Snapshoots
+# 🌠 Snapshots
 <div style="text-align: center;">
   <table style="width: 100%; margin: 0 auto;">
     <tr>
