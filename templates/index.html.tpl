@@ -4647,6 +4647,12 @@
 
             // 处理输入框键盘事件
             function handleAiInputKeydown(event) {
+                // 检查是否正在使用输入法
+                if (event.isComposing || event.keyCode === 229) {
+                    // 如果正在使用输入法，不处理 Enter 键
+                    return;
+                }
+                
                 if (event.key === 'Enter' && !event.shiftKey) {
                     event.preventDefault();
                     sendMessage();
