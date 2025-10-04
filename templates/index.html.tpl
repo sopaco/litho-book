@@ -1554,8 +1554,36 @@
             }
 
             .ai-suggestions {
-                padding: 1rem;
                 border-top: 1px solid var(--border-color);
+                background: var(--bg-secondary);
+                transition: all 0.3s ease;
+            }
+
+            .ai-suggestions.collapsed {
+                border-top: none;
+            }
+
+            .ai-suggestions-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 1rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                border-top: 1px solid var(--border-color);
+            }
+
+            .ai-suggestions.collapsed .ai-suggestions-header {
+                padding: 0.5rem 1rem;
+                border-top: none;
+                background: var(--bg-primary);
+            }
+
+            .ai-suggestions-header:hover {
+                background: var(--bg-tertiary);
+            }
+
+            .ai-suggestions.collapsed .ai-suggestions-header:hover {
                 background: var(--bg-secondary);
             }
 
@@ -1563,13 +1591,46 @@
                 font-size: 0.85rem;
                 font-weight: 600;
                 color: var(--text-secondary);
-                margin-bottom: 0.75rem;
+                margin: 0;
+            }
+
+            .ai-suggestions-toggle {
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                cursor: pointer;
+                padding: 0.25rem;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transform: rotate(0deg);
+            }
+
+            .ai-suggestions.collapsed .ai-suggestions-toggle {
+                transform: rotate(-90deg);
+            }
+
+            .ai-suggestions-toggle:hover {
+                background: var(--bg-tertiary);
+                color: var(--text-primary);
             }
 
             .ai-suggestions-list {
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
+                padding: 0 1rem 1rem 1rem;
+                max-height: 300px;
+                overflow: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .ai-suggestions.collapsed .ai-suggestions-list {
+                max-height: 0;
+                padding: 0 1rem;
+                opacity: 0;
             }
 
             .ai-suggestion-item {
@@ -2072,8 +2133,15 @@
                 </div>
                 
                 <div class="ai-suggestions" id="aiSuggestions">
-                    <div class="ai-suggestions-title">💡 推荐问题</div>
-                    <div class="ai-suggestions-list">
+                    <div class="ai-suggestions-header" onclick="toggleSuggestions()">
+                        <div class="ai-suggestions-title">💡 推荐问题</div>
+                        <button class="ai-suggestions-toggle" id="aiSuggestionsToggle">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="ai-suggestions-list" id="aiSuggestionsList">
                         <button class="ai-suggestion-item" onclick="sendSuggestion('这个项目的主要功能是什么？')">
                             这个项目的主要功能是什么？
                         </button>
@@ -4445,6 +4513,8 @@
             // AI助手功能
             let isAiAssistantOpen = false;
             let isAiLoading = false;
+            let isSuggestionsCollapsed = false;
+            let hasUserSentMessage = false;
 
             // 切换AI助手面板
             function toggleAiAssistant() {
@@ -4463,6 +4533,30 @@
                 } else {
                     trigger.classList.remove('hidden');
                     panel.classList.remove('show');
+                }
+            }
+
+            // 切换推荐区域折叠状态
+            function toggleSuggestions() {
+                const suggestions = document.getElementById('aiSuggestions');
+                const toggle = document.getElementById('aiSuggestionsToggle');
+                
+                isSuggestionsCollapsed = !isSuggestionsCollapsed;
+                
+                if (isSuggestionsCollapsed) {
+                    suggestions.classList.add('collapsed');
+                } else {
+                    suggestions.classList.remove('collapsed');
+                }
+            }
+
+            // 自动折叠推荐区域（用户发送消息后）
+            function autoCollapseSuggestions() {
+                if (!hasUserSentMessage && !isSuggestionsCollapsed) {
+                    hasUserSentMessage = true;
+                    setTimeout(() => {
+                        toggleSuggestions();
+                    }, 1000); // 延迟1秒后自动折叠
                 }
             }
 
@@ -4514,6 +4608,9 @@
                 
                 // 添加用户消息
                 addMessage(message, 'user');
+                
+                // 自动折叠推荐区域（首次发送消息后）
+                autoCollapseSuggestions();
                 
                 // 显示加载状态
                 const loadingId = addLoadingMessage();
@@ -4669,6 +4766,9 @@
                     button.onclick = () => sendSuggestion(suggestion);
                     suggestionsContainer.appendChild(button);
                 });
+                
+                // 如果推荐区域是折叠的，可以选择性地展开（这里我们保持折叠状态，让用户手动点击展开）
+                // 这样可以节省空间，同时用户可以根据需要查看新的建议
             }
 
             // 监听输入框变化
