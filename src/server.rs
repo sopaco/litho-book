@@ -484,9 +484,9 @@ fn generate_suggestions(ai_response: &str, _context: Option<&str>) -> Vec<String
         suggestions.push("有哪些替代的设计方案？".to_string());
     }
 
-    if ai_response.contains("实现") || ai_response.contains("代码") {
-        suggestions.push("这个实现有什么需要注意的地方？".to_string());
-        suggestions.push("如何优化这个实现？".to_string());
+    if ai_response.contains("性能") || ai_response.contains("耗时") {
+        suggestions.push("项目使用了哪些性能优化策略？".to_string());
+        suggestions.push("如何优化项目中的性能热点？".to_string());
     }
 
     if ai_response.contains("配置") || ai_response.contains("参数") {
