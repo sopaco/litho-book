@@ -12,7 +12,7 @@
 <p align="center">🛠️ 基于 <strong>Rust</strong> 和 <strong>Axum</strong> 构建的高性能Markdown阅读器，内置Mermaid图表渲染引擎</p>
 <p align="center">📚 为 <strong><a href="https://github.com/sopaco/deepwiki-rs">Litho (deepwiki-rs)</a></strong> 生成的文档提供现代化Web阅读体验</p>
 <p align="center">
-  <a href="./litho.docs/1、项目概述.md"><img src="https://img.shields.io/badge/Litho-Docs-blue" /></a>
+  <a href="./docs/1、项目概述.md"><img src="https://img.shields.io/badge/Litho-Docs-blue" /></a>
   <img src="https://img.shields.io/badge/built_with-Rust-dca282.svg?logo=rust" />
   <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/sopaco/litho-book/rust.yml">
 </p>
