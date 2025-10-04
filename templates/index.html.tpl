@@ -8,7 +8,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
-            href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@300;400;500;600;700&family=Source+Han+Sans+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap"
             rel="stylesheet"
         />
         <!-- 字体显示优化 -->
@@ -27,10 +27,6 @@
             }
             @font-face {
                 font-family: 'Inter';
-                font-display: swap;
-            }
-            @font-face {
-                font-family: 'Source Han Sans SC';
                 font-display: swap;
             }
         </style>
@@ -60,7 +56,7 @@
                 /* 字体设置 */
                 --font-family:
                     "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI",
-                    Roboto, "Helvetica Neue", Arial, sans-serif;
+                    "Helvetica Neue", Arial, sans-serif;
                 --font-size-base: 16px;
                 --font-size-scale: 1;
             }
@@ -760,7 +756,7 @@
                 padding: 0.2rem 0.4rem;
                 border-radius: 4px;
                 font-family:
-                    "JetBrains Mono", "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", 
+                    "JetBrains Mono", "SF Mono", "Monaco", "Inconsolata", 
                     "Source Code Pro", "Menlo", "Consolas", "DejaVu Sans Mono", 
                     "Liberation Mono", "Courier New", monospace;
                 font-size: calc(0.9em * var(--font-size-scale));
@@ -986,7 +982,7 @@
             }
 
             .search-match-content {
-                font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+                font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
                 font-size: calc(0.85rem * var(--font-size-scale));
                 line-height: 1.5;
                 color: var(--text-primary);
@@ -1412,8 +1408,8 @@
                             <option value="geist">
                                 Geist（现代无衬线字体，简洁清晰）
                             </option>
-                            <option value="source-han-sans-sc">
-                                思源黑体（现代中文黑体，清晰易读）
+                            <option value="noto-sans-sc">
+                                思源黑体/Noto Sans SC（现代中文黑体，清晰易读）
                             </option>
                             <option value="noto-serif-sc">
                                 思源宋体（传统中文宋体，适合长文阅读）
@@ -1599,19 +1595,19 @@
                 // 字体映射 - 优化中文字体支持
                 fontFamilies: {
                     // 现代无衬线字体 - 以 Geist 为主
-                    'geist': "'Geist', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', Roboto, sans-serif",
+                    'geist': "'Geist', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif",
                     
-                    // 思源黑体 - 现代中文黑体，清晰易读
-                    'source-han-sans-sc': "'Source Han Sans SC', 'Noto Sans SC', 'PingFang SC', gino Sans GB', 'Microsoft YaHei', sans-serif",
+                    // 思源黑体/Noto Sans SC - 现代中文黑体，清晰易读
+                    'noto-sans-sc': "'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif",
                     
                     // 思源宋体 - 传统中文宋体，适合长文阅读
-                    'noto-serif-sc': "'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', serif",
+                    'noto-serif-sc': "'Noto Serif SC',  'Songti SC', 'STSong', serif",
                     
                     // Inter - 现代界面字体，中文使用思源黑体
-                    'inter': "'Inter', 'Source Han Sans SC', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif",
+                    'inter': "'Inter', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif",
                     
                     // 苹方 - macOS 现代中文字体
-                    'pingfang': "'PingFang SC', 'Source Han Sans SC', 'Noto Sans SC', 'Hiragino Sans GB', sans-serif",
+                    'pingfang': "'PingFang SC', 'Noto Sans SC', 'Hiragino Sans GB', sans-serif",
                 },
 
                 // 加载设置
@@ -2122,8 +2118,8 @@
                                     element.textContent = originalContent;
                                     element.removeAttribute('data-processed');
                                     
-                                    // 使用mermaid.init()渲染单个图表
-                                    await mermaid.init(undefined, element);
+                                    // 使用mermaid.run()渲染单个图表
+                                    await mermaid.run(undefined, element);
                                 }
                             } catch (singleError) {
                                 console.warn(`图表 ${i} 渲染失败:`, singleError);
@@ -2211,7 +2207,7 @@
                         // 等待一下然后重新渲染
                         setTimeout(() => {
                             try {
-                                mermaid.init(undefined, '.mermaid');
+                                mermaid.run(undefined, '.mermaid');
                                 console.log('Mermaid重新渲染完成');
                                 
                                 // 重新增强
@@ -2732,7 +2728,7 @@
 
                         // 尝试渲染单个 Mermaid 图表
                         try {
-                            await mermaid.init(undefined, `#${mermaidId}`);
+                            await mermaid.run(undefined, `#${mermaidId}`);
                         } catch (error) {
                             console.warn(`Mermaid 图表渲染失败 (${mermaidId}):`, error);
                             
@@ -2775,7 +2771,7 @@
                                 border-radius: 6px;
                                 margin: 0;
                                 border: 1px solid var(--border-color);
-                                font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+                                font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
                                 font-size: 0.9em;
                                 color: var(--text-primary);
                                 overflow-x: auto;
