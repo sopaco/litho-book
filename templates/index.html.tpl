@@ -1359,6 +1359,346 @@
                 }
             }
 
+            /* AI助手样式 */
+            .ai-assistant-trigger {
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                width: 60px;
+                height: 60px;
+                background: var(--accent-color);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 4px 16px rgba(0, 123, 255, 0.3);
+                transition: all 0.3s ease;
+                z-index: 1000;
+            }
+
+            .ai-assistant-trigger:hover {
+                background: var(--accent-hover);
+                transform: scale(1.1);
+                box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            }
+
+            .ai-assistant-trigger.hidden {
+                display: none;
+            }
+
+            .ai-assistant-panel {
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                width: 700px;
+                height: 90%;
+                background: var(--bg-primary);
+                border: 1px solid var(--border-color);
+                border-radius: 16px;
+                box-shadow: 0 8px 32px var(--shadow);
+                display: none;
+                flex-direction: column;
+                z-index: 1001;
+                overflow: hidden;
+                backdrop-filter: blur(10px);
+            }
+
+            .ai-assistant-panel.show {
+                display: flex;
+                animation: slideInUp 0.3s ease-out;
+            }
+
+            @keyframes slideInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .ai-assistant-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 1rem 1.5rem;
+                background: var(--bg-secondary);
+                border-bottom: 1px solid var(--border-color);
+                border-radius: 16px 16px 0 0;
+            }
+
+            .ai-assistant-title {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-weight: 600;
+                color: var(--text-primary);
+                font-size: 1.1rem;
+            }
+
+            .ai-assistant-title svg {
+                stroke: var(--accent-color);
+            }
+
+            .ai-assistant-close {
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .ai-assistant-close:hover {
+                background: var(--bg-tertiary);
+                color: var(--text-primary);
+            }
+
+            .ai-assistant-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .ai-chat-messages {
+                flex: 1;
+                padding: 1rem;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .ai-message {
+                display: flex;
+                flex-direction: column;
+                max-width: 85%;
+            }
+
+            .ai-message-user {
+                align-self: flex-end;
+            }
+
+            .ai-message-assistant {
+                align-self: flex-start;
+            }
+
+            .ai-message-content {
+                padding: 0.75rem 1rem;
+                border-radius: 12px;
+                font-size: 0.9rem;
+                line-height: 1.5;
+                word-wrap: break-word;
+            }
+
+            .ai-message-user .ai-message-content {
+                background: var(--accent-color);
+                color: white;
+                border-bottom-right-radius: 4px;
+            }
+
+            .ai-message-assistant .ai-message-content {
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                border: 1px solid var(--border-color);
+                border-bottom-left-radius: 4px;
+            }
+
+            .ai-message-loading {
+                align-self: flex-start;
+            }
+
+            .ai-message-loading .ai-message-content {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border-color);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: var(--text-secondary);
+            }
+
+            .ai-typing-indicator {
+                display: flex;
+                gap: 0.25rem;
+            }
+
+            .ai-typing-dot {
+                width: 6px;
+                height: 6px;
+                background: var(--text-secondary);
+                border-radius: 50%;
+                animation: typingDot 1.4s infinite ease-in-out;
+            }
+
+            .ai-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+            .ai-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+            @keyframes typingDot {
+                0%, 80%, 100% {
+                    transform: scale(0.8);
+                    opacity: 0.5;
+                }
+                40% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .ai-suggestions {
+                padding: 1rem;
+                border-top: 1px solid var(--border-color);
+                background: var(--bg-secondary);
+            }
+
+            .ai-suggestions-title {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: var(--text-secondary);
+                margin-bottom: 0.75rem;
+            }
+
+            .ai-suggestions-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .ai-suggestion-item {
+                background: var(--bg-primary);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+                color: var(--text-primary);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-align: left;
+                line-height: 1.4;
+            }
+
+            .ai-suggestion-item:hover {
+                background: var(--accent-color);
+                color: white;
+                border-color: var(--accent-color);
+                transform: translateY(-1px);
+            }
+
+            .ai-assistant-input {
+                padding: 1rem;
+                border-top: 1px solid var(--border-color);
+                background: var(--bg-primary);
+                border-radius: 0 0 16px 16px;
+            }
+
+            .ai-input-container {
+                display: flex;
+                align-items: flex-end;
+                gap: 0.75rem;
+                background: var(--bg-secondary);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 0.75rem;
+                transition: border-color 0.2s ease;
+            }
+
+            .ai-input-container:focus-within {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+            }
+
+            .ai-input {
+                flex: 1;
+                background: none;
+                border: none;
+                outline: none;
+                color: var(--text-primary);
+                font-size: 0.9rem;
+                line-height: 1.4;
+                resize: none;
+                min-height: 20px;
+                max-height: 100px;
+                font-family: var(--font-family);
+            }
+
+            .ai-input::placeholder {
+                color: var(--text-secondary);
+            }
+
+            .ai-send-btn {
+                background: var(--accent-color);
+                border: none;
+                border-radius: 8px;
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                flex-shrink: 0;
+            }
+
+            .ai-send-btn:hover:not(:disabled) {
+                background: var(--accent-hover);
+                transform: scale(1.05);
+            }
+
+            .ai-send-btn:disabled {
+                background: var(--bg-tertiary);
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
+
+            .ai-send-btn svg {
+                stroke: white;
+            }
+
+            .ai-send-btn:disabled svg {
+                stroke: var(--text-secondary);
+            }
+
+            /* 响应式设计 */
+            @media (max-width: 768px) {
+                .ai-assistant-trigger {
+                    bottom: 1rem;
+                    right: 1rem;
+                    width: 50px;
+                    height: 50px;
+                }
+
+                .ai-assistant-panel {
+                    bottom: 0;
+                    right: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 70vh;
+                    border-radius: 16px 16px 0 0;
+                    max-height: 600px;
+                }
+
+                .ai-assistant-panel.show {
+                    animation: slideInUpMobile 0.3s ease-out;
+                }
+
+                @keyframes slideInUpMobile {
+                    from {
+                        transform: translateY(100%);
+                    }
+                    to {
+                        transform: translateY(0);
+                    }
+                }
+            }
+
             /* 滚动条样式 */
             ::-webkit-scrollbar {
                 width: 8px;
@@ -1387,6 +1727,20 @@
             }
 
             .doc-toc-content::-webkit-scrollbar-thumb {
+                background: var(--border-color);
+                border-radius: 2px;
+            }
+
+            /* AI聊天消息滚动条样式 */
+            .ai-chat-messages::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .ai-chat-messages::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .ai-chat-messages::-webkit-scrollbar-thumb {
                 background: var(--border-color);
                 border-radius: 2px;
             }
@@ -1676,6 +2030,80 @@
             </div>
             <div class="doc-toc-content" id="tocContent">
                 <!-- 目录项将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- AI助手按钮 -->
+        <div class="ai-assistant-trigger" id="aiAssistantTrigger" onclick="toggleAiAssistant()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="22"></line>
+                <line x1="8" y1="22" x2="16" y2="22"></line>
+            </svg>
+        </div>
+
+        <!-- AI助手面板 -->
+        <div class="ai-assistant-panel" id="aiAssistantPanel">
+            <div class="ai-assistant-header">
+                <div class="ai-assistant-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="22"></line>
+                        <line x1="8" y1="22" x2="16" y2="22"></line>
+                    </svg>
+                    AI助手
+                </div>
+                <button class="ai-assistant-close" onclick="toggleAiAssistant()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="ai-assistant-content">
+                <div class="ai-chat-messages" id="aiChatMessages">
+                    <div class="ai-message ai-message-assistant">
+                        <div class="ai-message-content">
+                            <p>👋 你好！我是你的文档助手，可以帮你理解和分析文档内容。有什么问题尽管问我！</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-suggestions" id="aiSuggestions">
+                    <div class="ai-suggestions-title">💡 推荐问题</div>
+                    <div class="ai-suggestions-list">
+                        <button class="ai-suggestion-item" onclick="sendSuggestion('这个项目的主要功能是什么？')">
+                            这个项目的主要功能是什么？
+                        </button>
+                        <button class="ai-suggestion-item" onclick="sendSuggestion('如何快速上手这个项目？')">
+                            如何快速上手这个项目？
+                        </button>
+                        <button class="ai-suggestion-item" onclick="sendSuggestion('项目的技术架构是怎样的？')">
+                            项目的技术架构是怎样的？
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ai-assistant-input">
+                <div class="ai-input-container">
+                    <textarea 
+                        class="ai-input" 
+                        id="aiInput" 
+                        placeholder="输入你的问题..." 
+                        rows="1"
+                        onkeydown="handleAiInputKeydown(event)"
+                        oninput="adjustTextareaHeight(this)"
+                    ></textarea>
+                    <button class="ai-send-btn" id="aiSendBtn" onclick="sendMessage()" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 2L11 13"></path>
+                            <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -4012,6 +4440,259 @@
             mermaidObserver.observe(document.body, {
                 childList: true,
                 subtree: true
+            });
+
+            // AI助手功能
+            let isAiAssistantOpen = false;
+            let isAiLoading = false;
+
+            // 切换AI助手面板
+            function toggleAiAssistant() {
+                const trigger = document.getElementById('aiAssistantTrigger');
+                const panel = document.getElementById('aiAssistantPanel');
+                
+                isAiAssistantOpen = !isAiAssistantOpen;
+                
+                if (isAiAssistantOpen) {
+                    trigger.classList.add('hidden');
+                    panel.classList.add('show');
+                    // 聚焦到输入框
+                    setTimeout(() => {
+                        document.getElementById('aiInput').focus();
+                    }, 300);
+                } else {
+                    trigger.classList.remove('hidden');
+                    panel.classList.remove('show');
+                }
+            }
+
+            // 发送建议问题
+            function sendSuggestion(question) {
+                const input = document.getElementById('aiInput');
+                input.value = question;
+                updateSendButton();
+                sendMessage();
+            }
+
+            // 处理输入框键盘事件
+            function handleAiInputKeydown(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    sendMessage();
+                } else if (event.key === 'Escape') {
+                    toggleAiAssistant();
+                }
+            }
+
+            // 自动调整文本框高度
+            function adjustTextareaHeight(textarea) {
+                textarea.style.height = 'auto';
+                textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+                updateSendButton();
+            }
+
+            // 更新发送按钮状态
+            function updateSendButton() {
+                const input = document.getElementById('aiInput');
+                const sendBtn = document.getElementById('aiSendBtn');
+                const hasText = input.value.trim().length > 0;
+                
+                sendBtn.disabled = !hasText || isAiLoading;
+            }
+
+            // 发送消息
+            async function sendMessage() {
+                const input = document.getElementById('aiInput');
+                const message = input.value.trim();
+                
+                if (!message || isAiLoading) return;
+                
+                // 清空输入框
+                input.value = '';
+                adjustTextareaHeight(input);
+                updateSendButton();
+                
+                // 添加用户消息
+                addMessage(message, 'user');
+                
+                // 显示加载状态
+                const loadingId = addLoadingMessage();
+                isAiLoading = true;
+                updateSendButton();
+                
+                try {
+                    // 获取当前文档内容作为上下文
+                    const context = getCurrentDocumentContext();
+                    
+                    // 调用AI API
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            context: context
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // 移除加载消息
+                    removeLoadingMessage(loadingId);
+                    
+                    // 添加AI回复
+                    addMessage(data.message, 'assistant');
+                    
+                    // 更新建议问题
+                    updateSuggestions(data.suggestions);
+                    
+                } catch (error) {
+                    console.error('AI请求失败:', error);
+                    
+                    // 移除加载消息
+                    removeLoadingMessage(loadingId);
+                    
+                    // 显示错误消息
+                    addMessage('抱歉，我现在无法回答您的问题。请稍后再试。', 'assistant', true);
+                } finally {
+                    isAiLoading = false;
+                    updateSendButton();
+                }
+            }
+
+            // 获取当前文档内容作为上下文
+            function getCurrentDocumentContext() {
+                const contentContainer = document.querySelector('.markdown-content');
+                if (contentContainer) {
+                    // 提取文本内容，去除HTML标签
+                    const text = contentContainer.textContent || contentContainer.innerText || '';
+                    // 限制上下文长度，避免请求过大
+                    return text.substring(0, 3000);
+                }
+                return null;
+            }
+
+            // 添加消息到聊天区域
+            function addMessage(content, type, isError = false) {
+                const messagesContainer = document.getElementById('aiChatMessages');
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `ai-message ai-message-${type}`;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'ai-message-content';
+                
+                if (type === 'assistant' && !isError) {
+                    // 对AI回复进行简单的markdown渲染
+                    contentDiv.innerHTML = renderSimpleMarkdown(content);
+                } else {
+                    contentDiv.textContent = content;
+                }
+                
+                if (isError) {
+                    contentDiv.style.color = '#dc3545';
+                }
+                
+                messageDiv.appendChild(contentDiv);
+                messagesContainer.appendChild(messageDiv);
+                
+                // 滚动到底部
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                return messageDiv;
+            }
+
+            // 添加加载消息
+            function addLoadingMessage() {
+                const messagesContainer = document.getElementById('aiChatMessages');
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'ai-message ai-message-loading';
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'ai-message-content';
+                contentDiv.innerHTML = `
+                    <span>AI正在思考</span>
+                    <div class="ai-typing-indicator">
+                        <div class="ai-typing-dot"></div>
+                        <div class="ai-typing-dot"></div>
+                        <div class="ai-typing-dot"></div>
+                    </div>
+                `;
+                
+                messageDiv.appendChild(contentDiv);
+                messagesContainer.appendChild(messageDiv);
+                
+                // 滚动到底部
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                return messageDiv;
+            }
+
+            // 移除加载消息
+            function removeLoadingMessage(loadingElement) {
+                if (loadingElement && loadingElement.parentNode) {
+                    loadingElement.parentNode.removeChild(loadingElement);
+                }
+            }
+
+            // 简单的markdown渲染
+            function renderSimpleMarkdown(text) {
+                return text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`(.*?)`/g, '<code>$1</code>')
+                    .replace(/\n/g, '<br>');
+            }
+
+            // 更新建议问题
+            function updateSuggestions(suggestions) {
+                const suggestionsContainer = document.querySelector('.ai-suggestions-list');
+                
+                if (!suggestions || suggestions.length === 0) {
+                    return;
+                }
+                
+                // 清空现有建议
+                suggestionsContainer.innerHTML = '';
+                
+                // 添加新建议
+                suggestions.forEach(suggestion => {
+                    const button = document.createElement('button');
+                    button.className = 'ai-suggestion-item';
+                    button.textContent = suggestion;
+                    button.onclick = () => sendSuggestion(suggestion);
+                    suggestionsContainer.appendChild(button);
+                });
+            }
+
+            // 监听输入框变化
+            document.addEventListener('DOMContentLoaded', () => {
+                const input = document.getElementById('aiInput');
+                if (input) {
+                    input.addEventListener('input', () => {
+                        adjustTextareaHeight(input);
+                        updateSendButton();
+                    });
+                }
+            });
+
+            // 点击页面其他地方时关闭AI助手（可选）
+            document.addEventListener('click', (event) => {
+                const panel = document.getElementById('aiAssistantPanel');
+                const trigger = document.getElementById('aiAssistantTrigger');
+                
+                if (isAiAssistantOpen && 
+                    !panel.contains(event.target) && 
+                    !trigger.contains(event.target)) {
+                    // 可以选择是否启用点击外部关闭功能
+                    // toggleAiAssistant();
+                }
             });
         </script>
     </body>

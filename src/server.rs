@@ -3,7 +3,7 @@ use axum::{
     extract::{Query, State},
     http::StatusCode,
     response::{Html, Json},
-    routing::get,
+    routing::{get, post},
 };
 use serde::{Deserialize, Serialize};
 use tower_http::cors::CorsLayer;
@@ -51,6 +51,45 @@ pub struct StatsResponse {
     pub formatted_size: String,
 }
 
+// AI助手相关的数据结构
+#[derive(Deserialize)]
+pub struct ChatRequest {
+    pub message: String,
+    pub context: Option<String>, // 当前文档内容作为上下文
+}
+
+#[derive(Serialize)]
+pub struct ChatResponse {
+    pub message: String,
+    pub suggestions: Vec<String>, // 推荐的追问问题
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct OpenAIMessage {
+    pub role: String,
+    pub content: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct OpenAIRequest {
+    pub model: String,
+    pub messages: Vec<OpenAIMessage>,
+    pub temperature: f32,
+    pub max_tokens: i32,
+    pub stream: bool,
+}
+
+#[derive(Deserialize)]
+pub struct OpenAIChoice {
+    pub message: OpenAIMessage,
+    pub finish_reason: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct OpenAIResponse {
+    pub choices: Vec<OpenAIChoice>,
+}
+
 /// Create the main application router
 pub fn create_router(doc_tree: DocumentTree, docs_path: String) -> Router {
     let state = AppState {
@@ -64,6 +103,7 @@ pub fn create_router(doc_tree: DocumentTree, docs_path: String) -> Router {
         .route("/api/tree", get(get_tree_handler))
         .route("/api/search", get(search_handler))
         .route("/api/stats", get(stats_handler))
+        .route("/api/chat", post(chat_handler))
         .route("/health", get(health_handler))
         .layer(CorsLayer::permissive())
         .with_state(state)
@@ -189,6 +229,115 @@ async fn health_handler() -> Json<serde_json::Value> {
         "timestamp": chrono::Utc::now().to_rfc3339(),
         "version": env!("CARGO_PKG_VERSION")
     }))
+}
+
+/// AI助手聊天处理函数
+async fn chat_handler(
+    State(_state): State<AppState>,
+    Json(request): Json<ChatRequest>,
+) -> Result<Json<ChatResponse>, StatusCode> {
+    debug!("AI助手收到消息: {}", request.message);
+
+    // 调用OpenAI兼容的API
+    let response = call_openai_api(&request.message, request.context.as_deref()).await
+        .map_err(|e| {
+            error!("调用AI API失败: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    // 生成推荐问题
+    let suggestions = generate_suggestions(&response, request.context.as_deref());
+
+    Ok(Json(ChatResponse {
+        message: response,
+        suggestions,
+    }))
+}
+
+/// 调用OpenAI兼容的API
+async fn call_openai_api(message: &str, context: Option<&str>) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    let client = reqwest::Client::new();
+    
+    // 构建系统提示词
+    let mut system_prompt = "你是一个专业的文档助手，专门帮助用户理解和分析技术文档。请用中文回答问题，回答要准确、简洁、有帮助。".to_string();
+    
+    if let Some(ctx) = context {
+        system_prompt.push_str(&format!("\n\n当前文档内容：\n{}", ctx));
+    }
+
+    // 构建消息
+    let messages = vec![
+        OpenAIMessage {
+            role: "system".to_string(),
+            content: system_prompt,
+        },
+        OpenAIMessage {
+            role: "user".to_string(),
+            content: message.to_string(),
+        },
+    ];
+
+    let request_body = OpenAIRequest {
+        model: "GLM-4.5-Flash".to_string(),
+        messages,
+        temperature: 0.7,
+        max_tokens: 2000,
+        stream: false,
+    };
+
+    let response = client
+        .post("https://open.bigmodel.cn/api/paas/v4/chat/completions")
+        .header("Authorization", "Bearer b0c0afc3b5d0402db47e5132fc0fa882.6vyDm2pOv2NSy5z7")
+        .header("Content-Type", "application/json")
+        .json(&request_body)
+        .send()
+        .await?;
+
+    if !response.status().is_success() {
+        let status = response.status();
+        let text = response.text().await.unwrap_or_default();
+        return Err(format!("API请求失败: {} - {}", status, text).into());
+    }
+
+    let openai_response: OpenAIResponse = response.json().await?;
+    
+    if let Some(choice) = openai_response.choices.first() {
+        Ok(choice.message.content.clone())
+    } else {
+        Err("API响应中没有找到消息内容".into())
+    }
+}
+
+/// 生成推荐的追问问题
+fn generate_suggestions(ai_response: &str, _context: Option<&str>) -> Vec<String> {
+    let mut suggestions = Vec::new();
+    
+    // 基于AI回答内容生成相关问题
+    if ai_response.contains("架构") || ai_response.contains("设计") {
+        suggestions.push("这个架构的优缺点是什么？".to_string());
+        suggestions.push("有哪些替代的设计方案？".to_string());
+    }
+    
+    if ai_response.contains("实现") || ai_response.contains("代码") {
+        suggestions.push("这个实现有什么需要注意的地方？".to_string());
+        suggestions.push("如何优化这个实现？".to_string());
+    }
+    
+    if ai_response.contains("配置") || ai_response.contains("参数") {
+        suggestions.push("这些配置的默认值是什么？".to_string());
+        suggestions.push("如何调优这些参数？".to_string());
+    }
+    
+    // 如果没有特定的建议，提供通用的
+    if suggestions.is_empty() {
+        suggestions.push("能详细解释一下吗？".to_string());
+        suggestions.push("有相关的示例吗？".to_string());
+        suggestions.push("这个有什么最佳实践？".to_string());
+    }
+    
+    // 限制建议数量
+    suggestions.truncate(3);
+    suggestions
 }
 
 /// Format bytes into human-readable format
