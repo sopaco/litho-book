@@ -2,10 +2,13 @@ use axum::{
     Router,
     extract::{Query, State},
     http::StatusCode,
-    response::{Html, Json},
+    response::{Html, Json, Sse, sse::Event},
     routing::{get, post},
 };
+use futures::stream::Stream;
 use serde::{Deserialize, Serialize};
+use std::convert::Infallible;
+use std::time::Duration;
 use tower_http::cors::CorsLayer;
 use tracing::{debug, error, info};
 
@@ -59,12 +62,6 @@ pub struct ChatRequest {
     pub history: Option<Vec<OpenAIMessage>>, // 历史会话消息
 }
 
-#[derive(Serialize)]
-pub struct ChatResponse {
-    pub message: String,
-    pub suggestions: Vec<String>, // 推荐的追问问题
-}
-
 #[derive(Serialize, Deserialize)]
 pub struct OpenAIMessage {
     pub role: String,
@@ -79,16 +76,29 @@ pub struct OpenAIRequest {
     pub max_tokens: i32,
     pub stream: bool,
 }
-
+// 流式响应相关的数据结构
 #[derive(Deserialize)]
-pub struct OpenAIChoice {
-    pub message: OpenAIMessage,
+pub struct OpenAIStreamChoice {
+    pub delta: OpenAIStreamDelta,
     pub finish_reason: Option<String>,
 }
 
 #[derive(Deserialize)]
-pub struct OpenAIResponse {
-    pub choices: Vec<OpenAIChoice>,
+pub struct OpenAIStreamDelta {
+    pub content: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct OpenAIStreamResponse {
+    pub choices: Vec<OpenAIStreamChoice>,
+}
+
+#[derive(Serialize)]
+pub struct StreamEvent {
+    pub event_type: String,
+    pub content: Option<String>,
+    pub suggestions: Option<Vec<String>>,
+    pub finished: bool,
 }
 
 /// Create the main application router
@@ -104,7 +114,7 @@ pub fn create_router(doc_tree: DocumentTree, docs_path: String) -> Router {
         .route("/api/tree", get(get_tree_handler))
         .route("/api/search", get(search_handler))
         .route("/api/stats", get(stats_handler))
-        .route("/api/chat", post(chat_handler))
+        .route("/api/chat", post(chat_stream_handler))
         .route("/health", get(health_handler))
         .layer(CorsLayer::permissive())
         .with_state(state)
@@ -232,40 +242,106 @@ async fn health_handler() -> Json<serde_json::Value> {
     }))
 }
 
-/// AI助手聊天处理函数
-async fn chat_handler(
+/// AI助手流式聊天处理函数
+async fn chat_stream_handler(
     State(_state): State<AppState>,
     Json(request): Json<ChatRequest>,
-) -> Result<Json<ChatResponse>, StatusCode> {
+) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     debug!("AI助手收到消息: {}", request.message);
 
-    // 调用OpenAI兼容的API，传递历史消息
-    let response = call_openai_api(
-        &request.message,
-        request.context.as_deref(),
-        request.history,
+    let stream = async_stream::stream! {
+        match call_openai_stream_api(
+            &request.message,
+            request.context.as_deref(),
+            request.history,
+        ).await {
+            Ok(mut response_stream) => {
+                let mut full_response = String::new();
+
+                // 发送开始事件
+                yield Ok(Event::default()
+                    .event("start")
+                    .data(serde_json::to_string(&StreamEvent {
+                        event_type: "start".to_string(),
+                        content: None,
+                        suggestions: None,
+                        finished: false,
+                    }).unwrap_or_default()));
+
+                // 处理流式响应
+                while let Some(chunk) = response_stream.recv().await {
+                    match chunk {
+                        Ok(content) => {
+                            full_response.push_str(&content);
+
+                            // 发送内容块
+                            yield Ok(Event::default()
+                                .event("content")
+                                .data(serde_json::to_string(&StreamEvent {
+                                    event_type: "content".to_string(),
+                                    content: Some(content),
+                                    suggestions: None,
+                                    finished: false,
+                                }).unwrap_or_default()));
+                        }
+                        Err(e) => {
+                            error!("流式响应错误: {}", e);
+                            yield Ok(Event::default()
+                                .event("error")
+                                .data(serde_json::to_string(&StreamEvent {
+                                    event_type: "error".to_string(),
+                                    content: Some("抱歉，我现在无法回答您的问题。请稍后再试。".to_string()),
+                                    suggestions: None,
+                                    finished: true,
+                                }).unwrap_or_default()));
+                            return;
+                        }
+                    }
+                }
+
+                // 生成推荐问题
+                let suggestions = generate_suggestions(&full_response, request.context.as_deref());
+
+                // 发送完成事件
+                yield Ok(Event::default()
+                    .event("finish")
+                    .data(serde_json::to_string(&StreamEvent {
+                        event_type: "finish".to_string(),
+                        content: None,
+                        suggestions: Some(suggestions),
+                        finished: true,
+                    }).unwrap_or_default()));
+            }
+            Err(e) => {
+                error!("调用AI API失败: {}", e);
+                yield Ok(Event::default()
+                    .event("error")
+                    .data(serde_json::to_string(&StreamEvent {
+                        event_type: "error".to_string(),
+                        content: Some("抱歉，我现在无法回答您的问题。请稍后再试。".to_string()),
+                        suggestions: None,
+                        finished: true,
+                    }).unwrap_or_default()));
+            }
+        }
+    };
+
+    Sse::new(stream).keep_alive(
+        axum::response::sse::KeepAlive::new()
+            .interval(Duration::from_secs(1))
+            .text("keep-alive-text"),
     )
-    .await
-    .map_err(|e| {
-        error!("调用AI API失败: {}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
-
-    // 生成推荐问题
-    let suggestions = generate_suggestions(&response, request.context.as_deref());
-
-    Ok(Json(ChatResponse {
-        message: response,
-        suggestions,
-    }))
 }
 
-/// 调用OpenAI兼容的API
-async fn call_openai_api(
+/// 调用OpenAI兼容的流式API
+async fn call_openai_stream_api(
     message: &str,
     context: Option<&str>,
     history: Option<Vec<OpenAIMessage>>,
-) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+) -> Result<
+    tokio::sync::mpsc::Receiver<Result<String, Box<dyn std::error::Error + Send + Sync>>>,
+    Box<dyn std::error::Error + Send + Sync>,
+> {
     let client = reqwest::Client::new();
 
     // 构建系统提示词
@@ -304,7 +380,7 @@ async fn call_openai_api(
         messages,
         temperature: 0.7,
         max_tokens: 16384,
-        stream: false,
+        stream: true, // 启用流式响应
     };
 
     let response = client
@@ -324,13 +400,78 @@ async fn call_openai_api(
         return Err(format!("API请求失败: {} - {}", status, text).into());
     }
 
-    let openai_response: OpenAIResponse = response.json().await?;
+    // 创建通道来传递流式数据
+    let (tx, rx) = tokio::sync::mpsc::channel(100);
 
-    if let Some(choice) = openai_response.choices.first() {
-        Ok(choice.message.content.clone())
-    } else {
-        Err("API响应中没有找到消息内容".into())
-    }
+    // 在后台任务中处理流式响应
+    tokio::spawn(async move {
+        use futures::StreamExt;
+
+        let mut stream = response.bytes_stream();
+        let mut buffer = String::new();
+
+        while let Some(chunk_result) = stream.next().await {
+            match chunk_result {
+                Ok(chunk) => {
+                    let chunk_str = String::from_utf8_lossy(&chunk);
+                    buffer.push_str(&chunk_str);
+
+                    // 处理SSE格式的数据
+                    let lines: Vec<&str> = buffer.lines().collect();
+                    let mut processed_lines = 0;
+
+                    for line in &lines {
+                        if line.starts_with("data: ") {
+                            let data = &line[6..]; // 移除 "data: " 前缀
+
+                            if data == "[DONE]" {
+                                // 流结束
+                                return;
+                            }
+
+                            // 尝试解析JSON
+                            if let Ok(stream_response) =
+                                serde_json::from_str::<OpenAIStreamResponse>(data)
+                            {
+                                if let Some(choice) = stream_response.choices.first() {
+                                    if let Some(content) = &choice.delta.content {
+                                        if !content.is_empty() {
+                                            if tx.send(Ok(content.clone())).await.is_err() {
+                                                return; // 接收端已关闭
+                                            }
+                                        }
+                                    }
+
+                                    // 检查是否完成
+                                    if choice.finish_reason.is_some() {
+                                        return;
+                                    }
+                                }
+                            }
+                            processed_lines += 1;
+                        } else if line.is_empty() {
+                            processed_lines += 1;
+                        } else {
+                            processed_lines += 1;
+                        }
+                    }
+
+                    // 保留未处理的部分
+                    if processed_lines < lines.len() {
+                        buffer = lines[processed_lines..].join("\n");
+                    } else {
+                        buffer.clear();
+                    }
+                }
+                Err(e) => {
+                    let _ = tx.send(Err(format!("流式响应错误: {}", e).into())).await;
+                    return;
+                }
+            }
+        }
+    });
+
+    Ok(rx)
 }
 
 /// 生成推荐的追问问题

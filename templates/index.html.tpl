@@ -1739,6 +1739,21 @@
                 stroke: var(--text-secondary);
             }
 
+            /* 流式输出光标动画 */
+            .ai-cursor {
+                display: inline-block;
+                background: var(--accent-color);
+                width: 2px;
+                height: 1.2em;
+                margin-left: 2px;
+                animation: blink 1s infinite;
+            }
+
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0; }
+            }
+
             /* 响应式设计 */
             @media (max-width: 768px) {
                 .ai-assistant-trigger {
@@ -4656,7 +4671,7 @@
                 sendBtn.disabled = !hasText || isAiLoading;
             }
 
-            // 发送消息
+            // 发送消息（流式版本）
             async function sendMessage() {
                 const input = document.getElementById('aiInput');
                 const message = input.value.trim();
@@ -4680,8 +4695,8 @@
                 // 自动折叠推荐区域（首次发送消息后）
                 autoCollapseSuggestions();
                 
-                // 显示加载状态
-                const loadingId = addLoadingMessage();
+                // 创建AI消息容器，用于流式显示
+                const aiMessageElement = addStreamingMessage();
                 isAiLoading = true;
                 updateSendButton();
                 
@@ -4689,11 +4704,12 @@
                     // 获取当前文档内容作为上下文
                     const context = getCurrentDocumentContext();
                     
-                    // 调用AI API，传递聊天历史
+                    // 调用流式AI API
                     const response = await fetch('/api/chat', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'text/event-stream',
                         },
                         body: JSON.stringify({
                             message: message,
@@ -4706,34 +4722,111 @@
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
                     
-                    const data = await response.json();
-                    
-                    // 移除加载消息
-                    removeLoadingMessage(loadingId);
-                    
-                    // 添加AI回复到界面
-                    addMessage(data.message, 'assistant');
-                    
-                    // 添加AI回复到历史记录
-                    chatHistory.push({
-                        role: 'assistant',
-                        content: data.message
-                    });
-                    
-                    // 更新建议问题
-                    updateSuggestions(data.suggestions);
+                    // 处理流式响应
+                    await handleStreamResponse(response, aiMessageElement);
                     
                 } catch (error) {
                     console.error('AI请求失败:', error);
                     
-                    // 移除加载消息
-                    removeLoadingMessage(loadingId);
+                    // 移除流式消息容器
+                    if (aiMessageElement && aiMessageElement.parentNode) {
+                        aiMessageElement.parentNode.removeChild(aiMessageElement);
+                    }
                     
                     // 显示错误消息
                     addMessage('抱歉，我现在无法回答您的问题。请稍后再试。', 'assistant', true);
                 } finally {
                     isAiLoading = false;
                     updateSendButton();
+                }
+            }
+
+            // 创建流式消息容器
+            function addStreamingMessage() {
+                const messagesContainer = document.getElementById('aiChatMessages');
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'ai-message ai-message-assistant';
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'ai-message-content';
+                contentDiv.innerHTML = '<span class="ai-cursor">|</span>'; // 添加光标效果
+                
+                messageDiv.appendChild(contentDiv);
+                messagesContainer.appendChild(messageDiv);
+                
+                // 滚动到底部
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                return messageDiv;
+            }
+
+            // 处理流式响应
+            async function handleStreamResponse(response, messageElement) {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullContent = '';
+                const contentDiv = messageElement.querySelector('.ai-message-content');
+                
+                try {
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        
+                        if (done) break;
+                        
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+                        
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                const data = line.slice(6);
+                                
+                                if (data === '[DONE]') {
+                                    // 移除光标
+                                    contentDiv.innerHTML = renderSimpleMarkdown(fullContent);
+                                    return;
+                                }
+                                
+                                try {
+                                    const event = JSON.parse(data);
+                                    
+                                    if (event.event_type === 'content' && event.content) {
+                                        fullContent += event.content;
+                                        // 更新显示内容，保持光标
+                                        contentDiv.innerHTML = renderSimpleMarkdown(fullContent) + '<span class="ai-cursor">|</span>';
+                                        
+                                        // 滚动到底部
+                                        const messagesContainer = document.getElementById('aiChatMessages');
+                                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                                    } else if (event.event_type === 'finish') {
+                                        // 移除光标
+                                        contentDiv.innerHTML = renderSimpleMarkdown(fullContent);
+                                        
+                                        // 添加AI回复到历史记录
+                                        chatHistory.push({
+                                            role: 'assistant',
+                                            content: fullContent
+                                        });
+                                        
+                                        // 更新建议问题
+                                        if (event.suggestions) {
+                                            updateSuggestions(event.suggestions);
+                                        }
+                                        return;
+                                    } else if (event.event_type === 'error') {
+                                        throw new Error(event.content || '流式响应错误');
+                                    }
+                                } catch (parseError) {
+                                    console.warn('解析SSE数据失败:', parseError, 'data:', data);
+                                }
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('流式响应处理错误:', error);
+                    // 移除光标，显示错误
+                    contentDiv.innerHTML = '抱歉，响应过程中出现错误。';
+                    throw error;
                 }
             }
 
