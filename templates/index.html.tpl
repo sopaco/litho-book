@@ -153,6 +153,9 @@
             .header h1 {
                 font-size: calc(1.1rem * var(--font-size-scale));
                 font-weight: 300;
+                display: flex;
+                align-items: center;
+                margin: 0;
             }
 
             .header-subtitle {
@@ -1837,7 +1840,7 @@
     <body>
         <div class="header">
             <div class="header-left">
-                <h1>📚 Litho Book</h1>
+                <h1><img src="assets/icon_litho_book_transparent.png" alt="Litho Book" style="width: 32px; height: 32px; margin-right: 8px;"> Litho Book</h1>
             </div>
             <div class="header-right">
                 <div class="header-subtitle" id="docs-path"></div>
