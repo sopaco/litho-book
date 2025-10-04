@@ -1444,6 +1444,13 @@
                 stroke: var(--accent-color);
             }
 
+            .ai-assistant-controls {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .ai-assistant-clear,
             .ai-assistant-close {
                 background: none;
                 border: none;
@@ -1457,9 +1464,14 @@
                 justify-content: center;
             }
 
+            .ai-assistant-clear:hover,
             .ai-assistant-close:hover {
                 background: var(--bg-tertiary);
                 color: var(--text-primary);
+            }
+
+            .ai-assistant-clear:hover {
+                color: #dc3545; /* 红色，表示删除操作 */
             }
 
             .ai-assistant-content {
@@ -2116,11 +2128,20 @@
                     </svg>
                     AI助手
                 </div>
-                <button class="ai-assistant-close" onclick="toggleAiAssistant()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
-                </button>
+                <div class="ai-assistant-controls">
+                    <button class="ai-assistant-clear" onclick="clearChatHistory()" title="清空聊天记录">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                    <button class="ai-assistant-close" onclick="toggleAiAssistant()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6L6 18M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
             
             <div class="ai-assistant-content">
@@ -4515,6 +4536,7 @@
             let isAiLoading = false;
             let isSuggestionsCollapsed = false;
             let hasUserSentMessage = false;
+            let chatHistory = []; // 存储聊天历史
 
             // 切换AI助手面板
             function toggleAiAssistant() {
@@ -4533,6 +4555,46 @@
                 } else {
                     trigger.classList.remove('hidden');
                     panel.classList.remove('show');
+                }
+            }
+
+            // 清空聊天历史
+            function clearChatHistory() {
+                if (confirm('确定要清空所有聊天记录吗？')) {
+                    // 清空聊天历史数组
+                    chatHistory = [];
+                    
+                    // 清空聊天界面，但保留欢迎消息
+                    const messagesContainer = document.getElementById('aiChatMessages');
+                    messagesContainer.innerHTML = `
+                        <div class="ai-message ai-message-assistant">
+                            <div class="ai-message-content">
+                                <p>👋 你好！我是你的文档助手，可以帮你理解和分析文档内容。有什么问题尽管问我！</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 重置状态
+                    hasUserSentMessage = false;
+                    
+                    // 如果推荐区域是折叠的，展开它
+                    if (isSuggestionsCollapsed) {
+                        toggleSuggestions();
+                    }
+                    
+                    // 恢复初始推荐问题
+                    const suggestionsContainer = document.querySelector('.ai-suggestions-list');
+                    suggestionsContainer.innerHTML = `
+                        <button class="ai-suggestion-item" onclick="sendSuggestion('这个项目的主要功能是什么？')">
+                            这个项目的主要功能是什么？
+                        </button>
+                        <button class="ai-suggestion-item" onclick="sendSuggestion('如何快速上手这个项目？')">
+                            如何快速上手这个项目？
+                        </button>
+                        <button class="ai-suggestion-item" onclick="sendSuggestion('项目的技术架构是怎样的？')">
+                            项目的技术架构是怎样的？
+                        </button>
+                    `;
                 }
             }
 
@@ -4606,8 +4668,14 @@
                 adjustTextareaHeight(input);
                 updateSendButton();
                 
-                // 添加用户消息
+                // 添加用户消息到界面
                 addMessage(message, 'user');
+                
+                // 添加用户消息到历史记录
+                chatHistory.push({
+                    role: 'user',
+                    content: message
+                });
                 
                 // 自动折叠推荐区域（首次发送消息后）
                 autoCollapseSuggestions();
@@ -4621,7 +4689,7 @@
                     // 获取当前文档内容作为上下文
                     const context = getCurrentDocumentContext();
                     
-                    // 调用AI API
+                    // 调用AI API，传递聊天历史
                     const response = await fetch('/api/chat', {
                         method: 'POST',
                         headers: {
@@ -4629,7 +4697,8 @@
                         },
                         body: JSON.stringify({
                             message: message,
-                            context: context
+                            context: context,
+                            history: chatHistory.slice(0, -1) // 发送除了当前消息之外的历史记录
                         })
                     });
                     
@@ -4642,8 +4711,14 @@
                     // 移除加载消息
                     removeLoadingMessage(loadingId);
                     
-                    // 添加AI回复
+                    // 添加AI回复到界面
                     addMessage(data.message, 'assistant');
+                    
+                    // 添加AI回复到历史记录
+                    chatHistory.push({
+                        role: 'assistant',
+                        content: data.message
+                    });
                     
                     // 更新建议问题
                     updateSuggestions(data.suggestions);
