@@ -8,9 +8,28 @@
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
-            href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Source+Han+Sans+SC:wght@300;400;500;600;700&family=PingFang+SC:wght@300;400;500;600;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap"
             rel="stylesheet"
         />
+        <!-- 字体显示优化 -->
+        <style>
+            @font-face {
+                font-family: 'Noto Sans SC';
+                font-display: swap;
+            }
+            @font-face {
+                font-family: 'Noto Serif SC';
+                font-display: swap;
+            }
+            @font-face {
+                font-family: 'Geist';
+                font-display: swap;
+            }
+            @font-face {
+                font-family: 'Inter';
+                font-display: swap;
+            }
+        </style>
 
         <style>
             :root {
@@ -100,6 +119,12 @@
                 background-color: var(--bg-primary);
                 color: var(--text-primary);
                 transition: all 0.3s ease;
+                /* 字体渲染优化 */
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                text-rendering: optimizeLegibility;
+                font-feature-settings: "kern" 1;
+                font-variant-ligatures: common-ligatures;
             }
 
             .header {
@@ -401,6 +426,62 @@
                 border-color: var(--accent-color);
             }
 
+            /* 字体预览样式 */
+            .font-preview {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                padding: 1rem;
+                margin-top: 0.5rem;
+            }
+
+            .font-preview-text {
+                font-family: var(--font-family);
+                line-height: 1.6;
+            }
+
+            .font-preview-text p {
+                margin: 0.5rem 0;
+                font-size: calc(0.9rem * var(--font-size-scale));
+                color: var(--text-primary);
+            }
+
+            .font-preview-text p:first-child {
+                font-weight: 400;
+            }
+
+            .font-preview-text p:nth-child(2) {
+                font-weight: 500;
+                color: var(--accent-color);
+            }
+
+            .font-preview-text p:nth-child(3) {
+                font-family: 'JetBrains Mono', 'SF Mono', 'Monaco', monospace;
+                background: var(--code-bg);
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-size: calc(0.85rem * var(--font-size-scale));
+            }
+
+            .font-preview-text p:last-child {
+                font-size: calc(0.8rem * var(--font-size-scale));
+                color: var(--text-secondary);
+            }
+
+            .font-info {
+                margin-top: 0.75rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid var(--border-color);
+            }
+
+            .font-info small {
+                color: var(--text-secondary);
+                font-size: calc(0.75rem * var(--font-size-scale));
+                font-family: 'JetBrains Mono', 'SF Mono', 'Monaco', monospace;
+                word-break: break-all;
+                line-height: 1.4;
+            }
+
             .container {
                 display: flex;
                 height: calc(100vh - 60px);
@@ -653,6 +734,11 @@
             .markdown-content p {
                 margin: 1rem 0;
                 text-align: justify;
+                /* 中文排版优化 */
+                line-height: 1.8;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                hyphens: auto;
             }
 
             .markdown-content ul,
@@ -670,9 +756,14 @@
                 padding: 0.2rem 0.4rem;
                 border-radius: 4px;
                 font-family:
-                    "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
+                    "JetBrains Mono", "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", 
+                    "Source Code Pro", "Menlo", "Consolas", "DejaVu Sans Mono", 
+                    "Liberation Mono", "Courier New", monospace;
                 font-size: calc(0.9em * var(--font-size-scale));
                 color: var(--code-text);
+                /* 代码字体优化 */
+                font-variant-ligatures: common-ligatures;
+                font-feature-settings: "calt" 1, "liga" 1;
             }
 
             .markdown-content pre {
@@ -1317,19 +1408,30 @@
                             <option value="geist">
                                 Geist（现代无衬线字体，简洁清晰）
                             </option>
-                            <option value="noto-sans-sc">
-                                Noto Sans SC（Google 开发的中文字体）
+                            <option value="noto-serif-sc">
+                                思源宋体（传统中文宋体，适合长文阅读）
+                            </option>
+                            <option value="pingfang">
+                                苹方（macOS 现代字体）
                             </option>
                             <option value="inter">
                                 Inter（优秀的界面字体，可读性强）
                             </option>
-                            <option value="source-han-sans">
-                                Source Han Sans SC（Adobe 思源黑体）
-                            </option>
-                            <option value="pingfang">
-                                PingFang SC（苹果苹方字体，优雅现代）
-                            </option>
                         </select>
+                    </div>
+                    <div class="settings-group">
+                        <label class="settings-label">字体预览</label>
+                        <div class="font-preview" id="fontPreview">
+                            <div class="font-preview-text">
+                                <p>The quick brown fox jumps over the lazy dog.</p>
+                                <p>中文字体预览：这是一段中文文本，用于测试字体显示效果。</p>
+                                <p>数字测试：0123456789</p>
+                                <p>标点符号：，。！？；：""''（）【】</p>
+                            </div>
+                            <div class="font-info" id="fontInfo">
+                                <small>当前字体栈：Geist, Noto Sans SC, PingFang SC...</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1487,13 +1589,19 @@
                 fontFamily: 'geist',
                 fontSizeScale: 1,
 
-                // 字体映射
+                // 字体映射 - 优化中文字体支持
                 fontFamilies: {
-                    'geist': "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-                    'noto-sans-sc': "'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-                    'inter': "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-                    'source-han-sans': "'Source Han Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-                    'pingfang': "'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+                    // 现代无衬线字体 - 以 Geist 为主
+                    'geist': "'Geist', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', Roboto, sans-serif",
+                    
+                    // 思源宋体 - 传统中文宋体，适合长文阅读
+                    'noto-serif-sc': "'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', serif",
+                    
+                    // Inter - 现代界面字体，中文使用思源黑体
+                    'inter': "'Inter', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif",
+                    
+                    // 苹方 - macOS 现代中文字体
+                    'pingfang': "'PingFang SC', 'Noto Sans SC', 'Hiragino Sans GB', sans-serif",
                 },
 
                 // 加载设置
@@ -1570,6 +1678,26 @@
                     if (fontSizeDisplay) {
                         fontSizeDisplay.textContent = Math.round(this.fontSizeScale * 100) + '%';
                     }
+
+                    // 更新字体预览
+                    const fontPreview = document.getElementById('fontPreview');
+                    if (fontPreview) {
+                        const previewText = fontPreview.querySelector('.font-preview-text');
+                        if (previewText) {
+                            previewText.style.fontFamily = this.fontFamilies[this.fontFamily];
+                            previewText.style.fontSize = `calc(0.9rem * ${this.fontSizeScale})`;
+                        }
+                        
+                        // 更新字体信息
+                        const fontInfo = fontPreview.querySelector('.font-info small');
+                        if (fontInfo) {
+                            // 延迟检测字体，确保字体已加载
+                            setTimeout(() => {
+                                const actualFontInfo = this.getActualFontInfo();
+                                fontInfo.innerHTML = `字体可用性：${actualFontInfo}<br>完整字体栈：${this.fontFamilies[this.fontFamily]}`;
+                            }, 100);
+                        }
+                    }
                 },
 
                 // 设置主题
@@ -1600,6 +1728,44 @@
                     this.fontSizeScale = 1;
                     this.apply();
                     this.save();
+                },
+
+                // 检测字体是否可用
+                checkFontAvailability(fontName) {
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    
+                    // 使用默认字体绘制文本
+                    context.font = '12px monospace';
+                    const defaultWidth = context.measureText('测试字体Test Font').width;
+                    
+                    // 使用指定字体绘制文本
+                    context.font = `12px "${fontName}", monospace`;
+                    const testWidth = context.measureText('测试字体Test Font').width;
+                    
+                    // 如果宽度不同，说明字体可用
+                    return defaultWidth !== testWidth;
+                },
+
+                // 获取实际使用的字体信息
+                getActualFontInfo() {
+                    const fontStack = this.fontFamilies[this.fontFamily].split(',').map(f => f.trim().replace(/['"]/g, ''));
+                    const availableFonts = [];
+                    
+                    for (const font of fontStack) {
+                        if (font.startsWith('-') || font === 'sans-serif' || font === 'serif' || font === 'monospace') {
+                            availableFonts.push(font);
+                            continue;
+                        }
+                        
+                        if (this.checkFontAvailability(font)) {
+                            availableFonts.push(`✓ ${font}`);
+                        } else {
+                            availableFonts.push(`✗ ${font}`);
+                        }
+                    }
+                    
+                    return availableFonts.slice(0, 5).join(', ') + (fontStack.length > 5 ? '...' : '');
                 }
             };
 
