@@ -24,3 +24,4 @@ target
 .DS_Store
 litho-book.toml
 .litho/
+litho.docs/
