@@ -244,7 +244,7 @@ async fn health_handler() -> Json<serde_json::Value> {
 
 /// AI助手流式聊天处理函数
 async fn chat_stream_handler(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     Json(request): Json<ChatRequest>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     debug!("AI助手收到消息: {}", request.message);
@@ -254,6 +254,7 @@ async fn chat_stream_handler(
             &request.message,
             request.context.as_deref(),
             request.history,
+            &state.docs_path,
         ).await {
             Ok(mut response_stream) => {
                 let mut full_response = String::new();
@@ -338,6 +339,7 @@ async fn call_openai_stream_api(
     message: &str,
     context: Option<&str>,
     history: Option<Vec<OpenAIMessage>>,
+    docs_path: &str,
 ) -> Result<
     tokio::sync::mpsc::Receiver<Result<String, Box<dyn std::error::Error + Send + Sync>>>,
     Box<dyn std::error::Error + Send + Sync>,
@@ -347,8 +349,14 @@ async fn call_openai_stream_api(
     // 构建系统提示词
     let mut system_prompt = "你是一个专业的文档助手，专门帮助用户理解和分析技术文档。请用中文回答问题，回答要准确、简洁、有帮助。".to_string();
 
+    // 添加架构概览文档作为背景材料
+    let architecture_path = std::path::Path::new(docs_path).join("2、架构概览.md");
+    if let Ok(architecture_content) = std::fs::read_to_string(&architecture_path) {
+        system_prompt.push_str(&format!("\n\n用户所关注项目的架构概览：\n{}", architecture_content));
+    }
+
     if let Some(ctx) = context {
-        system_prompt.push_str(&format!("\n\n当前文档内容：\n{}", ctx));
+        system_prompt.push_str(&format!("\n\n用户当前正在查看的文档内容：\n{}", ctx));
     }
 
     // 构建消息列表

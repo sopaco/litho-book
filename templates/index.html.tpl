@@ -2141,7 +2141,7 @@
                         <line x1="12" y1="19" x2="12" y2="22"></line>
                         <line x1="8" y1="22" x2="16" y2="22"></line>
                     </svg>
-                    AI助手
+                    Litho Advisor
                 </div>
                 <div class="ai-assistant-controls">
                     <button class="ai-assistant-clear" onclick="clearChatHistory()" title="清空聊天记录">
@@ -2163,7 +2163,7 @@
                 <div class="ai-chat-messages" id="aiChatMessages">
                     <div class="ai-message ai-message-assistant">
                         <div class="ai-message-content">
-                            <p>👋 你好！我是你的文档助手，可以帮你理解和分析文档内容。有什么问题尽管问我！</p>
+                            <p>👋 你好！我是Litho Advisor，你的文档助手，可以帮你理解和分析文档内容。有什么问题尽管问我！</p>
                         </div>
                     </div>
                 </div>
@@ -4584,7 +4584,7 @@
                     messagesContainer.innerHTML = `
                         <div class="ai-message ai-message-assistant">
                             <div class="ai-message-content">
-                                <p>👋 你好！我是你的文档助手，可以帮你理解和分析文档内容。有什么问题尽管问我！</p>
+                                <p>👋 你好！我是Litho Advisor，你的文档助手，可以帮你理解和分析文档内容。有什么问题尽管问我！</p>
                             </div>
                         </div>
                     `;
@@ -4908,11 +4908,79 @@
 
             // 简单的markdown渲染
             function renderSimpleMarkdown(text) {
-                return text
+                // 先处理 mermaid 代码块（在普通代码块之前）
+                const mermaidBlocks = [];
+                const mermaidPlaceholders = [];
+                
+                text = text.replace(/```mermaid\n([\s\S]*?)\n```/g, (match, mermaidCode) => {
+                    const mermaidId = `mermaid-ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                    const placeholder = `__MERMAID_PLACEHOLDER_${mermaidId}__`;
+                    mermaidBlocks.push({ id: mermaidId, code: mermaidCode.trim() });
+                    mermaidPlaceholders.push({ placeholder, id: mermaidId, code: mermaidCode.trim() });
+                    return placeholder;
+                });
+
+                // 处理普通代码块（排除已处理的 mermaid）
+                text = text.replace(/```(\w+)?\n([\s\S]*?)\n```/g, (match, lang, code) => {
+                    return `<pre><code class="language-${lang || ''}">${code}</code></pre>`;
+                });
+
+                // 处理其他 markdown 语法（但不处理换行符）
+                text = text
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/`(.*?)`/g, '<code>$1</code>')
-                    .replace(/\n/g, '<br>');
+                    .replace(/`(.*?)`/g, '<code>$1</code>');
+
+                // 将 mermaid 占位符替换为实际的 div 元素
+                mermaidPlaceholders.forEach(item => {
+                    text = text.replace(item.placeholder, `<div class="mermaid" id="${item.id}">${item.code}</div>`);
+                });
+
+                // 最后处理换行符（在 mermaid 处理之后）
+                text = text.replace(/\n/g, '<br>');
+
+                // 异步渲染 mermaid 图表
+                if (mermaidBlocks.length > 0) {
+                    setTimeout(() => {
+                        mermaidBlocks.forEach(block => {
+                            const element = document.getElementById(block.id);
+                            if (element && typeof mermaid !== 'undefined') {
+                                try {
+                                    console.log('渲染AI消息中的Mermaid图表:', block.id, '代码:', block.code);
+                                    // 确保元素内容是纯文本，没有HTML标签
+                                    element.textContent = block.code;
+                                    
+                                    // 使用 mermaid.run() 渲染图表
+                                    mermaid.run(undefined, `#${block.id}`).then(() => {
+                                        console.log('Mermaid图表渲染成功:', block.id);
+                                        // 渲染完成后增强图表
+                                        setTimeout(() => {
+                                            enhanceMermaidDiagrams();
+                                        }, 100);
+                                    }).catch(error => {
+                                        console.warn('AI消息中的Mermaid图表渲染失败:', error);
+                                        element.innerHTML = `
+                                            <div style="border: 1px solid #dc3545; border-radius: 4px; padding: 1rem; background: #f8d7da; color: #721c24;">
+                                                <strong>Mermaid 图表渲染失败</strong>
+                                                <pre style="margin-top: 0.5rem; background: #fff; padding: 0.5rem; border-radius: 4px; overflow-x: auto;"><code>${block.code}</code></pre>
+                                            </div>
+                                        `;
+                                    });
+                                } catch (error) {
+                                    console.warn('AI消息中的Mermaid图表渲染失败:', error);
+                                    element.innerHTML = `
+                                        <div style="border: 1px solid #dc3545; border-radius: 4px; padding: 1rem; background: #f8d7da; color: #721c24;">
+                                            <strong>Mermaid 图表渲染失败</strong>
+                                            <pre style="margin-top: 0.5rem; background: #fff; padding: 0.5rem; border-radius: 4px; overflow-x: auto;"><code>${block.code}</code></pre>
+                                        </div>
+                                    `;
+                                }
+                            }
+                        });
+                    }, 100);
+                }
+
+                return text;
             }
 
             // 更新建议问题
