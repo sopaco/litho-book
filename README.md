@@ -1,5 +1,5 @@
 <p align="center">
-  <img height="160" src="./assets/banner_litho_book.webp">
+  <img height="160" src="./assets/banner_litho_book_with_icon.webp">
 </p>
 <h3 align="center">Litho Book</h3>
 
