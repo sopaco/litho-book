@@ -202,22 +202,33 @@
             .settings-panel {
                 background: var(--bg-primary);
                 border-radius: 12px;
-                padding: 2rem;
                 width: 90%;
                 max-width: 500px;
                 max-height: 80vh;
-                overflow-y: auto;
                 box-shadow: 0 10px 30px var(--shadow);
                 border: 1px solid var(--border-color);
+                display: flex;
+                flex-direction: column;
             }
 
             .settings-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 2rem;
-                padding-bottom: 1rem;
+                padding: 2rem 2rem 1rem 2rem;
                 border-bottom: 1px solid var(--border-color);
+                background: var(--bg-primary);
+                border-radius: 12px 12px 0 0;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                flex-shrink: 0;
+            }
+
+            .settings-content {
+                padding: 0 2rem 2rem 2rem;
+                overflow-y: auto;
+                flex: 1;
             }
 
             .settings-title {
@@ -431,8 +442,78 @@
                 background: var(--bg-secondary);
                 border: 1px solid var(--border-color);
                 border-radius: 8px;
-                padding: 1rem;
                 margin-top: 0.5rem;
+                overflow: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .font-preview-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 1rem;
+                background: var(--bg-tertiary);
+                border-bottom: 1px solid var(--border-color);
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .font-preview-header:hover {
+                background: var(--accent-color);
+                color: white;
+            }
+
+            .font-preview-title {
+                font-size: calc(0.9rem * var(--font-size-scale));
+                font-weight: 500;
+                color: var(--text-primary);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .font-preview-header:hover .font-preview-title {
+                color: white;
+            }
+
+            .font-preview-toggle {
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                cursor: pointer;
+                padding: 0.25rem;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .font-preview-header:hover .font-preview-toggle {
+                color: white;
+            }
+
+            .font-preview-toggle svg {
+                width: 16px;
+                height: 16px;
+                stroke: currentColor;
+                transition: transform 0.3s ease;
+            }
+
+            .font-preview-toggle.collapsed svg {
+                transform: rotate(-90deg);
+            }
+
+            .font-preview-content {
+                padding: 1rem;
+                transition: all 0.3s ease;
+                max-height: 500px;
+                overflow: hidden;
+            }
+
+            .font-preview-content.collapsed {
+                max-height: 0;
+                padding: 0 1rem;
             }
 
             .font-preview-text {
@@ -1380,7 +1461,8 @@
                     </button>
                 </div>
 
-                <div class="settings-section">
+                <div class="settings-content">
+                    <div class="settings-section">
                     <div class="settings-section-title">🎨 主题</div>
                     <div class="settings-group">
                         <div class="theme-options">
@@ -1423,16 +1505,30 @@
                         </select>
                     </div>
                     <div class="settings-group">
-                        <label class="settings-label">字体预览</label>
                         <div class="font-preview" id="fontPreview">
-                            <div class="font-preview-text">
-                                <p>The quick brown fox jumps over the lazy dog.</p>
-                                <p>中文字体预览：这是一段中文文本，用于测试字体显示效果。</p>
-                                <p>数字测试：0123456789</p>
-                                <p>标点符号：，。！？；：""''（）【】</p>
+                            <div class="font-preview-header" onclick="toggleFontPreview()">
+                                <div class="font-preview-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 7h16M10 11h4M8 15h8M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path>
+                                    </svg>
+                                    字体预览
+                                </div>
+                                <button class="font-preview-toggle collapsed" id="fontPreviewToggle">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M6 9l6 6 6-6"></path>
+                                    </svg>
+                                </button>
                             </div>
-                            <div class="font-info" id="fontInfo">
-                                <small>当前字体栈：Geist, Noto Sans SC, PingFang SC...</small>
+                            <div class="font-preview-content collapsed" id="fontPreviewContent">
+                                <div class="font-preview-text">
+                                    <p>The quick brown fox jumps over the lazy dog.</p>
+                                    <p>中文字体预览：这是一段中文文本，用于测试字体显示效果。</p>
+                                    <p>数字测试：0123456789</p>
+                                    <p>标点符号：，。！？；：""''（）【】</p>
+                                </div>
+                                <div class="font-info" id="fontInfo">
+                                    <small>当前字体栈：Geist, Noto Sans SC, PingFang SC...</small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1465,6 +1561,7 @@
                 <button class="reset-btn" onclick="resetSettings()">
                     🔄 恢复默认设置
                 </button>
+                </div>
             </div>
         </div>
 
@@ -1791,6 +1888,24 @@
 
             function resetSettings() {
                 Settings.reset();
+            }
+
+            // 字体预览折叠功能
+            function toggleFontPreview() {
+                const content = document.getElementById('fontPreviewContent');
+                const toggle = document.getElementById('fontPreviewToggle');
+                
+                if (content && toggle) {
+                    const isCollapsed = content.classList.contains('collapsed');
+                    
+                    if (isCollapsed) {
+                        content.classList.remove('collapsed');
+                        toggle.classList.remove('collapsed');
+                    } else {
+                        content.classList.add('collapsed');
+                        toggle.classList.add('collapsed');
+                    }
+                }
             }
 
             // 目录功能
