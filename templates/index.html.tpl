@@ -1490,17 +1490,17 @@
                             <option value="geist">
                                 Geist（现代无衬线字体，简洁清晰）
                             </option>
+                            <option value="inter">
+                                Inter（紧凑型无衬线字体，轻盈和前卫）
+                            </option>
                             <option value="noto-sans-sc">
-                                思源黑体/Noto Sans SC（现代中文黑体，清晰易读）
+                                思源黑体（现代中文黑体，清晰易读）
                             </option>
                             <option value="noto-serif-sc">
                                 思源宋体（传统中文宋体，适合长文阅读）
                             </option>
                             <option value="pingfang">
                                 苹方（macOS 现代字体）
-                            </option>
-                            <option value="inter">
-                                Inter（优秀的界面字体，可读性强）
                             </option>
                         </select>
                     </div>
