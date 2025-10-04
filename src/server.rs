@@ -9,7 +9,7 @@ use futures::stream::Stream;
 use serde::{Deserialize, Serialize};
 use std::convert::Infallible;
 use std::time::Duration;
-use tower_http::cors::CorsLayer;
+use tower_http::{cors::CorsLayer, services::ServeDir};
 use tracing::{debug, error, info};
 
 use crate::filesystem::{DocumentTree, SearchResult};
@@ -116,6 +116,7 @@ pub fn create_router(doc_tree: DocumentTree, docs_path: String) -> Router {
         .route("/api/stats", get(stats_handler))
         .route("/api/chat", post(chat_stream_handler))
         .route("/health", get(health_handler))
+        .nest_service("/assets", ServeDir::new("assets"))
         .layer(CorsLayer::permissive())
         .with_state(state)
 }
