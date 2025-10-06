@@ -382,4 +382,5 @@ cargo run -- -d ./docs --verbose
   <strong>🚀 探索更多优秀的开源项目</strong><br>
   <a href="https://github.com/sopaco/deepwiki-rs">Litho (deepwiki-rs)</a> •
   <a href="https://github.com/sopaco/saga-reader">Saga Reader</a>
+  <a href="https://github.com/sopaco/mermaid-fixer">Mermaid Fixer</a>
 </p>
