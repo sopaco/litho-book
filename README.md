@@ -41,15 +41,13 @@
 
 # 🌟 Key Features
 
-- **🌲 Smart Directory Tree** - Left panel displays document directory structure with collapsible folders and expand/collapse operations
 - **📖 Real-time Rendering** - Right panel renders markdown content in real-time with syntax highlighting and formatting
 - **📊 Mermaid Chart Support** - Perfect support for various Mermaid chart rendering, bringing architecture diagrams to life
 - **🔍 Intelligent Search** - Quick search for document files with fuzzy matching for filenames and paths
-- **📱 Responsive Design** - Supports desktop and mobile devices with adaptive layout for reading anywhere
+- **🤖 AI Companion** - AI Intelligent Document Interpretation, Answering Questions
+- **🔤 Smart Sorting** - Directories and files are automatically sorted by name for quick content discovery
 - **⚡ High-Performance Architecture** - Built with Rust and Axum for low memory usage and fast response times
 - **🎨 Modern UI** - Clean and beautiful user interface with clear information hierarchy and elegant interactions
-- **📁 Path Navigation** - Title bar shows current document directory path for easy location and navigation
-- **🔤 Smart Sorting** - Directories and files are automatically sorted by name for quick content discovery
 
 # 🧠 How it Works
 
