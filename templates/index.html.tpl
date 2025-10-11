@@ -3552,7 +3552,7 @@
 
             // 初始化默认文档加载（带降级策略）
             async function initializeDefaultDocument() {
-                const defaultFiles = ['1、项目概述.md', '1、Overview.md', 'README.md', 'Overview.md', '项目概述.md'];
+                const defaultFiles = ['1、项目概述.md', '1.Overview.md', 'README.md', 'Overview.md', '项目概述.md'];
                 
                 for (const fileName of defaultFiles) {
                     try {
