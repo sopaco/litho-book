@@ -340,7 +340,7 @@ async fn call_openai_stream_api(
     message: &str,
     context: Option<&str>,
     history: Option<Vec<OpenAIMessage>>,
-    docs_path: &str,
+    _docs_path: &str,
 ) -> Result<
     tokio::sync::mpsc::Receiver<Result<String, Box<dyn std::error::Error + Send + Sync>>>,
     Box<dyn std::error::Error + Send + Sync>,
@@ -349,21 +349,6 @@ async fn call_openai_stream_api(
 
     // 构建系统提示词
     let mut system_prompt = "你是一个专业的文档助手，专门帮助用户理解和分析技术文档。请用中文回答问题，回答要准确、简洁、有帮助。".to_string();
-
-    // 检查上下文中是否已经包含架构概览文档
-    let architecture_in_context = if let Some(ctx) = context {
-        ctx.contains("2、架构概览.md") || ctx.contains("架构概览")
-    } else {
-        false
-    };
-    
-    // 添加架构概览文档作为背景材料（仅当上下文中未包含时）
-    if !architecture_in_context {
-        let architecture_path = std::path::Path::new(docs_path).join("2、架构概览.md");
-        if let Ok(architecture_content) = std::fs::read_to_string(&architecture_path) {
-            system_prompt.push_str(&format!("\n\n用户所关注项目的架构概览：\n{}", architecture_content));
-        }
-    }
 
     // 添加上下文（如果有的话）
     if let Some(ctx) = context {

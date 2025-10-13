@@ -1677,7 +1677,7 @@
 
             .ai-input-container {
                 display: flex;
-                align-items: flex-end;
+                flex-direction: column;
                 gap: 0.75rem;
                 background: var(--bg-secondary);
                 border: 1px solid var(--border-color);
@@ -1689,6 +1689,13 @@
             .ai-input-container:focus-within {
                 border-color: var(--accent-color);
                 box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+            }
+
+            #contextTagsContainer {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                width: 100%;
             }
 
             .ai-input {
@@ -1703,6 +1710,7 @@
                 min-height: 20px;
                 max-height: 100px;
                 font-family: var(--font-family);
+                width: 100%;
             }
 
             .ai-input::placeholder {
@@ -1721,6 +1729,8 @@
                 cursor: pointer;
                 transition: all 0.2s ease;
                 flex-shrink: 0;
+                align-self: flex-end;
+                margin-top: 0.5rem;
             }
 
             .ai-send-btn:hover:not(:disabled) {
@@ -2191,10 +2201,12 @@
             
             <div class="ai-assistant-input">
                 <div class="ai-input-container">
+                    <!-- 添加上下文标签容器 -->
+                    <div id="contextTagsContainer" style="margin-bottom: 0.5rem; display: flex; flex-wrap: wrap;"></div>
                     <textarea 
                         class="ai-input" 
                         id="aiInput" 
-                        placeholder="输入你的问题..." 
+                        placeholder="输入你的问题... (输入@选择文档)" 
                         rows="1"
                         onkeydown="handleAiInputKeydown(event)"
                         oninput="adjustTextareaHeight(this)"
@@ -2205,6 +2217,9 @@
                             <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
                         </svg>
                     </button>
+                </div>
+            </div>
+
                 </div>
             </div>
         </div>
@@ -3482,6 +3497,9 @@
                         document.getElementById('sidebar').classList.remove('show');
                     }
 
+                    // 更新AI助手中的上下文标签
+                    updateContextOnFileChange(filePath);
+
                 } catch (error) {
                     contentContainer.innerHTML = `
                         <div class="error">
@@ -3491,6 +3509,132 @@
                         </div>
                     `;
                 }
+            }
+
+            // 当文件切换时更新AI助手上下文
+            function updateContextOnFileChange(filePath) {
+                // 获取当前文件名
+                const currentFileName = filePath ? filePath.split('/').pop() : null;
+                
+                if (!currentFileName) return;
+                
+                // 检查当前文件是否已经在选中列表中
+                const isAlreadySelected = selectedContextFiles.some(file => file.path === filePath);
+                
+                // 如果当前文件不在选中列表中，添加它
+                if (!isAlreadySelected) {
+                    selectedContextFiles.push({
+                        name: currentFileName,
+                        path: filePath
+                    });
+                }
+                
+                // 更新上下文标签显示
+                updateContextTags();
+            }
+
+            // 更新上下文标签显示
+            function updateContextTags() {
+                const tagsContainer = document.getElementById('contextTagsContainer');
+                if (!tagsContainer) return;
+                
+                // 清空现有标签
+                tagsContainer.innerHTML = '';
+                
+                // 获取当前文件名
+                const currentFileName = currentFile ? currentFile.split('/').pop() : null;
+                
+                // 为每个选中的文件创建标签
+                selectedContextFiles.forEach((file, index) => {
+                    const tag = document.createElement('div');
+                    tag.style.cssText = `
+                        display: inline-flex;
+                        align-items: center;
+                        background: var(--accent-color);
+                        color: white;
+                        border-radius: 12px;
+                        padding: 0.25rem 0.75rem;
+                        margin-right: 0.5rem;
+                        margin-bottom: 0.5rem;
+                        font-size: 0.85rem;
+                    `;
+                    
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = file.name;
+                    nameSpan.style.cssText = `
+                        margin-right: 0.5rem;
+                        max-width: 150px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    `;
+                    
+                    // 如果是当前文件，不显示删除按钮
+                    if (currentFileName && file.name === currentFileName) {
+                        tag.style.background = 'var(--text-secondary)'; // 不同的颜色表示不可删除
+                        tag.appendChild(nameSpan);
+                    } else {
+                        // 其他文件显示删除按钮
+                        const removeBtn = document.createElement('button');
+                        removeBtn.innerHTML = '&times;';
+                        removeBtn.style.cssText = `
+                            background: none;
+                            border: none;
+                            color: white;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            line-height: 1;
+                            padding: 0;
+                            width: 16px;
+                            height: 16px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        `;
+                        
+                        removeBtn.onclick = () => {
+                            // 从选中列表中移除
+                            selectedContextFiles = selectedContextFiles.filter(f => f.path !== file.path);
+                            // 更新标签显示
+                            updateContextTags();
+                            // 更新文档选择器中的复选框状态（如果打开的话）
+                            const checkbox = document.querySelector(`input[type="checkbox"][data-path="${file.path}"]`);
+                            if (checkbox) {
+                                checkbox.checked = false;
+                            }
+                        };
+                        
+                        tag.appendChild(nameSpan);
+                        tag.appendChild(removeBtn);
+                    }
+                    
+                    tagsContainer.appendChild(tag);
+                });
+            }
+
+            // 初始化默认上下文
+            function initializeDefaultContext() {
+                // 默认添加架构概览文档
+                selectedContextFiles = [{
+                    name: '2、架构概览.md',
+                    path: '2、架构概览.md'
+                }];
+                
+                // 如果有当前文件，也添加到上下文
+                if (currentFile) {
+                    const currentFileName = currentFile.split('/').pop();
+                    // 检查是否已经添加过
+                    const isAlreadyAdded = selectedContextFiles.some(file => file.name === currentFileName);
+                    if (!isAlreadyAdded) {
+                        selectedContextFiles.push({
+                            name: currentFileName,
+                            path: currentFile
+                        });
+                    }
+                }
+                
+                // 更新上下文标签显示
+                updateContextTags();
             }
 
             // 响应式处理
@@ -3548,6 +3692,9 @@
                 // 渲染目录树（不包含根节点）
                 const treeContainer = document.getElementById('tree-container');
                 renderTreeChildren(treeData, treeContainer);
+                
+                // 初始化默认文档加载（带降级策略）
+                initializeDefaultDocument();
             });
 
             // 初始化默认文档加载（带降级策略）
@@ -3589,9 +3736,12 @@
                         </div>
                     </div>
                 `;
+                
+                // 初始化AI助手默认上下文
+                setTimeout(() => {
+                    initializeDefaultContext();
+                }, 100);
             }
-
-            initializeDefaultDocument();
 
             // Mermaid图表增强功能
             function enhanceMermaidDiagrams() {
@@ -4660,22 +4810,13 @@
             async function getSelectedContextFilesContent() {
                 const contextContents = [];
                 
-                // 添加架构概览文档（如果存在）
-                try {
-                    const architectureResponse = await fetch('/api/file?file=2、架构概览.md');
-                    if (architectureResponse.ok) {
-                        const architectureData = await architectureResponse.json();
-                        contextContents.push({
-                            name: '2、架构概览.md',
-                            content: architectureData.content.substring(0, 3000)
-                        });
-                    }
-                } catch (error) {
-                    console.warn('无法加载架构概览文档:', error);
-                }
-                
                 // 添加用户选择的上下文文件
                 for (const file of selectedContextFiles) {
+                    // 跳过当前文件（当前文件会单独处理）
+                    if (currentFile && file.path === currentFile) {
+                        continue;
+                    }
+                    
                     try {
                         const response = await fetch(`/api/file?file=${encodeURIComponent(file.path)}`);
                         if (response.ok) {
@@ -4695,14 +4836,10 @@
                 const currentFileName = currentFile ? currentFile.split('/').pop() : null;
                 
                 if (currentContent && currentFileName) {
-                    // 检查当前文档是否已添加
-                    const isAlreadyAdded = contextContents.some(item => item.name === currentFileName);
-                    if (!isAlreadyAdded) {
-                        contextContents.push({
-                            name: currentFileName,
-                            content: currentContent
-                        });
-                    }
+                    contextContents.push({
+                        name: currentFileName,
+                        content: currentContent
+                    });
                 }
                 
                 // 格式化上下文内容
@@ -4811,13 +4948,19 @@
                         transition: background 0.2s;
                     `;
                     
-                    itemDiv.onmouseenter = () => {
-                        itemDiv.style.background = 'var(--bg-secondary)';
-                    };
-                    
-                    itemDiv.onmouseleave = () => {
-                        itemDiv.style.background = 'transparent';
-                    };
+                    // 为文件夹和文件设置不同的点击行为
+                    if (node.is_file) {
+                        itemDiv.onmouseenter = () => {
+                            itemDiv.style.background = 'var(--bg-secondary)';
+                        };
+                        
+                        itemDiv.onmouseleave = () => {
+                            itemDiv.style.background = 'transparent';
+                        };
+                    } else {
+                        // 文件夹不响应悬停效果
+                        itemDiv.style.cursor = 'default';
+                    }
                     
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
@@ -4825,9 +4968,37 @@
                         margin-right: 0.5rem;
                     `;
                     
+                    // 设置数据属性以便后续查找
+                    checkbox.setAttribute('data-path', node.path);
+                    
                     // 检查文件是否已被选中
                     const isSelected = selectedContextFiles.some(f => f.path === node.path);
                     checkbox.checked = isSelected;
+                    
+                    // 默认选中架构概览文档
+                    if (node.name === '2、架构概览.md') {
+                        checkbox.checked = true;
+                        // 如果还没有添加到选中列表，则添加
+                        if (!isSelected) {
+                            selectedContextFiles.push({
+                                name: node.name,
+                                path: node.path
+                            });
+                        }
+                    }
+                    
+                    // 当前文件默认选中且不可取消
+                    const currentFileName = currentFile ? currentFile.split('/').pop() : null;
+                    if (node.is_file && currentFileName && node.name === currentFileName) {
+                        checkbox.checked = true;
+                        checkbox.disabled = true; // 当前文件不可取消选择
+                    }
+                    
+                    // 文件夹不能被选择
+                    if (!node.is_file) {
+                        checkbox.style.visibility = 'hidden'; // 隐藏文件夹的复选框
+                        checkbox.disabled = true;
+                    }
                     
                     checkbox.onchange = (e) => {
                         if (e.target.checked) {
@@ -4840,6 +5011,8 @@
                             // 从选中列表移除
                             selectedContextFiles = selectedContextFiles.filter(f => f.path !== node.path);
                         }
+                        // 更新上下文标签显示
+                        updateContextTags();
                     };
                     
                     const icon = document.createElement('span');
@@ -4864,6 +5037,22 @@
                     
                     // 添加缩进
                     itemDiv.style.paddingLeft = `${0.5 + level * 1}rem`;
+                    
+                    // 为文件添加点击整个行选择的功能
+                    if (node.is_file) {
+                        itemDiv.onclick = (e) => {
+                            // 如果点击的是复选框本身，不处理（避免重复触发）
+                            if (e.target === checkbox) return;
+                            
+                            // 如果是当前文件，不允许取消选择
+                            const currentFileName = currentFile ? currentFile.split('/').pop() : null;
+                            if (currentFileName && node.name === currentFileName) return;
+                            
+                            // 切换复选框状态
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.onchange({ target: checkbox });
+                        };
+                    }
                     
                     itemDiv.appendChild(checkbox);
                     itemDiv.appendChild(icon);
@@ -4921,8 +5110,8 @@
                     cursor: pointer;
                 `;
                 confirmBtn.onclick = () => {
-                    // 更新输入框中的@符号显示
-                    updateContextIndicator();
+                    // 更新上下文标签显示
+                    updateContextTags();
                     document.body.removeChild(modal);
                 };
                 
@@ -4947,18 +5136,104 @@
                 };
             }
 
-            // 更新输入框中的上下文指示器
-            function updateContextIndicator() {
-                const input = document.getElementById('aiInput');
-                if (!input) return;
+            // 更新上下文标签显示
+            function updateContextTags() {
+                const tagsContainer = document.getElementById('contextTagsContainer');
+                if (!tagsContainer) return;
                 
-                // 如果有选中的上下文文件，在输入框中显示指示器
-                if (selectedContextFiles.length > 0) {
-                    // 检查是否已经添加了指示器
-                    if (!input.value.includes('[已选择')) {
-                        input.value = `[已选择${selectedContextFiles.length}个文档] ` + input.value;
+                // 清空现有标签
+                tagsContainer.innerHTML = '';
+                
+                // 获取当前文件名
+                const currentFileName = currentFile ? currentFile.split('/').pop() : null;
+                
+                // 为每个选中的文件创建标签
+                selectedContextFiles.forEach((file, index) => {
+                    const tag = document.createElement('div');
+                    tag.style.cssText = `
+                        display: inline-flex;
+                        align-items: center;
+                        background: var(--accent-color);
+                        color: white;
+                        border-radius: 12px;
+                        padding: 0.25rem 0.75rem;
+                        margin-right: 0.5rem;
+                        margin-bottom: 0.5rem;
+                        font-size: 0.85rem;
+                    `;
+                    
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = file.name;
+                    nameSpan.style.cssText = `
+                        margin-right: 0.5rem;
+                        max-width: 150px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    `;
+                    
+                    // 如果是当前文件，不显示删除按钮
+                    if (currentFileName && file.name === currentFileName) {
+                        tag.style.background = 'var(--text-secondary)'; // 不同的颜色表示不可删除
+                        tag.appendChild(nameSpan);
+                    } else {
+                        // 其他文件显示删除按钮
+                        const removeBtn = document.createElement('button');
+                        removeBtn.innerHTML = '&times;';
+                        removeBtn.style.cssText = `
+                            background: none;
+                            border: none;
+                            color: white;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            line-height: 1;
+                            padding: 0;
+                            width: 16px;
+                            height: 16px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        `;
+                        
+                        removeBtn.onclick = () => {
+                            // 从选中列表中移除
+                            selectedContextFiles = selectedContextFiles.filter(f => f.path !== file.path);
+                            // 更新标签显示
+                            updateContextTags();
+                            // 更新文档选择器中的复选框状态（如果打开的话）
+                            const checkbox = document.querySelector(`input[type="checkbox"][data-path="${file.path}"]`);
+                            if (checkbox) {
+                                checkbox.checked = false;
+                            }
+                        };
+                        
+                        tag.appendChild(nameSpan);
+                        tag.appendChild(removeBtn);
                     }
+                    
+                    tagsContainer.appendChild(tag);
+                });
+            }
+
+            // 初始化默认上下文
+            function initializeDefaultContext() {
+                // 默认添加架构概览文档
+                selectedContextFiles = [{
+                    name: '2、架构概览.md',
+                    path: '2、架构概览.md'
+                }];
+                
+                // 如果有当前文件，也添加到上下文
+                if (currentFile) {
+                    const currentFileName = currentFile.split('/').pop();
+                    selectedContextFiles.push({
+                        name: currentFileName,
+                        path: currentFile
+                    });
                 }
+                
+                // 更新上下文标签显示
+                updateContextTags();
             }
 
             // 处理输入框键盘事件
@@ -5184,7 +5459,7 @@
                 contentDiv.className = 'ai-message-content';
                 
                 if (type === 'assistant' && !isError) {
-                    // 对AI回复进行简单的markdown渲染
+                    // 对AI回复进行简单的代码渲染
                     contentDiv.innerHTML = renderSimpleMarkdown(content);
                 } else {
                     contentDiv.textContent = content;
@@ -5237,7 +5512,7 @@
                 }
             }
 
-            // 简单的markdown渲染
+            // 简单的代码渲染
             function renderSimpleMarkdown(text) {
                 // 先处理 mermaid 代码块（在普通代码块之前）
                 const mermaidBlocks = [];
@@ -5347,7 +5622,22 @@
                         updateSendButton();
                     });
                 }
+                
+                // 初始化默认选中的上下文文件（架构概览文档）
+                initializeDefaultContext();
             });
+
+            // 初始化默认上下文
+            function initializeDefaultContext() {
+                // 默认添加架构概览文档
+                selectedContextFiles = [{
+                    name: '2、架构概览.md',
+                    path: '2、架构概览.md'
+                }];
+                
+                // 更新上下文标签显示
+                updateContextTags();
+            }
 
             // 点击页面其他地方时关闭AI助手（可选）
             document.addEventListener('click', (event) => {
