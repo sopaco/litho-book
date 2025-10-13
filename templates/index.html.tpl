@@ -4550,6 +4550,7 @@
             let isSuggestionsCollapsed = false;
             let hasUserSentMessage = false;
             let chatHistory = []; // 存储聊天历史
+            let selectedContextFiles = []; // 存储用户选择的上下文文件
 
             // 切换AI助手面板
             function toggleAiAssistant() {
@@ -4643,11 +4644,337 @@
                 sendMessage();
             }
 
+            // 获取当前文档内容作为上下文
+            function getCurrentDocumentContext() {
+                const contentContainer = document.querySelector('.markdown-content');
+                if (contentContainer) {
+                    // 提取文本内容，去除HTML标签
+                    const text = contentContainer.textContent || contentContainer.innerText || '';
+                    // 限制上下文长度，避免请求过大
+                    return text.substring(0, 3000);
+                }
+                return null;
+            }
+
+            // 获取所有选中的上下文文件内容
+            async function getSelectedContextFilesContent() {
+                const contextContents = [];
+                
+                // 添加架构概览文档（如果存在）
+                try {
+                    const architectureResponse = await fetch('/api/file?file=2、架构概览.md');
+                    if (architectureResponse.ok) {
+                        const architectureData = await architectureResponse.json();
+                        contextContents.push({
+                            name: '2、架构概览.md',
+                            content: architectureData.content.substring(0, 3000)
+                        });
+                    }
+                } catch (error) {
+                    console.warn('无法加载架构概览文档:', error);
+                }
+                
+                // 添加用户选择的上下文文件
+                for (const file of selectedContextFiles) {
+                    try {
+                        const response = await fetch(`/api/file?file=${encodeURIComponent(file.path)}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            contextContents.push({
+                                name: file.name,
+                                content: data.content.substring(0, 3000)
+                            });
+                        }
+                    } catch (error) {
+                        console.warn(`无法加载文件 ${file.name}:`, error);
+                    }
+                }
+                
+                // 添加当前文档（如果存在且不重复）
+                const currentContent = getCurrentDocumentContext();
+                const currentFileName = currentFile ? currentFile.split('/').pop() : null;
+                
+                if (currentContent && currentFileName) {
+                    // 检查当前文档是否已添加
+                    const isAlreadyAdded = contextContents.some(item => item.name === currentFileName);
+                    if (!isAlreadyAdded) {
+                        contextContents.push({
+                            name: currentFileName,
+                            content: currentContent
+                        });
+                    }
+                }
+                
+                // 格式化上下文内容
+                if (contextContents.length > 0) {
+                    let contextText = "用户选择的上下文文件内容：\n";
+                    contextContents.forEach((item, index) => {
+                        contextText += `\n[${index + 1}] 文件: ${item.name}\n${item.content}\n`;
+                    });
+                    return contextText;
+                }
+                
+                return null;
+            }
+
+            // 显示文档选择面板
+            function showDocumentSelector() {
+                // 创建模态框
+                const modal = document.createElement('div');
+                modal.id = 'documentSelectorModal';
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                `;
+                
+                const container = document.createElement('div');
+                container.style.cssText = `
+                    background: var(--bg-primary);
+                    border-radius: 12px;
+                    width: 80%;
+                    max-width: 600px;
+                    max-height: 80vh;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                    border: 1px solid var(--border-color);
+                `;
+                
+                const header = document.createElement('div');
+                header.style.cssText = `
+                    padding: 1rem 1.5rem;
+                    background: var(--bg-secondary);
+                    border-bottom: 1px solid var(--border-color);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                `;
+                
+                const title = document.createElement('h3');
+                title.textContent = '选择文档添加到上下文';
+                title.style.cssText = `
+                    margin: 0;
+                    color: var(--text-primary);
+                    font-size: 1.2rem;
+                `;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '&times;';
+                closeBtn.style.cssText = `
+                    background: none;
+                    border: none;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    color: var(--text-secondary);
+                    padding: 0;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                `;
+                closeBtn.onclick = () => document.body.removeChild(modal);
+                
+                const content = document.createElement('div');
+                content.style.cssText = `
+                    padding: 1rem;
+                    overflow-y: auto;
+                    flex: 1;
+                `;
+                
+                // 创建文档列表
+                const fileList = document.createElement('div');
+                fileList.id = 'documentList';
+                fileList.style.cssText = `
+                    max-height: 60vh;
+                    overflow-y: auto;
+                `;
+                
+                // 递归渲染文档树
+                function renderFileNode(node, container, level = 0) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style.cssText = `
+                        display: flex;
+                        align-items: center;
+                        padding: 0.5rem;
+                        margin: 0.25rem 0;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        transition: background 0.2s;
+                    `;
+                    
+                    itemDiv.onmouseenter = () => {
+                        itemDiv.style.background = 'var(--bg-secondary)';
+                    };
+                    
+                    itemDiv.onmouseleave = () => {
+                        itemDiv.style.background = 'transparent';
+                    };
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.style.cssText = `
+                        margin-right: 0.5rem;
+                    `;
+                    
+                    // 检查文件是否已被选中
+                    const isSelected = selectedContextFiles.some(f => f.path === node.path);
+                    checkbox.checked = isSelected;
+                    
+                    checkbox.onchange = (e) => {
+                        if (e.target.checked) {
+                            // 添加到选中列表
+                            selectedContextFiles.push({
+                                name: node.name,
+                                path: node.path
+                            });
+                        } else {
+                            // 从选中列表移除
+                            selectedContextFiles = selectedContextFiles.filter(f => f.path !== node.path);
+                        }
+                    };
+                    
+                    const icon = document.createElement('span');
+                    icon.style.cssText = `
+                        margin-right: 0.5rem;
+                        width: 20px;
+                        text-align: center;
+                    `;
+                    
+                    if (node.is_file) {
+                        icon.textContent = '📄';
+                    } else {
+                        icon.textContent = '📁';
+                    }
+                    
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = node.name;
+                    nameSpan.style.cssText = `
+                        flex: 1;
+                        color: var(--text-primary);
+                    `;
+                    
+                    // 添加缩进
+                    itemDiv.style.paddingLeft = `${0.5 + level * 1}rem`;
+                    
+                    itemDiv.appendChild(checkbox);
+                    itemDiv.appendChild(icon);
+                    itemDiv.appendChild(nameSpan);
+                    
+                    container.appendChild(itemDiv);
+                    
+                    // 如果是文件夹，渲染子节点
+                    if (!node.is_file && node.children && node.children.length > 0) {
+                        node.children.forEach(child => {
+                            renderFileNode(child, container, level + 1);
+                        });
+                    }
+                }
+                
+                // 渲染整个文档树（跳过根节点）
+                if (originalTreeData && originalTreeData.children) {
+                    originalTreeData.children.forEach(child => {
+                        renderFileNode(child, fileList, 0);
+                    });
+                }
+                
+                content.appendChild(fileList);
+                
+                const footer = document.createElement('div');
+                footer.style.cssText = `
+                    padding: 1rem;
+                    background: var(--bg-secondary);
+                    border-top: 1px solid var(--border-color);
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 0.5rem;
+                `;
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.textContent = '取消';
+                cancelBtn.style.cssText = `
+                    padding: 0.5rem 1rem;
+                    background: var(--bg-tertiary);
+                    border: 1px solid var(--border-color);
+                    border-radius: 6px;
+                    color: var(--text-primary);
+                    cursor: pointer;
+                `;
+                cancelBtn.onclick = () => document.body.removeChild(modal);
+                
+                const confirmBtn = document.createElement('button');
+                confirmBtn.textContent = '确认选择';
+                confirmBtn.style.cssText = `
+                    padding: 0.5rem 1rem;
+                    background: var(--accent-color);
+                    border: 1px solid var(--accent-color);
+                    border-radius: 6px;
+                    color: white;
+                    cursor: pointer;
+                `;
+                confirmBtn.onclick = () => {
+                    // 更新输入框中的@符号显示
+                    updateContextIndicator();
+                    document.body.removeChild(modal);
+                };
+                
+                footer.appendChild(cancelBtn);
+                footer.appendChild(confirmBtn);
+                
+                header.appendChild(title);
+                header.appendChild(closeBtn);
+                
+                container.appendChild(header);
+                container.appendChild(content);
+                container.appendChild(footer);
+                
+                modal.appendChild(container);
+                document.body.appendChild(modal);
+                
+                // 点击背景关闭
+                modal.onclick = (e) => {
+                    if (e.target === modal) {
+                        document.body.removeChild(modal);
+                    }
+                };
+            }
+
+            // 更新输入框中的上下文指示器
+            function updateContextIndicator() {
+                const input = document.getElementById('aiInput');
+                if (!input) return;
+                
+                // 如果有选中的上下文文件，在输入框中显示指示器
+                if (selectedContextFiles.length > 0) {
+                    // 检查是否已经添加了指示器
+                    if (!input.value.includes('[已选择')) {
+                        input.value = `[已选择${selectedContextFiles.length}个文档] ` + input.value;
+                    }
+                }
+            }
+
             // 处理输入框键盘事件
             function handleAiInputKeydown(event) {
                 // 检查是否正在使用输入法
                 if (event.isComposing || event.keyCode === 229) {
                     // 如果正在使用输入法，不处理 Enter 键
+                    return;
+                }
+                
+                // 检查是否输入了@符号
+                if (event.key === '@') {
+                    // 延迟显示文档选择面板，确保@符号已经输入
+                    setTimeout(() => {
+                        showDocumentSelector();
+                    }, 10);
                     return;
                 }
                 
@@ -4682,7 +5009,7 @@
                 
                 if (!message || isAiLoading) return;
                 
-                // 清空输入框
+                // 清空输入框（但保留上下文指示器）
                 input.value = '';
                 adjustTextareaHeight(input);
                 updateSendButton();
@@ -4705,8 +5032,8 @@
                 updateSendButton();
                 
                 try {
-                    // 获取当前文档内容作为上下文
-                    const context = getCurrentDocumentContext();
+                    // 获取选中的上下文文件内容
+                    const context = await getSelectedContextFilesContent();
                     
                     // 调用流式AI API
                     const response = await fetch('/api/chat', {
