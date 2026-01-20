@@ -382,7 +382,7 @@ async fn call_openai_stream_api(
     });
 
     let request_body = OpenAIRequest {
-        model: "GLM-4.5-Flash".to_string(),
+        model: "GLM-4.7-Flash".to_string(),
         messages,
         temperature: 0.7,
         max_tokens: 16384,
