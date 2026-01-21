@@ -395,7 +395,7 @@ async fn call_openai_stream_api(
             "Authorization",
             {
                 use std::env;
-                use log::error;
+                use tracing::log::error;
 
                 let llm_key = env::var("LITHO_BOOK_LLM_KEY").unwrap_or_else(|_| {
                     error!("LITHO_BOOK_LLM_KEY environment variable not set, using empty string");
