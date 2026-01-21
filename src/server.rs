@@ -393,7 +393,17 @@ async fn call_openai_stream_api(
         .post("https://open.bigmodel.cn/api/paas/v4/chat/completions")
         .header(
             "Authorization",
-            "Bearer b0c0afc3b5d0402db47e5132fc0fa882.6vyDm2pOv2NSy5z7",
+            {
+                use std::env;
+                use log::error;
+
+                let llm_key = env::var("LITHO_BOOK_LLM_KEY").unwrap_or_else(|_| {
+                    error!("LITHO_BOOK_LLM_KEY environment variable not set, using empty string");
+                    String::new()
+                });
+
+                format!("Bearer {}", llm_key)
+            },
         )
         .header("Content-Type", "application/json")
         .json(&request_body)
