@@ -4463,19 +4463,8 @@
                 
                 try {
                     const svgData = new XMLSerializer().serializeToString(svg);
-                    
-                    // 方法1: 尝试复制SVG文本
-                    try {
-                        await navigator.clipboard.writeText(svgData);
-                        showToast('SVG代码已复制到剪贴板！');
-                        return;
-                    } catch (textError) {
-                        console.warn('复制SVG文本失败，尝试复制图片:', textError);
-                    }
-                    
-                    // 方法2: 尝试转换为PNG并复制
+                    // 直接转换为PNG并复制到剪贴板
                     await convertSvgToPngAndCopy(svg, svgData);
-                    
                 } catch (error) {
                     console.error('复制失败:', error);
                     showToast('复制失败，请重试', 'error');
@@ -4530,29 +4519,29 @@
                                         showToast('PNG图片已复制到剪贴板！');
                                     } catch (clipboardError) {
                                         console.warn('复制PNG失败:', clipboardError);
-                                        showToast('图片复制失败，但SVG代码已复制', 'warning');
+                                        showToast('图片复制失败，请重试', 'error');
                                     }
                                 } else {
-                                    showToast('图片转换失败，但SVG代码已复制', 'warning');
+                                    showToast('图片转换失败，请重试', 'error');
                                 }
                             }, 'image/png');
                             
                         } catch (canvasError) {
                             console.warn('Canvas操作失败:', canvasError);
-                            showToast('图片复制失败，但SVG代码已复制', 'warning');
+                            showToast('图片复制失败，请重试', 'error');
                         }
                     };
                     
                     img.onerror = () => {
                         console.warn('图片加载失败');
-                        showToast('图片复制失败，但SVG代码已复制', 'warning');
+                        showToast('图片复制失败，请重试', 'error');
                     };
                     
                     img.src = dataUrl;
                     
                 } catch (error) {
                     console.warn('PNG转换失败:', error);
-                    showToast('图片复制失败，但SVG代码已复制', 'warning');
+                    showToast('图片复制失败，请重试', 'error');
                 }
             }
             
