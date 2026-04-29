@@ -7,7 +7,10 @@ use axum::{
 };
 use futures::stream::Stream;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::convert::Infallible;
+use std::fs;
+use std::path::Path;
 use std::time::Duration;
 use tower_http::{cors::CorsLayer, services::ServeDir};
 use tracing::{debug, error, info};
@@ -18,6 +21,7 @@ use crate::filesystem::{DocumentTree, SearchResult};
 pub struct AppState {
     pub doc_tree: DocumentTree,
     pub docs_path: String,
+    pub lang: String,
 }
 
 #[derive(Deserialize)]
@@ -102,10 +106,11 @@ pub struct StreamEvent {
 }
 
 /// Create the main application router
-pub fn create_router(doc_tree: DocumentTree, docs_path: String) -> Router {
+pub fn create_router(doc_tree: DocumentTree, docs_path: String, lang: String) -> Router {
     let state = AppState {
         doc_tree,
         docs_path,
+        lang,
     };
 
     Router::new()
@@ -130,7 +135,7 @@ async fn index_handler(State(state): State<AppState>) -> Result<Html<String>, St
         StatusCode::INTERNAL_SERVER_ERROR
     })?;
 
-    let html = generate_index_html(&tree_json, &state.docs_path);
+    let html = generate_index_html(&tree_json, &state.docs_path, &state.lang);
     Ok(Html(html))
 }
 
@@ -391,20 +396,17 @@ async fn call_openai_stream_api(
 
     let response = client
         .post("https://open.bigmodel.cn/api/paas/v4/chat/completions")
-        .header(
-            "Authorization",
-            {
-                use std::env;
-                use tracing::log::error;
+        .header("Authorization", {
+            use std::env;
+            use tracing::log::error;
 
-                let llm_key = env::var("LITHO_BOOK_LLM_KEY").unwrap_or_else(|_| {
-                    error!("LITHO_BOOK_LLM_KEY environment variable not set, using empty string");
-                    String::new()
-                });
+            let llm_key = env::var("LITHO_BOOK_LLM_KEY").unwrap_or_else(|_| {
+                error!("LITHO_BOOK_LLM_KEY environment variable not set, using empty string");
+                String::new()
+            });
 
-                format!("Bearer {}", llm_key)
-            },
-        )
+            format!("Bearer {}", llm_key)
+        })
         .header("Content-Type", "application/json")
         .json(&request_body)
         .send()
@@ -546,12 +548,60 @@ fn format_bytes(bytes: u64) -> String {
 }
 
 /// Generate the main HTML page
-fn generate_index_html(tree_json: &str, docs_path: &str) -> String {
+fn generate_index_html(tree_json: &str, docs_path: &str, lang: &str) -> String {
+    let labels = load_labels(lang);
+
     // Read the template file
     let template_content = include_str!("../templates/index.html.tpl");
 
     // Replace the placeholders with actual data
-    template_content
+    let mut html = template_content
         .replace("{{ tree_json|safe }}", tree_json)
-        .replace("{{ docs_path }}", docs_path)
+        .replace("{{ docs_path }}", docs_path);
+
+    // Generic i18n placeholder replacement:
+    // {{ i18n.some_key }} -> labels["some_key"]
+    for (key, value) in labels {
+        let placeholder = format!("{{{{ i18n.{} }}}}", key);
+        html = html.replace(&placeholder, &value);
+    }
+
+    html
 }
+
+fn load_labels(lang: &str) -> HashMap<String, String> {
+    let i18n_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("i18n");
+    let en_path = i18n_dir.join("en.json");
+    let mut labels = load_i18n_map(&en_path)
+        .or_else(|| {
+            serde_json::from_str::<HashMap<String, String>>(include_str!("../i18n/en.json")).ok()
+        })
+        .unwrap_or_default();
+
+    let normalized_lang = normalize_lang(lang);
+    if normalized_lang != "en" {
+        let lang_path = i18n_dir.join(format!("{}.json", normalized_lang));
+        if let Some(lang_labels) = load_i18n_map(&lang_path) {
+            // English keys remain the fallback for missing translations.
+            labels.extend(lang_labels);
+        }
+    }
+
+    labels
+}
+
+fn normalize_lang(lang: &str) -> String {
+    let normalized = lang.trim().to_lowercase().replace('_', "-");
+    normalized
+        .split('-')
+        .next()
+        .filter(|part| !part.is_empty())
+        .unwrap_or("en")
+        .to_string()
+}
+
+fn load_i18n_map(path: &Path) -> Option<HashMap<String, String>> {
+    let content = fs::read_to_string(path).ok()?;
+    serde_json::from_str::<HashMap<String, String>>(&content).ok()
+}
+
