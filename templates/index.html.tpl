@@ -840,8 +840,8 @@
                 padding: 0.2rem 0.4rem;
                 border-radius: 4px;
                 font-family:
-                    "JetBrains Mono", "SF Mono", "Monaco", "Inconsolata", 
-                    "Source Code Pro", "Menlo", "Consolas", "DejaVu Sans Mono", 
+                    "JetBrains Mono", "SF Mono", "Monaco", "Inconsolata",
+                    "Source Code Pro", "Menlo", "Consolas", "DejaVu Sans Mono",
                     "Liberation Mono", "Courier New", monospace;
                 font-size: calc(0.9em * var(--font-size-scale));
                 color: var(--code-text);
@@ -2166,7 +2166,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="ai-assistant-content">
                 <div class="ai-chat-messages" id="aiChatMessages">
                     <div class="ai-message ai-message-assistant">
@@ -2175,7 +2175,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="ai-suggestions" id="aiSuggestions">
                     <div class="ai-suggestions-header" onclick="toggleSuggestions()">
                         <div class="ai-suggestions-title">💡 推荐问题</div>
@@ -2198,15 +2198,15 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="ai-assistant-input">
                 <div class="ai-input-container">
                     <!-- 添加上下文标签容器 -->
                     <div id="contextTagsContainer" style="margin-bottom: 0.5rem; display: flex; flex-wrap: wrap;"></div>
-                    <textarea 
-                        class="ai-input" 
-                        id="aiInput" 
-                        placeholder="输入你的问题... (输入@选择文档)" 
+                    <textarea
+                        class="ai-input"
+                        id="aiInput"
+                        placeholder="输入你的问题... (输入@选择文档)"
                         rows="1"
                         onkeydown="handleAiInputKeydown(event)"
                         oninput="adjustTextareaHeight(this)"
@@ -2225,7 +2225,7 @@
         </div>
 
         <!-- 引入Mermaid.js -->
-        <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 
         <script>
             // 设置管理
@@ -2238,16 +2238,16 @@
                 fontFamilies: {
                     // 现代无衬线字体 - 以 Geist 为主
                     'geist': "'Geist', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif",
-                    
+
                     // 思源黑体/Noto Sans SC - 现代中文黑体，清晰易读
                     'noto-sans-sc': "'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif",
-                    
+
                     // 思源宋体 - 传统中文宋体，适合长文阅读
                     'noto-serif-sc': "'Noto Serif SC',  'Songti SC', 'STSong', serif",
-                    
+
                     // Inter - 现代界面字体，中文使用思源黑体
                     'inter': "'Inter', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', sans-serif",
-                    
+
                     // 苹方 - macOS 现代中文字体
                     'pingfang': "'PingFang SC', 'Noto Sans SC', 'Hiragino Sans GB', sans-serif",
                 },
@@ -2335,7 +2335,7 @@
                             previewText.style.fontFamily = this.fontFamilies[this.fontFamily];
                             previewText.style.fontSize = `calc(0.9rem * ${this.fontSizeScale})`;
                         }
-                        
+
                         // 更新字体信息
                         const fontInfo = fontPreview.querySelector('.font-info small');
                         if (fontInfo) {
@@ -2382,15 +2382,15 @@
                 checkFontAvailability(fontName) {
                     const canvas = document.createElement('canvas');
                     const context = canvas.getContext('2d');
-                    
+
                     // 使用默认字体绘制文本
                     context.font = '12px monospace';
                     const defaultWidth = context.measureText('测试字体Test Font').width;
-                    
+
                     // 使用指定字体绘制文本
                     context.font = `12px "${fontName}", monospace`;
                     const testWidth = context.measureText('测试字体Test Font').width;
-                    
+
                     // 如果宽度不同，说明字体可用
                     return defaultWidth !== testWidth;
                 },
@@ -2399,20 +2399,20 @@
                 getActualFontInfo() {
                     const fontStack = this.fontFamilies[this.fontFamily].split(',').map(f => f.trim().replace(/['"]/g, ''));
                     const availableFonts = [];
-                    
+
                     for (const font of fontStack) {
                         if (font.startsWith('-') || font === 'sans-serif' || font === 'serif' || font === 'monospace') {
                             availableFonts.push(font);
                             continue;
                         }
-                        
+
                         if (this.checkFontAvailability(font)) {
                             availableFonts.push(`✓ ${font}`);
                         } else {
                             availableFonts.push(`✗ ${font}`);
                         }
                     }
-                    
+
                     return availableFonts.slice(0, 5).join(', ') + (fontStack.length > 5 ? '...' : '');
                 }
             };
@@ -2439,10 +2439,10 @@
             function toggleFontPreview() {
                 const content = document.getElementById('fontPreviewContent');
                 const toggle = document.getElementById('fontPreviewToggle');
-                
+
                 if (content && toggle) {
                     const isCollapsed = content.classList.contains('collapsed');
-                    
+
                     if (isCollapsed) {
                         content.classList.remove('collapsed');
                         toggle.classList.remove('collapsed');
@@ -2642,18 +2642,18 @@
                 const currentTheme = document.documentElement.getAttribute('data-theme');
                 return currentTheme === 'dark' ? 'dark' : 'default';
             }
-            
+
             // 获取当前主题的实际颜色值
             function getMermaidThemeVariables() {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
                 const computedStyle = getComputedStyle(document.documentElement);
-                
+
                 // 获取CSS变量的实际值
                 function getCSSVar(varName) {
                     const value = computedStyle.getPropertyValue(varName).trim();
                     return value || (currentTheme === 'dark' ? '#ffffff' : '#000000');
                 }
-                
+
                 if (currentTheme === 'dark') {
                     return {
                         primaryColor: '#3b82f6',
@@ -2690,15 +2690,15 @@
                     };
                 }
             }
-            
+
             // 初始化Mermaid
             function initializeMermaid() {
                 try {
                     const theme = getMermaidTheme();
                     const themeVariables = getMermaidThemeVariables();
-                    
+
                     console.log('正在初始化Mermaid，主题:', theme);
-                    
+
                     mermaid.initialize({
                         startOnLoad: false,
                         theme: theme,
@@ -2709,25 +2709,25 @@
                         errorLevel: 'warn',
                         logLevel: 'warn'
                     });
-                    
+
                     console.log('Mermaid初始化成功，主题:', theme);
                 } catch (error) {
                     console.error('Mermaid初始化失败:', error);
                 }
             }
-            
+
             // 重新渲染所有Mermaid图表
             async function rerenderMermaidDiagrams() {
                 try {
                     const mermaidElements = document.querySelectorAll('.mermaid');
-                    
+
                     // 如果没有Mermaid元素，直接返回
                     if (mermaidElements.length === 0) {
                         return;
                     }
-                    
+
                     console.log('开始重新渲染Mermaid图表，数量:', mermaidElements.length);
-                    
+
                     // 清理所有现有的Mermaid渲染
                     mermaidElements.forEach(element => {
                         // 保存原始内容（如果还没有保存的话）
@@ -2740,7 +2740,7 @@
                                 element.setAttribute('data-original-content', originalContent);
                             }
                         }
-                        
+
                         // 清除现有内容和标记
                         if (originalContent) {
                             element.innerHTML = '';
@@ -2749,17 +2749,17 @@
                         element.removeAttribute('data-processed');
                         element.removeAttribute('data-enhanced');
                         element.dataset.needsReenhancement = 'true';
-                        
+
                         // 移除现有的控制按钮
                         const existingControls = element.querySelector('.mermaid-controls');
                         if (existingControls) {
                             existingControls.remove();
                         }
                     });
-                    
+
                     // 等待DOM更新完成
                     await new Promise(resolve => setTimeout(resolve, 100));
-                    
+
                     // 使用mermaid.run()重新渲染所有图表
                     try {
                         await mermaid.run({
@@ -2768,7 +2768,7 @@
                         console.log('Mermaid图表重新渲染成功');
                     } catch (error) {
                         console.warn('mermaid.run()失败，尝试逐个渲染:', error);
-                        
+
                         // 如果mermaid.run()失败，回退到逐个渲染
                         for (let i = 0; i < mermaidElements.length; i++) {
                             const element = mermaidElements[i];
@@ -2777,7 +2777,7 @@
                                 if (originalContent) {
                                     element.textContent = originalContent;
                                     element.removeAttribute('data-processed');
-                                    
+
                                     // 使用mermaid.run()渲染单个图表
                                     await mermaid.run(undefined, element);
                                 }
@@ -2792,43 +2792,43 @@
                             }
                         }
                     }
-                    
+
                     // 重新增强Mermaid图表
                     setTimeout(() => {
                         enhanceMermaidDiagrams();
                     }, 200);
-                    
+
                 } catch (error) {
                     console.error('重新渲染Mermaid图表时发生错误:', error);
                 }
             }
-            
+
             // 防抖变量
             let mermaidRerenderTimeout = null;
             let isRerenderingMermaid = false;
-            
+
             // 简单的重新渲染函数
             function simpleRerenderMermaid() {
                 // 清除之前的定时器
                 if (mermaidRerenderTimeout) {
                     clearTimeout(mermaidRerenderTimeout);
                 }
-                
+
                 // 如果正在重新渲染，跳过
                 if (isRerenderingMermaid) {
                     return;
                 }
-                
+
                 mermaidRerenderTimeout = setTimeout(() => {
                     if (isRerenderingMermaid) return;
-                    
+
                     isRerenderingMermaid = true;
                     try {
                         console.log('开始简单重新渲染');
-                        
+
                         // 重新初始化Mermaid
                         initializeMermaid();
-                        
+
                         // 找到所有Mermaid元素并重新渲染
                         const mermaidElements = document.querySelectorAll('.mermaid');
                         mermaidElements.forEach((element, index) => {
@@ -2843,33 +2843,33 @@
                                         element.setAttribute('data-original-content', originalContent);
                                     }
                                 }
-                                
+
                                 if (originalContent) {
                                     // 清理元素
                                     element.innerHTML = '';
                                     element.textContent = originalContent;
                                     element.removeAttribute('data-processed');
                                     element.removeAttribute('data-enhanced');
-                                    
+
                                     // 移除控制按钮
                                     const controls = element.querySelector('.mermaid-controls');
                                     if (controls) {
                                         controls.remove();
                                     }
-                                    
+
                                     console.log(`准备重新渲染图表 ${index}:`, originalContent.substring(0, 50));
                                 }
                             } catch (error) {
                                 console.warn(`清理图表 ${index} 失败:`, error);
                             }
                         });
-                        
+
                         // 等待一下然后重新渲染
                         setTimeout(() => {
                             try {
                                 mermaid.run(undefined, '.mermaid');
                                 console.log('Mermaid重新渲染完成');
-                                
+
                                 // 重新增强
                                 setTimeout(() => {
                                     enhanceMermaidDiagrams();
@@ -2880,17 +2880,17 @@
                                 isRerenderingMermaid = false;
                             }
                         }, 200);
-                        
+
                     } catch (error) {
                         console.error('简单重新渲染失败:', error);
                         isRerenderingMermaid = false;
                     }
                 }, 150);
             }
-            
+
             // 防抖的重新渲染函数（保持向后兼容）
             const debouncedRerenderMermaid = simpleRerenderMermaid;
-            
+
             // 全局错误处理
             window.addEventListener('unhandledrejection', function(event) {
                 if (event.reason && event.reason.toString().includes('mermaid')) {
@@ -2898,7 +2898,7 @@
                     event.preventDefault(); // 阻止错误显示在控制台
                 }
             });
-            
+
             // 初始化Mermaid
             initializeMermaid();
 
@@ -2935,7 +2935,7 @@
                 const query = document.getElementById('searchInput').value.trim();
                 const clearBtn = document.getElementById('searchClearBtn');
                 const modeToggle = document.getElementById('searchModeToggle');
-                
+
                 // 显示/隐藏清除按钮
                 if (query) {
                     clearBtn.classList.add('show');
@@ -2962,7 +2962,7 @@
             // 执行搜索
             async function performSearch(query) {
                 if (isSearching) return;
-                
+
                 isSearching = true;
                 const treeContainer = document.getElementById('tree-container');
 
@@ -3006,7 +3006,7 @@
             // 显示搜索结果
             function displaySearchResults(data) {
                 const treeContainer = document.getElementById('tree-container');
-                
+
                 if (data.total === 0) {
                     treeContainer.innerHTML = `
                         <div class="search-empty">
@@ -3029,7 +3029,7 @@
                 data.results.forEach(result => {
                     const title = result.title || result.file_name;
                     const score = Math.round(result.relevance_score * 10) / 10;
-                    
+
                     html += `
                         <div class="search-result-item" onclick="loadFile('${result.file_path}')">
                             <div class="search-result-header">
@@ -3045,14 +3045,14 @@
                     // 限制显示的匹配数量
                     const maxMatches = 3;
                     const matches = result.matches.slice(0, maxMatches);
-                    
+
                     matches.forEach(match => {
                         html += `
                             <div class="search-match">
                                 <div class="search-match-line">第 ${match.line_number} 行</div>
                                 <div class="search-match-content">${match.highlighted_content}</div>
                         `;
-                        
+
                         if (match.context_before || match.context_after) {
                             html += '<div class="search-match-context">';
                             if (match.context_before) {
@@ -3063,7 +3063,7 @@
                             }
                             html += '</div>';
                         }
-                        
+
                         html += '</div>';
                     });
 
@@ -3088,7 +3088,7 @@
             // 设置搜索模式
             function setSearchMode(mode) {
                 searchMode = mode;
-                
+
                 // 更新按钮状态
                 document.querySelectorAll('.search-mode-btn').forEach(btn => {
                     btn.classList.remove('active');
@@ -3118,11 +3118,11 @@
                 const clearBtn = document.getElementById('searchClearBtn');
                 const modeToggle = document.getElementById('searchModeToggle');
                 const treeContainer = document.getElementById('tree-container');
-                
+
                 searchInput.value = '';
                 clearBtn.classList.remove('show');
                 modeToggle.style.display = 'none';
-                
+
                 // 恢复原始目录树
                 treeContainer.innerHTML = '';
                 if (originalTreeData) {
@@ -3153,20 +3153,20 @@
                         const match = name.match(/^(\d+)[^\d]/);
                         return match ? parseInt(match[1], 10) : null;
                     };
-                    
+
                     const aNumber = getNumberPrefix(a.name);
                     const bNumber = getNumberPrefix(b.name);
-                    
+
                     if (aNumber !== null && bNumber !== null) {
                         if (aNumber !== bNumber) {
                             return aNumber - bNumber;
                         }
                         return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
                     }
-                    
+
                     if (aNumber !== null && bNumber === null) return -1;
                     if (aNumber === null && bNumber !== null) return 1;
-                    
+
                     return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
                 });
 
@@ -3212,10 +3212,10 @@
                     const match = name.match(/^(\d+)[^\d]/);
                     return match ? parseInt(match[1], 10) : null;
                 };
-                
+
                 const aNumber = getNumberPrefix(a.name);
                 const bNumber = getNumberPrefix(b.name);
-                
+
                 // 如果两个都有数字前缀，按数字大小排序
                 if (aNumber !== null && bNumber !== null) {
                     if (aNumber !== bNumber) {
@@ -3224,11 +3224,11 @@
                     // 数字相同时，按字符串排序
                     return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
                 }
-                
+
                 // 如果只有一个有数字前缀，有数字的在前
                 if (aNumber !== null && bNumber === null) return -1;
                 if (aNumber === null && bNumber !== null) return 1;
-                
+
                 // 都没有数字前缀，按字母顺序排序
                 return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
             }
@@ -3238,7 +3238,7 @@
                 if (node.children && node.children.length > 0) {
                     // 使用智能排序函数对子节点进行排序
                     const sortedChildren = [...node.children].sort(smartSort);
-                    
+
                     sortedChildren.forEach(child => {
                         renderTree(child, container, 0);
                     });
@@ -3370,7 +3370,7 @@
 
                     // 渲染Mermaid图表
                     const mermaidElements = contentContainer.querySelectorAll('code.language-mermaid, pre code.language-mermaid');
-                    
+
                     // 为每个 Mermaid 元素单独处理，避免一个错误影响所有渲染
                     for (let i = 0; i < mermaidElements.length; i++) {
                         const element = mermaidElements[i];
@@ -3391,7 +3391,7 @@
                             await mermaid.run(undefined, `#${mermaidId}`);
                         } catch (error) {
                             console.warn(`Mermaid 图表渲染失败 (${mermaidId}):`, error);
-                            
+
                             // 创建错误显示容器
                             const errorContainer = document.createElement('div');
                             errorContainer.style.cssText = `
@@ -3450,7 +3450,7 @@
                                 color: var(--text-secondary);
                                 font-size: 0.85rem;
                             `;
-                            
+
                             const errorSummary = document.createElement('summary');
                             errorSummary.style.cssText = `
                                 cursor: pointer;
@@ -3458,7 +3458,7 @@
                                 font-weight: 500;
                             `;
                             errorSummary.textContent = '查看错误详情';
-                            
+
                             const errorMessage = document.createElement('pre');
                             errorMessage.style.cssText = `
                                 margin-top: 0.5rem;
@@ -3470,7 +3470,7 @@
                                 word-wrap: break-word;
                             `;
                             errorMessage.textContent = error.message || error.toString();
-                            
+
                             errorDetails.appendChild(errorSummary);
                             errorDetails.appendChild(errorMessage);
 
@@ -3515,12 +3515,12 @@
             function updateContextOnFileChange(filePath) {
                 // 获取当前文件名
                 const currentFileName = filePath ? filePath.split('/').pop() : null;
-                
+
                 if (!currentFileName) return;
-                
+
                 // 检查当前文件是否已经在选中列表中
                 const isAlreadySelected = selectedContextFiles.some(file => file.path === filePath);
-                
+
                 // 如果当前文件不在选中列表中，添加它
                 if (!isAlreadySelected) {
                     selectedContextFiles.push({
@@ -3528,7 +3528,7 @@
                         path: filePath
                     });
                 }
-                
+
                 // 更新上下文标签显示
                 updateContextTags();
             }
@@ -3537,13 +3537,13 @@
             function updateContextTags() {
                 const tagsContainer = document.getElementById('contextTagsContainer');
                 if (!tagsContainer) return;
-                
+
                 // 清空现有标签
                 tagsContainer.innerHTML = '';
-                
+
                 // 获取当前文件名
                 const currentFileName = currentFile ? currentFile.split('/').pop() : null;
-                
+
                 // 为每个选中的文件创建标签
                 selectedContextFiles.forEach((file, index) => {
                     const tag = document.createElement('div');
@@ -3558,7 +3558,7 @@
                         margin-bottom: 0.5rem;
                         font-size: 0.85rem;
                     `;
-                    
+
                     const nameSpan = document.createElement('span');
                     nameSpan.textContent = file.name;
                     nameSpan.style.cssText = `
@@ -3568,7 +3568,7 @@
                         text-overflow: ellipsis;
                         white-space: nowrap;
                     `;
-                    
+
                     // 如果是当前文件，不显示删除按钮
                     if (currentFileName && file.name === currentFileName) {
                         tag.style.background = 'var(--text-secondary)'; // 不同的颜色表示不可删除
@@ -3591,7 +3591,7 @@
                             align-items: center;
                             justify-content: center;
                         `;
-                        
+
                         removeBtn.onclick = () => {
                             // 从选中列表中移除
                             selectedContextFiles = selectedContextFiles.filter(f => f.path !== file.path);
@@ -3603,11 +3603,11 @@
                                 checkbox.checked = false;
                             }
                         };
-                        
+
                         tag.appendChild(nameSpan);
                         tag.appendChild(removeBtn);
                     }
-                    
+
                     tagsContainer.appendChild(tag);
                 });
             }
@@ -3619,7 +3619,7 @@
                     name: '2、架构概览.md',
                     path: '2、架构概览.md'
                 }];
-                
+
                 // 如果有当前文件，也添加到上下文
                 if (currentFile) {
                     const currentFileName = currentFile.split('/').pop();
@@ -3632,7 +3632,7 @@
                         });
                     }
                 }
-                
+
                 // 更新上下文标签显示
                 updateContextTags();
             }
@@ -3692,7 +3692,7 @@
                 // 渲染目录树（不包含根节点）
                 const treeContainer = document.getElementById('tree-container');
                 renderTreeChildren(treeData, treeContainer);
-                
+
                 // 初始化默认文档加载（带降级策略）
                 initializeDefaultDocument();
             });
@@ -3700,7 +3700,7 @@
             // 初始化默认文档加载（带降级策略）
             async function initializeDefaultDocument() {
                 const defaultFiles = ['1、项目概述.md', '1.Overview.md', 'README.md', 'Overview.md', '项目概述.md'];
-                
+
                 for (const fileName of defaultFiles) {
                     try {
                         const response = await fetch(`/api/file?file=${encodeURIComponent(fileName)}`);
@@ -3714,7 +3714,7 @@
                         console.warn(`尝试加载 ${fileName} 失败:`, error);
                     }
                 }
-                
+
                 // 如果所有默认文件都失败，显示欢迎信息
                 console.info('未找到默认文档文件，显示欢迎界面');
                 const contentContainer = document.getElementById('content-container');
@@ -3736,7 +3736,7 @@
                         </div>
                     </div>
                 `;
-                
+
                 // 初始化AI助手默认上下文
                 setTimeout(() => {
                     initializeDefaultContext();
@@ -3752,35 +3752,35 @@
                         console.log('跳过未渲染的Mermaid元素:', mermaidElement);
                         return;
                     }
-                    
+
                     // 避免重复增强（但允许主题切换后重新增强）
                     if (mermaidElement.dataset.enhanced && !mermaidElement.dataset.needsReenhancement) return;
                     mermaidElement.dataset.enhanced = 'true';
                     mermaidElement.dataset.needsReenhancement = 'false';
-                    
+
                     console.log('增强Mermaid图表:', mermaidElement);
-                    
+
                     // 确保mermaid元素有相对定位
                     mermaidElement.style.position = 'relative';
                     mermaidElement.style.cursor = 'pointer';
                     mermaidElement.style.transition = 'all 0.2s ease';
-                    
+
                     // 添加悬停效果
                     mermaidElement.addEventListener('mouseenter', () => {
                         mermaidElement.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.1)';
                         mermaidElement.style.transform = 'translateY(-2px)';
                     });
-                    
+
                     mermaidElement.addEventListener('mouseleave', () => {
                         mermaidElement.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
                         mermaidElement.style.transform = 'translateY(0)';
                     });
-                    
+
                     // 添加点击预览功能
                     mermaidElement.addEventListener('click', () => {
                         openMermaidPreview(mermaidElement);
                     });
-                    
+
                     // 创建控制按钮容器
                     const controlsContainer = document.createElement('div');
                     controlsContainer.className = 'mermaid-controls';
@@ -3794,7 +3794,7 @@
                         transition: opacity 0.2s ease;
                         z-index: 10;
                     `;
-                    
+
                     // 下载按钮
                     const downloadBtn = document.createElement('button');
                     downloadBtn.innerHTML = '⬇️';
@@ -3815,22 +3815,22 @@
                         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
                         transition: all 0.2s ease;
                     `;
-                    
+
                     downloadBtn.addEventListener('mouseenter', () => {
                         downloadBtn.style.background = '#0056b3';
                         downloadBtn.style.transform = 'scale(1.1)';
                     });
-                    
+
                     downloadBtn.addEventListener('mouseleave', () => {
                         downloadBtn.style.background = '#007bff';
                         downloadBtn.style.transform = 'scale(1)';
                     });
-                    
+
                     downloadBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         downloadMermaidImage(mermaidElement);
                     });
-                    
+
                     // 复制按钮
                     const copyBtn = document.createElement('button');
                     copyBtn.innerHTML = '📋';
@@ -3851,103 +3851,103 @@
                         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
                         transition: all 0.2s ease;
                     `;
-                    
+
                     copyBtn.addEventListener('mouseenter', () => {
                         copyBtn.style.background = '#1e7e34';
                         copyBtn.style.transform = 'scale(1.1)';
                     });
-                    
+
                     copyBtn.addEventListener('mouseleave', () => {
                         copyBtn.style.background = '#28a745';
                         copyBtn.style.transform = 'scale(1)';
                     });
-                    
+
                     copyBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         copyMermaidImage(mermaidElement);
                     });
-                    
+
                     // 添加按钮到容器
                     controlsContainer.appendChild(downloadBtn);
                     controlsContainer.appendChild(copyBtn);
                     mermaidElement.appendChild(controlsContainer);
-                    
+
                     // 悬停显示/隐藏控制按钮
                     mermaidElement.addEventListener('mouseenter', () => {
                         controlsContainer.style.opacity = '1';
                     });
-                    
+
                     mermaidElement.addEventListener('mouseleave', () => {
                         controlsContainer.style.opacity = '0';
                     });
                 });
             }
-            
+
             // 全局变量跟踪当前预览状态
             let currentPreviewModal = null;
             let isPreviewOpen = false;
             let isPreviewOpening = false; // 防止重复点击
-            
+
             // 替换预览内容（避免重新创建模态框）
             function replacePreviewContent(mermaidElement) {
                 if (!currentPreviewModal || !isPreviewOpen) return;
-                
+
                 const svg = mermaidElement.querySelector('svg');
                 if (!svg) return;
-                
+
                 // 找到当前预览的内容容器
                 const contentContainer = currentPreviewModal.querySelector('.content');
                 if (!contentContainer) return;
-                
+
                 // 重置缩放状态
                 window.currentZoom = 1;
                 window.currentTranslate = { x: 0, y: 0 };
-                
+
                 // 移除旧的SVG和缩放信息
                 const oldSvg = contentContainer.querySelector('#previewSvg');
                 const oldZoomInfo = contentContainer.querySelector('#zoomInfo');
                 if (oldSvg) oldSvg.remove();
                 if (oldZoomInfo) oldZoomInfo.remove();
-                
+
                 // 创建新的SVG内容（复用原有的克隆逻辑）
                 const clonedSvg = createClonedSvg(svg);
                 const zoomInfo = createZoomInfo();
-                
+
                 // 添加新内容
                 contentContainer.appendChild(clonedSvg);
                 contentContainer.appendChild(zoomInfo);
-                
+
                 // 重新设置事件监听器
                 setupSvgInteractions(clonedSvg);
-                
+
                 // 更新缩放信息显示
                 updateZoomInfo();
             }
-            
+
             // 创建克隆的SVG（提取为独立函数）
             function createClonedSvg(svg) {
                 // 克隆SVG并保持样式完全一致
                 const clonedSvg = svg.cloneNode(true);
                 clonedSvg.id = 'previewSvg';
-                
+
                 // 深度复制所有样式信息
                 function copyElementStyles(source, target) {
                     const sourceStyles = window.getComputedStyle(source);
-                    
+
                     // 复制所有重要的样式属性
                     const importantStyles = [
                         'color', 'backgroundColor', 'fill', 'stroke', 'strokeWidth',
                         'fontFamily', 'fontSize', 'fontWeight', 'fontStyle',
                         'textAnchor', 'dominantBaseline', 'opacity'
                     ];
-                    
+
                     importantStyles.forEach(prop => {
                         const value = sourceStyles.getPropertyValue(prop);
                         if (value && value !== 'initial' && value !== 'inherit') {
                             target.style.setProperty(prop, value);
                         }
                     });
-                    
+
                     // 递归处理子元素
                     for (let i = 0; i < source.children.length; i++) {
                         if (target.children[i]) {
@@ -3955,10 +3955,10 @@
                         }
                     }
                 }
-                
+
                 // 应用样式复制
                 copyElementStyles(svg, clonedSvg);
-                
+
                 // 设置预览模式的基本样式
                 clonedSvg.style.cssText += `
                     max-width: 100%;
@@ -3968,32 +3968,32 @@
                     transition: transform 0.2s ease;
                     cursor: grab;
                 `;
-                
+
                 // 保持原始SVG的所有属性
                 const originalSvgRect = svg.getBoundingClientRect();
                 const originalWidth = svg.getAttribute('width') || originalSvgRect.width;
                 const originalHeight = svg.getAttribute('height') || originalSvgRect.height;
-                
+
                 // 保持原始尺寸和viewBox
                 if (originalWidth && originalHeight) {
                     clonedSvg.setAttribute('width', originalWidth);
                     clonedSvg.setAttribute('height', originalHeight);
                 }
-                
+
                 if (svg.getAttribute('viewBox')) {
                     clonedSvg.setAttribute('viewBox', svg.getAttribute('viewBox'));
                 }
-                
+
                 // 复制所有SVG属性
                 Array.from(svg.attributes).forEach(attr => {
                     if (attr.name !== 'id' && attr.name !== 'style') {
                         clonedSvg.setAttribute(attr.name, attr.value);
                     }
                 });
-                
+
                 return clonedSvg;
             }
-            
+
             // 创建缩放信息显示（提取为独立函数）
             function createZoomInfo() {
                 const zoomInfo = document.createElement('div');
@@ -4017,37 +4017,37 @@
                 `;
                 return zoomInfo;
             }
-            
+
             // 设置SVG交互事件（提取为独立函数）
             function setupSvgInteractions(clonedSvg) {
                 let isDragging = false;
                 let dragStart = { x: 0, y: 0 };
-                
+
                 // 添加拖拽功能
                 clonedSvg.addEventListener('mousedown', (e) => {
                     isDragging = true;
                     dragStart = { x: e.clientX, y: e.clientY };
                     clonedSvg.style.cursor = 'grabbing';
                 });
-                
+
                 document.addEventListener('mousemove', (e) => {
                     if (!isDragging) return;
-                    
+
                     const deltaX = e.clientX - dragStart.x;
                     const deltaY = e.clientY - dragStart.y;
-                    
+
                     window.currentTranslate.x += deltaX;
                     window.currentTranslate.y += deltaY;
-                    
+
                     window.updateSvgTransform();
                     dragStart = { x: e.clientX, y: e.clientY };
                 });
-                
+
                 document.addEventListener('mouseup', () => {
                     isDragging = false;
                     clonedSvg.style.cursor = 'grab';
                 });
-                
+
                 // 滚轮缩放
                 clonedSvg.addEventListener('wheel', (e) => {
                     e.preventDefault();
@@ -4057,7 +4057,7 @@
                     window.updateSvgTransform();
                 });
             }
-            
+
             // 全局关闭预览函数
             function closeAllMermaidPreviews() {
                 // 关闭所有可能存在的预览模态框
@@ -4070,16 +4070,16 @@
                         }
                     }, 200);
                 });
-                
+
                 // 重置全局状态
                 currentPreviewModal = null;
                 isPreviewOpen = false;
                 isPreviewOpening = false;
-                
+
                 // 移除所有键盘事件监听器
                 document.removeEventListener('keydown', globalKeydownHandler);
             }
-            
+
             // 全局键盘事件处理器
             function globalKeydownHandler(e) {
                 if (e.key === 'Escape') {
@@ -4105,17 +4105,17 @@
                     }
                 }
             }
-            
+
             // 打开Mermaid预览模态框
             function openMermaidPreview(mermaidElement) {
                 const svg = mermaidElement.querySelector('svg');
                 if (!svg) return;
-                
+
                 // 防止重复点击
                 if (isPreviewOpening) {
                     return;
                 }
-                
+
                 // 如果已经有预览打开，检查是否是同一个元素
                 if (isPreviewOpen && currentPreviewModal) {
                     // 如果点击的是同一个图表，直接返回，不做任何操作
@@ -4128,16 +4128,16 @@
                             return;
                         }
                     }
-                    
+
                     // 如果是不同的图表，直接替换内容而不是重新创建模态框
                     replacePreviewContent(mermaidElement);
                     return;
                 }
-                
+
                 // 设置预览状态
                 isPreviewOpening = true;
                 isPreviewOpen = true;
-                
+
                 // 创建模态框（使用唯一ID）
                 const modal = document.createElement('div');
                 const modalId = `mermaidPreviewModal_${Date.now()}`;
@@ -4157,7 +4157,7 @@
                     opacity: 0;
                     transition: opacity 0.2s ease;
                 `;
-                
+
                 // 创建容器
                 const container = document.createElement('div');
                 container.style.cssText = `
@@ -4173,7 +4173,7 @@
                     display: flex;
                     flex-direction: column;
                 `;
-                
+
                 // 创建头部
                 const header = document.createElement('div');
                 header.style.cssText = `
@@ -4185,7 +4185,7 @@
                     justify-content: space-between;
                     flex-shrink: 0;
                 `;
-                
+
                 const title = document.createElement('div');
                 title.textContent = 'Mermaid 图表预览';
                 title.style.cssText = `
@@ -4193,7 +4193,7 @@
                     color: var(--text-primary);
                     font-size: 1.1rem;
                 `;
-                
+
                 // 创建控制按钮组
                 const controls = document.createElement('div');
                 controls.style.cssText = `
@@ -4201,39 +4201,39 @@
                     gap: 0.5rem;
                     align-items: center;
                 `;
-                
+
                 // 放大按钮
                 const zoomInBtn = createControlButton('+', '放大', () => {
                     window.currentZoom *= 1.2;
                     window.updateSvgTransform();
                 });
-                
+
                 // 缩小按钮
                 const zoomOutBtn = createControlButton('-', '缩小', () => {
                     window.currentZoom *= 0.8;
                     window.updateSvgTransform();
                 });
-                
+
                 // 重置按钮
                 const resetBtn = createControlButton('重置', '重置缩放', () => {
                     window.currentZoom = 1;
                     window.currentTranslate = { x: 0, y: 0 };
                     window.updateSvgTransform();
                 });
-                
+
                 // 关闭按钮
                 const closeBtn = createControlButton('关闭', '关闭预览', () => {
                     closeAllMermaidPreviews();
                 }, '#dc3545');
-                
+
                 controls.appendChild(zoomOutBtn);
                 controls.appendChild(zoomInBtn);
                 controls.appendChild(resetBtn);
                 controls.appendChild(closeBtn);
-                
+
                 header.appendChild(title);
                 header.appendChild(controls);
-                
+
                 // 创建内容区域
                 const content = document.createElement('div');
                 content.className = 'content'; // 添加类名以便后续查找
@@ -4248,14 +4248,14 @@
                     background: var(--bg-primary);
                     min-height: 0;
                 `;
-                
+
                 // 确保预览容器继承正确的主题样式
                 const currentTheme = document.documentElement.getAttribute('data-theme');
                 if (currentTheme) {
                     container.setAttribute('data-theme', currentTheme);
                     modal.setAttribute('data-theme', currentTheme);
                 }
-                
+
                 // 将原始SVG的父容器样式应用到预览容器
                 const originalParent = svg.closest('.mermaid');
                 if (originalParent) {
@@ -4263,11 +4263,11 @@
                     content.style.backgroundColor = parentStyles.backgroundColor;
                     content.style.color = parentStyles.color;
                 }
-                
+
                 // 重置缩放状态
                 window.currentZoom = 1;
                 window.currentTranslate = { x: 0, y: 0 };
-                
+
                 // 更新SVG变换函数
                 window.updateSvgTransform = function() {
                     const clonedSvg = currentPreviewModal?.querySelector('#previewSvg');
@@ -4279,25 +4279,25 @@
                         }
                     }
                 };
-                
+
                 // 使用提取的函数创建SVG和缩放信息
                 const clonedSvg = createClonedSvg(svg);
                 const zoomInfo = createZoomInfo();
-                
+
                 // 设置SVG交互
                 setupSvgInteractions(clonedSvg);
-                
+
                 // 更新缩放信息显示
                 zoomInfo.textContent = `${Math.round(window.currentZoom * 100)}%`;
-                
+
                 content.appendChild(clonedSvg);
                 content.appendChild(zoomInfo);
-                
+
                 container.appendChild(header);
                 container.appendChild(content);
                 modal.appendChild(container);
                 document.body.appendChild(modal);
-                
+
                 // 显示动画
                 setTimeout(() => {
                     modal.style.opacity = '1';
@@ -4306,18 +4306,18 @@
                         isPreviewOpening = false;
                     }, 200);
                 }, 10);
-                
+
                 // 点击背景关闭
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
                         closeAllMermaidPreviews();
                     }
                 });
-                
+
                 // 添加全局键盘事件监听器
                 document.addEventListener('keydown', globalKeydownHandler);
             }
-            
+
             // 创建控制按钮
             function createControlButton(text, title, onClick, bgColor = '#6c757d') {
                 const btn = document.createElement('button');
@@ -4335,93 +4335,93 @@
                     transition: background-color 0.2s ease;
                     white-space: nowrap;
                 `;
-                
+
                 btn.addEventListener('click', onClick);
-                
+
                 btn.addEventListener('mouseenter', () => {
                     btn.style.opacity = '0.8';
                 });
-                
+
                 btn.addEventListener('mouseleave', () => {
                     btn.style.opacity = '1';
                 });
-                
+
                 return btn;
             }
-            
+
             // 下载Mermaid图片
             async function downloadMermaidImage(mermaidElement) {
                 const svg = mermaidElement.querySelector('svg');
                 if (!svg) return;
-                
+
                 try {
                     // 方法1: 直接下载SVG文件
                     const svgData = new XMLSerializer().serializeToString(svg);
                     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
                     const url = URL.createObjectURL(svgBlob);
-                    
+
                     const link = document.createElement('a');
                     link.download = `mermaid-diagram-${Date.now()}.svg`;
                     link.href = url;
                     link.click();
-                    
+
                     URL.revokeObjectURL(url);
                     showToast('SVG图片下载成功！');
-                    
+
                     // 尝试转换为PNG（如果支持的话）
                     setTimeout(() => {
                         convertSvgToPng(svg, svgData).catch(() => {
                             // PNG转换失败时的备用方案已经在convertSvgToPng中处理
                         });
                     }, 100);
-                    
+
                 } catch (error) {
                     console.error('下载失败:', error);
                     showToast('下载失败，请重试', 'error');
                 }
             }
-            
+
             // 转换SVG为PNG
             async function convertSvgToPng(svg, svgData) {
                 try {
                     // 清理SVG数据，移除可能导致安全问题的内容
                     let cleanSvgData = svgData;
-                    
+
                     // 确保SVG有正确的命名空间
                     if (!cleanSvgData.includes('xmlns="http://www.w3.org/2000/svg"')) {
                         cleanSvgData = cleanSvgData.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
                     }
-                    
+
                     // 获取SVG尺寸
                     const svgRect = svg.getBoundingClientRect();
                     const svgWidth = svgRect.width || 800;
                     const svgHeight = svgRect.height || 600;
-                    
+
                     // 创建canvas
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    
+
                     // 设置canvas尺寸
                     canvas.width = svgWidth * 2;
                     canvas.height = svgHeight * 2;
                     ctx.scale(2, 2);
-                    
+
                     // 创建图片
                     const img = new Image();
                     img.crossOrigin = 'anonymous'; // 尝试避免跨域问题
-                    
+
                     // 使用data URL而不是blob URL
                     const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(cleanSvgData)));
-                    
+
                     img.onload = () => {
                         try {
                             // 白色背景
                             ctx.fillStyle = 'white';
                             ctx.fillRect(0, 0, svgWidth, svgHeight);
-                            
+
                             // 绘制SVG
                             ctx.drawImage(img, 0, 0, svgWidth, svgHeight);
-                            
+
                             // 下载PNG
                             canvas.toBlob((blob) => {
                                 if (blob) {
@@ -4436,31 +4436,31 @@
                                     showToast('PNG转换失败，已下载SVG格式', 'warning');
                                 }
                             }, 'image/png');
-                            
+
                         } catch (canvasError) {
                             console.warn('Canvas操作失败:', canvasError);
                             showToast('PNG转换失败，已下载SVG格式', 'warning');
                         }
                     };
-                    
+
                     img.onerror = () => {
                         console.warn('图片加载失败，PNG转换失败');
                         showToast('PNG转换失败，已下载SVG格式', 'warning');
                     };
-                    
+
                     img.src = dataUrl;
-                    
+
                 } catch (error) {
                     console.warn('PNG转换失败:', error);
                     showToast('PNG转换失败，已下载SVG格式', 'warning');
                 }
             }
-            
+
             // 复制Mermaid图片
             async function copyMermaidImage(mermaidElement) {
                 const svg = mermaidElement.querySelector('svg');
                 if (!svg) return;
-                
+
                 try {
                     const svgData = new XMLSerializer().serializeToString(svg);
                     // 直接转换为PNG并复制到剪贴板
@@ -4470,7 +4470,7 @@
                     showToast('复制失败，请重试', 'error');
                 }
             }
-            
+
             // 转换SVG为PNG并复制
             async function convertSvgToPngAndCopy(svg, svgData) {
                 try {
@@ -4479,36 +4479,36 @@
                     if (!cleanSvgData.includes('xmlns="http://www.w3.org/2000/svg"')) {
                         cleanSvgData = cleanSvgData.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
                     }
-                    
+
                     // 获取SVG尺寸
                     const svgRect = svg.getBoundingClientRect();
                     const svgWidth = svgRect.width || 800;
                     const svgHeight = svgRect.height || 600;
-                    
+
                     // 创建canvas
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    
+
                     canvas.width = svgWidth * 2;
                     canvas.height = svgHeight * 2;
                     ctx.scale(2, 2);
-                    
+
                     // 创建图片
                     const img = new Image();
                     img.crossOrigin = 'anonymous';
-                    
+
                     // 使用data URL
                     const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(cleanSvgData)));
-                    
+
                     img.onload = () => {
                         try {
                             // 白色背景
                             ctx.fillStyle = 'white';
                             ctx.fillRect(0, 0, svgWidth, svgHeight);
-                            
+
                             // 绘制SVG
                             ctx.drawImage(img, 0, 0, svgWidth, svgHeight);
-                            
+
                             // 复制到剪贴板
                             canvas.toBlob(async (blob) => {
                                 if (blob) {
@@ -4525,31 +4525,31 @@
                                     showToast('图片转换失败，请重试', 'error');
                                 }
                             }, 'image/png');
-                            
+
                         } catch (canvasError) {
                             console.warn('Canvas操作失败:', canvasError);
                             showToast('图片复制失败，请重试', 'error');
                         }
                     };
-                    
+
                     img.onerror = () => {
                         console.warn('图片加载失败');
                         showToast('图片复制失败，请重试', 'error');
                     };
-                    
+
                     img.src = dataUrl;
-                    
+
                 } catch (error) {
                     console.warn('PNG转换失败:', error);
                     showToast('图片复制失败，请重试', 'error');
                 }
             }
-            
+
             // 显示提示消息
             function showToast(message, type = 'success') {
                 const toast = document.createElement('div');
                 toast.textContent = message;
-                
+
                 let backgroundColor;
                 switch (type) {
                     case 'success':
@@ -4564,7 +4564,7 @@
                     default:
                         backgroundColor = '#28a745';
                 }
-                
+
                 toast.style.cssText = `
                     position: fixed;
                     top: 20px;
@@ -4580,9 +4580,9 @@
                     max-width: 300px;
                     word-wrap: break-word;
                 `;
-                
+
                 document.body.appendChild(toast);
-                
+
                 setTimeout(() => {
                     toast.style.animation = 'slideOutRight 0.3s ease';
                     setTimeout(() => {
@@ -4592,7 +4592,7 @@
                     }, 300);
                 }, 3000); // 延长显示时间到3秒
             }
-            
+
             // 添加动画样式和预览模式样式
             const style = document.createElement('style');
             style.textContent = `
@@ -4604,55 +4604,55 @@
                     from { transform: translateX(0); opacity: 1; }
                     to { transform: translateX(100%); opacity: 0; }
                 }
-                
+
                 /* 确保预览模式中的Mermaid图表样式一致 */
                 #mermaidPreviewModal {
                     --preview-bg: var(--bg-primary);
                     --preview-text: var(--text-primary);
                     --preview-border: var(--border-color);
                 }
-                
+
                 #mermaidPreviewModal[data-theme="dark"] {
                     --preview-bg: var(--bg-primary);
                     --preview-text: var(--text-primary);
                     --preview-border: var(--border-color);
                 }
-                
+
                 #mermaidPreviewModal[data-theme="light"] {
                     --preview-bg: var(--bg-primary);
                     --preview-text: var(--text-primary);
                     --preview-border: var(--border-color);
                 }
-                
+
                 #mermaidPreviewModal[data-theme="morandi"] {
                     --preview-bg: var(--bg-primary);
                     --preview-text: var(--text-primary);
                     --preview-border: var(--border-color);
                 }
-                
+
                 /* 预览模式中的SVG样式继承 */
                 #mermaidPreviewModal svg {
                     background: transparent !important;
                 }
-                
+
                 #mermaidPreviewModal svg * {
                     font-family: inherit !important;
                 }
-                
+
                 /* 确保预览容器的背景与主题一致 */
                 #mermaidPreviewModal .content {
                     background: var(--preview-bg) !important;
                 }
             `;
             document.head.appendChild(style);
-            
-            
-            
+
+
+
             // 页面加载后增强Mermaid图表
             setTimeout(() => {
                 enhanceMermaidDiagrams();
             }, 1000);
-            
+
             // 监听内容变化，自动增强新的Mermaid图表
             const mermaidObserver = new MutationObserver((mutations) => {
                 let shouldEnhance = false;
@@ -4670,14 +4670,14 @@
                         }
                     });
                 });
-                
+
                 if (shouldEnhance) {
                     setTimeout(() => {
                         enhanceMermaidDiagrams();
                     }, 100);
                 }
             });
-            
+
             mermaidObserver.observe(document.body, {
                 childList: true,
                 subtree: true
@@ -4695,9 +4695,9 @@
             function toggleAiAssistant() {
                 const trigger = document.getElementById('aiAssistantTrigger');
                 const panel = document.getElementById('aiAssistantPanel');
-                
+
                 isAiAssistantOpen = !isAiAssistantOpen;
-                
+
                 if (isAiAssistantOpen) {
                     trigger.classList.add('hidden');
                     panel.classList.add('show');
@@ -4716,7 +4716,7 @@
                 if (confirm('确定要清空所有聊天记录吗？')) {
                     // 清空聊天历史数组
                     chatHistory = [];
-                    
+
                     // 清空聊天界面，但保留欢迎消息
                     const messagesContainer = document.getElementById('aiChatMessages');
                     messagesContainer.innerHTML = `
@@ -4726,15 +4726,15 @@
                             </div>
                         </div>
                     `;
-                    
+
                     // 重置状态
                     hasUserSentMessage = false;
-                    
+
                     // 如果推荐区域是折叠的，展开它
                     if (isSuggestionsCollapsed) {
                         toggleSuggestions();
                     }
-                    
+
                     // 恢复初始推荐问题
                     const suggestionsContainer = document.querySelector('.ai-suggestions-list');
                     suggestionsContainer.innerHTML = `
@@ -4755,9 +4755,9 @@
             function toggleSuggestions() {
                 const suggestions = document.getElementById('aiSuggestions');
                 const toggle = document.getElementById('aiSuggestionsToggle');
-                
+
                 isSuggestionsCollapsed = !isSuggestionsCollapsed;
-                
+
                 if (isSuggestionsCollapsed) {
                     suggestions.classList.add('collapsed');
                 } else {
@@ -4798,14 +4798,14 @@
             // 获取所有选中的上下文文件内容
             async function getSelectedContextFilesContent() {
                 const contextContents = [];
-                
+
                 // 添加用户选择的上下文文件
                 for (const file of selectedContextFiles) {
                     // 跳过当前文件（当前文件会单独处理）
                     if (currentFile && file.path === currentFile) {
                         continue;
                     }
-                    
+
                     try {
                         const response = await fetch(`/api/file?file=${encodeURIComponent(file.path)}`);
                         if (response.ok) {
@@ -4819,18 +4819,18 @@
                         console.warn(`无法加载文件 ${file.name}:`, error);
                     }
                 }
-                
+
                 // 添加当前文档（如果存在且不重复）
                 const currentContent = getCurrentDocumentContext();
                 const currentFileName = currentFile ? currentFile.split('/').pop() : null;
-                
+
                 if (currentContent && currentFileName) {
                     contextContents.push({
                         name: currentFileName,
                         content: currentContent
                     });
                 }
-                
+
                 // 格式化上下文内容
                 if (contextContents.length > 0) {
                     let contextText = "用户选择的上下文文件内容：\n";
@@ -4839,7 +4839,7 @@
                     });
                     return contextText;
                 }
-                
+
                 return null;
             }
 
@@ -4860,7 +4860,7 @@
                     justify-content: center;
                     z-index: 10000;
                 `;
-                
+
                 const container = document.createElement('div');
                 container.style.cssText = `
                     background: var(--bg-primary);
@@ -4873,7 +4873,7 @@
                     flex-direction: column;
                     border: 1px solid var(--border-color);
                 `;
-                
+
                 const header = document.createElement('div');
                 header.style.cssText = `
                     padding: 1rem 1.5rem;
@@ -4883,7 +4883,7 @@
                     align-items: center;
                     justify-content: space-between;
                 `;
-                
+
                 const title = document.createElement('h3');
                 title.textContent = '选择文档添加到上下文';
                 title.style.cssText = `
@@ -4891,7 +4891,7 @@
                     color: var(--text-primary);
                     font-size: 1.2rem;
                 `;
-                
+
                 const closeBtn = document.createElement('button');
                 closeBtn.innerHTML = '&times;';
                 closeBtn.style.cssText = `
@@ -4908,14 +4908,14 @@
                     justify-content: center;
                 `;
                 closeBtn.onclick = () => document.body.removeChild(modal);
-                
+
                 const content = document.createElement('div');
                 content.style.cssText = `
                     padding: 1rem;
                     overflow-y: auto;
                     flex: 1;
                 `;
-                
+
                 // 创建文档列表
                 const fileList = document.createElement('div');
                 fileList.id = 'documentList';
@@ -4923,7 +4923,7 @@
                     max-height: 60vh;
                     overflow-y: auto;
                 `;
-                
+
                 // 递归渲染文档树
                 function renderFileNode(node, container, level = 0) {
                     const itemDiv = document.createElement('div');
@@ -4936,13 +4936,13 @@
                         cursor: pointer;
                         transition: background 0.2s;
                     `;
-                    
+
                     // 为文件夹和文件设置不同的点击行为
                     if (node.is_file) {
                         itemDiv.onmouseenter = () => {
                             itemDiv.style.background = 'var(--bg-secondary)';
                         };
-                        
+
                         itemDiv.onmouseleave = () => {
                             itemDiv.style.background = 'transparent';
                         };
@@ -4950,20 +4950,20 @@
                         // 文件夹不响应悬停效果
                         itemDiv.style.cursor = 'default';
                     }
-                    
+
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.style.cssText = `
                         margin-right: 0.5rem;
                     `;
-                    
+
                     // 设置数据属性以便后续查找
                     checkbox.setAttribute('data-path', node.path);
-                    
+
                     // 检查文件是否已被选中
                     const isSelected = selectedContextFiles.some(f => f.path === node.path);
                     checkbox.checked = isSelected;
-                    
+
                     // 默认选中架构概览文档
                     if (node.name === '2、架构概览.md') {
                         checkbox.checked = true;
@@ -4975,20 +4975,20 @@
                             });
                         }
                     }
-                    
+
                     // 当前文件默认选中且不可取消
                     const currentFileName = currentFile ? currentFile.split('/').pop() : null;
                     if (node.is_file && currentFileName && node.name === currentFileName) {
                         checkbox.checked = true;
                         checkbox.disabled = true; // 当前文件不可取消选择
                     }
-                    
+
                     // 文件夹不能被选择
                     if (!node.is_file) {
                         checkbox.style.visibility = 'hidden'; // 隐藏文件夹的复选框
                         checkbox.disabled = true;
                     }
-                    
+
                     checkbox.onchange = (e) => {
                         if (e.target.checked) {
                             // 添加到选中列表
@@ -5003,52 +5003,52 @@
                         // 更新上下文标签显示
                         updateContextTags();
                     };
-                    
+
                     const icon = document.createElement('span');
                     icon.style.cssText = `
                         margin-right: 0.5rem;
                         width: 20px;
                         text-align: center;
                     `;
-                    
+
                     if (node.is_file) {
                         icon.textContent = '📄';
                     } else {
                         icon.textContent = '📁';
                     }
-                    
+
                     const nameSpan = document.createElement('span');
                     nameSpan.textContent = node.name;
                     nameSpan.style.cssText = `
                         flex: 1;
                         color: var(--text-primary);
                     `;
-                    
+
                     // 添加缩进
                     itemDiv.style.paddingLeft = `${0.5 + level * 1}rem`;
-                    
+
                     // 为文件添加点击整个行选择的功能
                     if (node.is_file) {
                         itemDiv.onclick = (e) => {
                             // 如果点击的是复选框本身，不处理（避免重复触发）
                             if (e.target === checkbox) return;
-                            
+
                             // 如果是当前文件，不允许取消选择
                             const currentFileName = currentFile ? currentFile.split('/').pop() : null;
                             if (currentFileName && node.name === currentFileName) return;
-                            
+
                             // 切换复选框状态
                             checkbox.checked = !checkbox.checked;
                             checkbox.onchange({ target: checkbox });
                         };
                     }
-                    
+
                     itemDiv.appendChild(checkbox);
                     itemDiv.appendChild(icon);
                     itemDiv.appendChild(nameSpan);
-                    
+
                     container.appendChild(itemDiv);
-                    
+
                     // 如果是文件夹，渲染子节点
                     if (!node.is_file && node.children && node.children.length > 0) {
                         node.children.forEach(child => {
@@ -5056,16 +5056,16 @@
                         });
                     }
                 }
-                
+
                 // 渲染整个文档树（跳过根节点）
                 if (originalTreeData && originalTreeData.children) {
                     originalTreeData.children.forEach(child => {
                         renderFileNode(child, fileList, 0);
                     });
                 }
-                
+
                 content.appendChild(fileList);
-                
+
                 const footer = document.createElement('div');
                 footer.style.cssText = `
                     padding: 1rem;
@@ -5075,7 +5075,7 @@
                     justify-content: flex-end;
                     gap: 0.5rem;
                 `;
-                
+
                 const cancelBtn = document.createElement('button');
                 cancelBtn.textContent = '取消';
                 cancelBtn.style.cssText = `
@@ -5087,7 +5087,7 @@
                     cursor: pointer;
                 `;
                 cancelBtn.onclick = () => document.body.removeChild(modal);
-                
+
                 const confirmBtn = document.createElement('button');
                 confirmBtn.textContent = '确认选择';
                 confirmBtn.style.cssText = `
@@ -5103,20 +5103,20 @@
                     updateContextTags();
                     document.body.removeChild(modal);
                 };
-                
+
                 footer.appendChild(cancelBtn);
                 footer.appendChild(confirmBtn);
-                
+
                 header.appendChild(title);
                 header.appendChild(closeBtn);
-                
+
                 container.appendChild(header);
                 container.appendChild(content);
                 container.appendChild(footer);
-                
+
                 modal.appendChild(container);
                 document.body.appendChild(modal);
-                
+
                 // 点击背景关闭
                 modal.onclick = (e) => {
                     if (e.target === modal) {
@@ -5129,13 +5129,13 @@
             function updateContextTags() {
                 const tagsContainer = document.getElementById('contextTagsContainer');
                 if (!tagsContainer) return;
-                
+
                 // 清空现有标签
                 tagsContainer.innerHTML = '';
-                
+
                 // 获取当前文件名
                 const currentFileName = currentFile ? currentFile.split('/').pop() : null;
-                
+
                 // 为每个选中的文件创建标签
                 selectedContextFiles.forEach((file, index) => {
                     const tag = document.createElement('div');
@@ -5150,7 +5150,7 @@
                         margin-bottom: 0.5rem;
                         font-size: 0.85rem;
                     `;
-                    
+
                     const nameSpan = document.createElement('span');
                     nameSpan.textContent = file.name;
                     nameSpan.style.cssText = `
@@ -5160,7 +5160,7 @@
                         text-overflow: ellipsis;
                         white-space: nowrap;
                     `;
-                    
+
                     // 如果是当前文件，不显示删除按钮
                     if (currentFileName && file.name === currentFileName) {
                         tag.style.background = 'var(--text-secondary)'; // 不同的颜色表示不可删除
@@ -5183,7 +5183,7 @@
                             align-items: center;
                             justify-content: center;
                         `;
-                        
+
                         removeBtn.onclick = () => {
                             // 从选中列表中移除
                             selectedContextFiles = selectedContextFiles.filter(f => f.path !== file.path);
@@ -5195,11 +5195,11 @@
                                 checkbox.checked = false;
                             }
                         };
-                        
+
                         tag.appendChild(nameSpan);
                         tag.appendChild(removeBtn);
                     }
-                    
+
                     tagsContainer.appendChild(tag);
                 });
             }
@@ -5211,7 +5211,7 @@
                     name: '2、架构概览.md',
                     path: '2、架构概览.md'
                 }];
-                
+
                 // 如果有当前文件，也添加到上下文
                 if (currentFile) {
                     const currentFileName = currentFile.split('/').pop();
@@ -5220,7 +5220,7 @@
                         path: currentFile
                     });
                 }
-                
+
                 // 更新上下文标签显示
                 updateContextTags();
             }
@@ -5232,7 +5232,7 @@
                     // 如果正在使用输入法，不处理 Enter 键
                     return;
                 }
-                
+
                 // 检查是否输入了@符号
                 if (event.key === '@') {
                     // 延迟显示文档选择面板，确保@符号已经输入
@@ -5241,7 +5241,7 @@
                     }, 10);
                     return;
                 }
-                
+
                 if (event.key === 'Enter' && !event.shiftKey) {
                     event.preventDefault();
                     sendMessage();
@@ -5262,7 +5262,7 @@
                 const input = document.getElementById('aiInput');
                 const sendBtn = document.getElementById('aiSendBtn');
                 const hasText = input.value.trim().length > 0;
-                
+
                 sendBtn.disabled = !hasText || isAiLoading;
             }
 
@@ -5270,35 +5270,35 @@
             async function sendMessage() {
                 const input = document.getElementById('aiInput');
                 const message = input.value.trim();
-                
+
                 if (!message || isAiLoading) return;
-                
+
                 // 清空输入框（但保留上下文指示器）
                 input.value = '';
                 adjustTextareaHeight(input);
                 updateSendButton();
-                
+
                 // 添加用户消息到界面
                 addMessage(message, 'user');
-                
+
                 // 添加用户消息到历史记录
                 chatHistory.push({
                     role: 'user',
                     content: message
                 });
-                
+
                 // 自动折叠推荐区域（首次发送消息后）
                 autoCollapseSuggestions();
-                
+
                 // 创建AI消息容器，用于流式显示
                 const aiMessageElement = addStreamingMessage();
                 isAiLoading = true;
                 updateSendButton();
-                
+
                 try {
                     // 获取选中的上下文文件内容
                     const context = await getSelectedContextFilesContent();
-                    
+
                     // 调用流式AI API
                     const response = await fetch('/api/chat', {
                         method: 'POST',
@@ -5312,22 +5312,22 @@
                             history: chatHistory.slice(0, -1) // 发送除了当前消息之外的历史记录
                         })
                     });
-                    
+
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
-                    
+
                     // 处理流式响应
                     await handleStreamResponse(response, aiMessageElement);
-                    
+
                 } catch (error) {
                     console.error('AI请求失败:', error);
-                    
+
                     // 移除流式消息容器
                     if (aiMessageElement && aiMessageElement.parentNode) {
                         aiMessageElement.parentNode.removeChild(aiMessageElement);
                     }
-                    
+
                     // 显示错误消息
                     addMessage('抱歉，我现在无法回答您的问题。请稍后再试。', 'assistant', true);
                 } finally {
@@ -5339,20 +5339,20 @@
             // 创建流式消息容器
             function addStreamingMessage() {
                 const messagesContainer = document.getElementById('aiChatMessages');
-                
+
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'ai-message ai-message-assistant';
-                
+
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'ai-message-content';
                 contentDiv.innerHTML = '<span class="ai-cursor">|</span>'; // 添加光标效果
-                
+
                 messageDiv.appendChild(contentDiv);
                 messagesContainer.appendChild(messageDiv);
-                
+
                 // 滚动到底部
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
+
                 return messageDiv;
             }
 
@@ -5362,47 +5362,47 @@
                 const decoder = new TextDecoder();
                 let fullContent = '';
                 const contentDiv = messageElement.querySelector('.ai-message-content');
-                
+
                 try {
                     while (true) {
                         const { done, value } = await reader.read();
-                        
+
                         if (done) break;
-                        
+
                         const chunk = decoder.decode(value, { stream: true });
                         const lines = chunk.split('\n');
-                        
+
                         for (const line of lines) {
                             if (line.startsWith('data: ')) {
                                 const data = line.slice(6);
-                                
+
                                 if (data === '[DONE]') {
                                     // 移除光标
                                     contentDiv.innerHTML = renderSimpleMarkdown(fullContent);
                                     return;
                                 }
-                                
+
                                 try {
                                     const event = JSON.parse(data);
-                                    
+
                                     if (event.event_type === 'content' && event.content) {
                                         fullContent += event.content;
                                         // 更新显示内容，保持光标
                                         contentDiv.innerHTML = renderSimpleMarkdown(fullContent) + '<span class="ai-cursor">|</span>';
-                                        
+
                                         // 滚动到底部
                                         const messagesContainer = document.getElementById('aiChatMessages');
                                         messagesContainer.scrollTop = messagesContainer.scrollHeight;
                                     } else if (event.event_type === 'finish') {
                                         // 移除光标
                                         contentDiv.innerHTML = renderSimpleMarkdown(fullContent);
-                                        
+
                                         // 添加AI回复到历史记录
                                         chatHistory.push({
                                             role: 'assistant',
                                             content: fullContent
                                         });
-                                        
+
                                         // 更新建议问题
                                         if (event.suggestions) {
                                             updateSuggestions(event.suggestions);
@@ -5440,40 +5440,40 @@
             // 添加消息到聊天区域
             function addMessage(content, type, isError = false) {
                 const messagesContainer = document.getElementById('aiChatMessages');
-                
+
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `ai-message ai-message-${type}`;
-                
+
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'ai-message-content';
-                
+
                 if (type === 'assistant' && !isError) {
                     // 对AI回复进行简单的代码渲染
                     contentDiv.innerHTML = renderSimpleMarkdown(content);
                 } else {
                     contentDiv.textContent = content;
                 }
-                
+
                 if (isError) {
                     contentDiv.style.color = '#dc3545';
                 }
-                
+
                 messageDiv.appendChild(contentDiv);
                 messagesContainer.appendChild(messageDiv);
-                
+
                 // 滚动到底部
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
+
                 return messageDiv;
             }
 
             // 添加加载消息
             function addLoadingMessage() {
                 const messagesContainer = document.getElementById('aiChatMessages');
-                
+
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'ai-message ai-message-loading';
-                
+
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'ai-message-content';
                 contentDiv.innerHTML = `
@@ -5484,13 +5484,13 @@
                         <div class="ai-typing-dot"></div>
                     </div>
                 `;
-                
+
                 messageDiv.appendChild(contentDiv);
                 messagesContainer.appendChild(messageDiv);
-                
+
                 // 滚动到底部
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
+
                 return messageDiv;
             }
 
@@ -5506,7 +5506,7 @@
                 // 先处理 mermaid 代码块（在普通代码块之前）
                 const mermaidBlocks = [];
                 const mermaidPlaceholders = [];
-                
+
                 text = text.replace(/```mermaid\n([\s\S]*?)\n```/g, (match, mermaidCode) => {
                     const mermaidId = `mermaid-ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
                     const placeholder = `__MERMAID_PLACEHOLDER_${mermaidId}__`;
@@ -5544,7 +5544,7 @@
                                     console.log('渲染AI消息中的Mermaid图表:', block.id, '代码:', block.code);
                                     // 确保元素内容是纯文本，没有HTML标签
                                     element.textContent = block.code;
-                                    
+
                                     // 使用 mermaid.run() 渲染图表
                                     mermaid.run(undefined, `#${block.id}`).then(() => {
                                         console.log('Mermaid图表渲染成功:', block.id);
@@ -5581,14 +5581,14 @@
             // 更新建议问题
             function updateSuggestions(suggestions) {
                 const suggestionsContainer = document.querySelector('.ai-suggestions-list');
-                
+
                 if (!suggestions || suggestions.length === 0) {
                     return;
                 }
-                
+
                 // 清空现有建议
                 suggestionsContainer.innerHTML = '';
-                
+
                 // 添加新建议
                 suggestions.forEach(suggestion => {
                     const button = document.createElement('button');
@@ -5597,7 +5597,7 @@
                     button.onclick = () => sendSuggestion(suggestion);
                     suggestionsContainer.appendChild(button);
                 });
-                
+
                 // 如果推荐区域是折叠的，可以选择性地展开（这里我们保持折叠状态，让用户手动点击展开）
                 // 这样可以节省空间，同时用户可以根据需要查看新的建议
             }
@@ -5611,7 +5611,7 @@
                         updateSendButton();
                     });
                 }
-                
+
                 // 初始化默认选中的上下文文件（架构概览文档）
                 initializeDefaultContext();
             });
@@ -5623,7 +5623,7 @@
                     name: '2、架构概览.md',
                     path: '2、架构概览.md'
                 }];
-                
+
                 // 更新上下文标签显示
                 updateContextTags();
             }
@@ -5632,9 +5632,9 @@
             document.addEventListener('click', (event) => {
                 const panel = document.getElementById('aiAssistantPanel');
                 const trigger = document.getElementById('aiAssistantTrigger');
-                
-                if (isAiAssistantOpen && 
-                    !panel.contains(event.target) && 
+
+                if (isAiAssistantOpen &&
+                    !panel.contains(event.target) &&
                     !trigger.contains(event.target)) {
                     // 可以选择是否启用点击外部关闭功能
                     // toggleAiAssistant();
