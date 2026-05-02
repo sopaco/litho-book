@@ -1857,7 +1857,7 @@
                 <button
                     class="settings-btn"
                     onclick="openSettings()"
-                    title="设置"
+                    title="{{ i18n.settings_title }}"
                 >
                     <svg
                         width="20"
@@ -1898,7 +1898,7 @@
                                 d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
                             ></path>
                         </svg>
-                        设置
+                        {{ i18n.settings_title }}
                     </div>
                     <button class="settings-close" onclick="closeSettings()">
                         <svg
@@ -2023,7 +2023,7 @@
         <div class="container">
             <div class="sidebar" id="sidebar">
                 <div class="sidebar-header">
-                    <div class="sidebar-title">文档目录</div>
+                    <div class="sidebar-title">{{ i18n.sidebar_title }}</div>
                     <button class="toggle-btn" onclick="toggleSidebar()">
                         <svg
                             width="16"
